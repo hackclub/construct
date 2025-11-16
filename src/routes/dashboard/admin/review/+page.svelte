@@ -21,118 +21,141 @@
 	);
 </script>
 
-<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Review</h1>
+<div class="flex h-full flex-col">
+	<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Review</h1>
 
-<div class="flex flex-col-reverse gap-5 lg:flex-row">
-	<div class="themed-box grow p-3">
-		<h2 class="mb-2 text-xl font-bold">Filter & Sort</h2>
-		<form method="POST" use:enhance>
-			<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-				<!-- Project status -->
-				<label class="flex flex-col gap-1">
-					<span class="font-medium">Status</span>
-					<select
-						class="grow border-3 border-amber-700 bg-amber-900 fill-amber-50 p-2 text-sm ring-amber-900 placeholder:text-amber-900 active:ring-3"
-						name="status"
-						value={form?.fields.status ?? ['submitted']}
-						multiple
-					>
-						<option value="building" class="truncate">Building</option>
-						<option value="submitted" class="truncate">Submitted</option>
-						<option value="t1_approved" class="truncate">Review approved</option>
-						<option value="t2_approved" class="truncate">YSWS review approved</option>
-						<option value="finalized" class="truncate">Finalized</option>
-						<option value="rejected" class="truncate">Rejected</option>
-						<option value="rejected_locked" class="truncate">Rejected (locked)</option>
-					</select>
-				</label>
+	<div class="flex flex-col-reverse gap-5 lg:flex-row">
+		<div class="themed-box grow p-3">
+			<h2 class="mb-2 text-xl font-bold">Filter & Sort</h2>
+			<form method="POST" use:enhance>
+				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+					<!-- Project status -->
+					<label class="flex flex-col gap-1">
+						<span class="font-medium">Status</span>
+						<select
+							class="grow border-3 border-amber-700 bg-amber-900 fill-amber-50 p-2 text-sm ring-amber-900 placeholder:text-amber-900 active:ring-3"
+							name="status"
+							value={form?.fields.status ?? ['submitted']}
+							multiple
+						>
+							<option value="building" class="truncate">Building</option>
+							<option value="submitted" class="truncate">Submitted</option>
+							<option value="t1_approved" class="truncate">Review approved</option>
+							<option value="t2_approved" class="truncate">YSWS review approved</option>
+							<option value="finalized" class="truncate">Finalized</option>
+							<option value="rejected" class="truncate">Rejected</option>
+							<option value="rejected_locked" class="truncate">Rejected (locked)</option>
+						</select>
+					</label>
 
-				<!-- Project -->
-				<label class="flex flex-col">
-					<span class="mb-1 font-medium">Project</span>
-					<input
-						type="text"
-						placeholder="search"
-						bind:value={projectSearch}
-						class="themed-input-light border-b-0 py-1.5"
-					/>
-					<select
-						class="themed-input-light grow"
-						name="project"
-						value={form?.fields.project ?? []}
-						multiple
-					>
-						{#each filteredProjects as project}
-							<option value={project.id} class="truncate">{project.name}</option>
-						{/each}
-					</select>
-				</label>
+					<!-- Project -->
+					<label class="flex flex-col">
+						<span class="mb-1 font-medium">Project</span>
+						<input
+							type="text"
+							placeholder="search"
+							bind:value={projectSearch}
+							class="themed-input-light border-b-0 py-1.5"
+						/>
+						<select
+							class="themed-input-light grow"
+							name="project"
+							value={form?.fields.project ?? []}
+							multiple
+						>
+							{#each filteredProjects as project}
+								<option value={project.id} class="truncate">{project.name}</option>
+							{/each}
+						</select>
+					</label>
 
-				<!-- User -->
-				<label class="flex flex-col">
-					<span class="mb-1 font-medium">User</span>
-					<input
-						type="text"
-						placeholder="search"
-						bind:value={userSearch}
-						class="themed-input-light border-b-0 py-1.5"
-					/>
-					<select
-						class="themed-input-light grow"
-						name="user"
-						value={form?.fields.user ?? []}
-						multiple
-					>
-						{#each filteredUsers as user}
-							<option value={user?.id} class="truncate">{user?.name}</option>
-						{/each}
-					</select>
-				</label>
-			</div>
-			<button type="submit" class="button md amber mt-3 w-full">Apply!</button>
-		</form>
-	</div>
-	<div class="themed-box grow p-3 lg:min-w-[30%]">
-		<h2 class="text-xl font-bold">Leaderboard</h2>
-	</div>
-</div>
-
-<h2 class="mt-4 mb-2 text-2xl font-bold">Projects</h2>
-
-<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-	{#each projects as project}
-		<div class="themed-box relative flex flex-col p-3 shadow-lg/20 transition-all hover:scale-102">
-			<a
-				class="absolute inset-0 z-1"
-				href={`/dashboard/projects/${project.project.id}`}
-				aria-label="project"
-			>
-			</a>
-			<h1 class="flex flex-row gap-1 text-xl font-semibold">
-				<span class="grow truncate">{project.project.name}</span>
-			</h1>
-			<p class="grow">{project.project.description}</p>
-			{#if project.project.url && project.project.url.length > 0}
-				<div class="my-2 flex">
-					<a class="button sm amber relative z-2" href={project.project.url} target="_blank">
-						<ExternalLink />
-						Link to project
-					</a>
+					<!-- User -->
+					<label class="flex flex-col">
+						<span class="mb-1 font-medium">User</span>
+						<input
+							type="text"
+							placeholder="search"
+							bind:value={userSearch}
+							class="themed-input-light border-b-0 py-1.5"
+						/>
+						<select
+							class="themed-input-light grow"
+							name="user"
+							value={form?.fields.user ?? []}
+							multiple
+						>
+							{#each filteredUsers as user}
+								<option value={user?.id} class="truncate">{user?.name}</option>
+							{/each}
+						</select>
+					</label>
 				</div>
-			{:else}
-				<div class="mb-2"></div>
-			{/if}
-			<p class="text-sm">
-				{project.devlogCount} journal{project.devlogCount !== 1 ? 's' : ''} ∙ {Math.floor(project.timeSpent / 60)}h {project.timeSpent % 60}min
-			</p>
-			<div class="flex flex-row gap-4">
-				<p class="grow text-sm">
-					Created <abbr title={`${project.project.createdAt.toUTCString()}`} class="relative z-2">
-						{relativeDate(project.project.createdAt)}
-					</abbr>
+				<button type="submit" class="button md amber mt-3 w-full">Apply!</button>
+			</form>
+		</div>
+		<div class="themed-box grow p-3 lg:min-w-[30%]">
+			<h2 class="text-xl font-bold">Leaderboard</h2>
+		</div>
+	</div>
+
+	<h2 class="mt-4 mb-2 text-2xl font-bold">Projects</h2>
+
+	{#if projects.length == 0}
+		<div class="flex grow items-center justify-center">
+			<div>
+				<p class="themed-box p-3 shadow-lg/20">
+					No projects found matching the filter <img
+						src="https://emoji.slack-edge.com/T0266FRGM/heavysob/55bf09f6c9d93d08.png"
+						alt="heavysob"
+						class="inline h-5.5"
+					/>
 				</p>
-				<p class="text-sm">{projectStatuses[project.project.status]}</p>
 			</div>
 		</div>
-	{/each}
+	{:else}
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+			{#each projects as project}
+				<div
+					class="themed-box relative flex flex-col p-3 shadow-lg/20 transition-all hover:scale-102"
+				>
+					<a
+						class="absolute inset-0 z-1"
+						href={`/dashboard/projects/${project.project.id}`}
+						aria-label="project"
+					>
+					</a>
+					<h1 class="flex flex-row gap-1 text-xl font-semibold">
+						<span class="grow truncate">{project.project.name}</span>
+					</h1>
+					<p class="grow">{project.project.description}</p>
+					{#if project.project.url && project.project.url.length > 0}
+						<div class="my-2 flex">
+							<a class="button sm amber relative z-2" href={project.project.url} target="_blank">
+								<ExternalLink />
+								Link to project
+							</a>
+						</div>
+					{:else}
+						<div class="mb-2"></div>
+					{/if}
+					<p class="text-sm">
+						{project.devlogCount} journal{project.devlogCount !== 1 ? 's' : ''} ∙ {Math.floor(
+							project.timeSpent / 60
+						)}h {project.timeSpent % 60}min
+					</p>
+					<div class="flex flex-row gap-4">
+						<p class="grow text-sm">
+							Created <abbr
+								title={`${project.project.createdAt.toUTCString()}`}
+								class="relative z-2"
+							>
+								{relativeDate(project.project.createdAt)}
+							</abbr>
+						</p>
+						<p class="text-sm">{projectStatuses[project.project.status]}</p>
+					</div>
+				</div>
+			{/each}
+		</div>
+	{/if}
 </div>

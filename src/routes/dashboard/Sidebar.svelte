@@ -35,11 +35,11 @@
 			Review
 		</SidebarButton>
 	{/if}
-	{#if user.hasT2Review}
+	<!-- {#if user.hasT2Review}
 		<SidebarButton icon={ClipboardPenLine} href="/dashboard/admin/ysws-review" admin={true}>
 			YSWS Review
 		</SidebarButton>
-	{/if}
+	{/if} -->
 	<div class="grow"></div>
 	<a
 		href={isOnOwnUserPage ? null : `/dashboard/users/${user.id}`}

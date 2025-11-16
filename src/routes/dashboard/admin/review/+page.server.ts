@@ -91,7 +91,8 @@ export const actions = {
 				and(
 					eq(project.deleted, false),
 					inArray(project.status, statusFilter),
-					projectFilter.length > 0 ? inArray(project.id, projectFilter) : undefined
+					projectFilter.length > 0 ? inArray(project.id, projectFilter) : undefined,
+					userFilter.length > 0 ? inArray(project.userId, userFilter) : undefined,
 				)
 			)
 			.groupBy(project.id);
