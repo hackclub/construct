@@ -65,7 +65,7 @@
 		@apply flex cursor-pointer flex-row justify-center transition-colors;
 
 		&.sm {
-			@apply gap-1 p-2 text-sm hover:outline-2 focus:outline-2;
+			@apply gap-1 p-2 text-sm hover:outline-2 focus:outline-2 rounded-sm;
 
 			& .lucide-icon {
 				@apply size-[20px];
@@ -73,7 +73,7 @@
 		}
 
 		&.xs {
-			@apply gap-1 p-1.5 text-xs hover:outline-2 focus:outline-2;
+			@apply gap-1 p-1.5 text-xs hover:outline-2 focus:outline-2 rounded-sm;
 
 			& .lucide-icon {
 				@apply size-[16px];
@@ -81,7 +81,7 @@
 		}
 
 		&.md {
-			@apply gap-1 p-2 hover:outline-3 focus:outline-3;
+			@apply gap-1 p-2 hover:outline-3 focus:outline-3 rounded-lg;
 		}
 
 		&.disabled {
@@ -112,6 +112,6 @@
 
 @layer utilities {
 	.themed-box {
-		@apply border-3 border-dashed border-amber-900 bg-amber-950;
+		@apply border-3 rounded-lg border-dashed border-amber-900 bg-amber-950;
 	}
 }

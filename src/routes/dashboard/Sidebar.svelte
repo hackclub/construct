@@ -20,7 +20,7 @@
 	);
 </script>
 
-<div class="themed-box m-5 flex w-60 flex-none flex-col gap-2 p-3 shadow-lg/20 2xl:w-70">
+<div class="themed-box m-5 flex w-60 flex-none flex-col gap-2 p-3 shadow-lg/20 2xl:w-70 rounded-xl">
 	<div class="mb-0">
 		<a href="/">
 			<img src={logo} alt="logo" />
@@ -43,7 +43,7 @@
 	<div class="grow"></div>
 	<a
 		href={isOnOwnUserPage ? null : `/dashboard/users/${user.id}`}
-		class={`flex h-15 flex-row gap-3 border-2 shadow-xl/3 transition-colors 2xl:h-16 ${isOnOwnUserPage ? 'border-amber-700 bg-amber-800' : 'border-amber-800 bg-amber-900 hover:bg-amber-800 hover:outline-2 hover:outline-amber-100'}`}
+		class={`flex h-15 flex-row gap-3 overflow-clip rounded-lg border-2 shadow-xl/3 transition-colors 2xl:h-16 ${isOnOwnUserPage ? 'border-amber-700 bg-amber-800' : 'border-amber-800 bg-amber-900 hover:bg-amber-800 hover:outline-2 hover:outline-amber-100'}`}
 	>
 		<div class="aspect-square">
 			<img src={user.profilePicture} alt="User profile pic" class="aspect-square h-full" />
