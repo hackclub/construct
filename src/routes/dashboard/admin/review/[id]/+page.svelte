@@ -19,8 +19,8 @@
 							{relativeDate(data.project.project.createdAt)}
 						</abbr>
 						∙ Updated
-						<abbr title={`${new Date(data.project.lastUpdated).toUTCString()}`}>
-							{relativeDate(data.project.lastUpdated)}
+						<abbr title={`${new Date(data.project.project.updatedAt).toUTCString()}`}>
+							{relativeDate(data.project.project.updatedAt)}
 						</abbr>
 					</p>
 					<p>

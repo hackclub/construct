@@ -101,6 +101,13 @@ export const actions = {
 				and(eq(devlog.id, devlogId), eq(devlog.userId, locals.user.id), eq(devlog.deleted, false))
 			);
 
+		await db
+			.update(project)
+			.set({
+				updatedAt: new Date(Date.now())
+			})
+			.where(and(eq(project.id, queriedDevlog.projectId)));
+
 		return redirect(303, `/dashboard/projects/${id}`);
 	}
 } satisfies Actions;

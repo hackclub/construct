@@ -42,8 +42,8 @@
 		{relativeDate(data.project.createdAt)}
 	</abbr>
 	∙ Updated
-	<abbr title={`${new Date(data.project.lastUpdated).toUTCString()}`}>
-		{relativeDate(data.project.lastUpdated)}
+	<abbr title={`${new Date(data.project.updatedAt).toUTCString()}`}>
+		{relativeDate(data.project.updatedAt)}
 	</abbr>
 	∙ {Math.floor(data.project.timeSpent / 60)}h {data.project.timeSpent % 60}min
 </p>

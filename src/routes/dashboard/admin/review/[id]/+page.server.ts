@@ -22,6 +22,7 @@ export async function load({ locals, params }) {
 				description: project.description,
 				url: project.url,
 				createdAt: project.createdAt,
+				updatedAt: project.updatedAt,
 				status: project.status
 			},
 			user: {
@@ -32,12 +33,7 @@ export async function load({ locals, params }) {
 				hackatimeTrust: user.hackatimeTrust
 			},
 			timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
-			devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`,
-			lastUpdated: sql<Date>`CASE
-      WHEN MAX(${devlog.createdAt}) IS NULL THEN ${project.updatedAt}
-      WHEN MAX(${devlog.createdAt}) > ${project.updatedAt} THEN MAX(${devlog.createdAt})
-      ELSE ${project.updatedAt}
-    END`
+			devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`
 		})
 		.from(project)
 		.leftJoin(devlog, and(eq(project.id, devlog.projectId), eq(devlog.deleted, false)))

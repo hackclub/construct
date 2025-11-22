@@ -30,12 +30,7 @@ export async function load({ params }) {
 	const queriedProject = await db
 		.select({
 			project: project,
-			timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
-			lastUpdated: sql<Date>`CASE
-      WHEN MAX(${devlog.createdAt}) IS NULL THEN ${project.updatedAt}
-      WHEN MAX(${devlog.createdAt}) > ${project.updatedAt} THEN MAX(${devlog.createdAt})
-      ELSE ${project.updatedAt}
-    END`
+			timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`
 		})
 		.from(project)
 		.leftJoin(devlog, and(eq(project.id, devlog.projectId), eq(devlog.deleted, false)))
@@ -61,8 +56,8 @@ export async function load({ params }) {
 			description: queriedProject.project.description,
 			url: queriedProject.project.url,
 			createdAt: queriedProject.project.createdAt,
+			updatedAt: queriedProject.project.updatedAt,
 			timeSpent: queriedProject.timeSpent,
-			lastUpdated: queriedProject.lastUpdated,
 			status: queriedProject.project.status
 		},
 		devlogs: devlogs.map((devlog) => {
