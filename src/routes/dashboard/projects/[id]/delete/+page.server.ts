@@ -67,6 +67,7 @@ export const actions = {
 			throw error(404);
 		}
 
+		// Delete project
 		await db
 			.update(project)
 			.set({
@@ -78,6 +79,20 @@ export const actions = {
 					eq(project.id, queriedProject.id),
 					eq(project.userId, locals.user.id),
 					eq(project.deleted, false)
+				)
+			);
+		
+		// Mark all associated devlogs as deleted
+		await db
+			.update(devlog)
+			.set({
+				deleted: true,
+				updatedAt: new Date(Date.now())
+			})
+			.where(
+				and(
+					eq(devlog.projectId, queriedProject.id),
+					eq(devlog.userId, locals.user.id),
 				)
 			);
 
