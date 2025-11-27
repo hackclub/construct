@@ -6,7 +6,7 @@
 >
 	<div class="">
 		<p class="text-center">
-			Made with 💛 by <a href="https://hackclub.com" class="underline">Hack Clubbers</a>
+			A <a href="https://hackclub.com" class="underline">Hack Club</a> program. Made by teens, for teens!
 		</p>
 	</div>
 </footer>
