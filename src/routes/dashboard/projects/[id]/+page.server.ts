@@ -3,7 +3,6 @@ import { devlog, project } from '$lib/server/db/schema.js';
 import { error, fail } from '@sveltejs/kit';
 import { eq, and, desc, sql, or } from 'drizzle-orm';
 import type { Actions } from './$types';
-import { writeFile } from 'node:fs/promises';
 import { extname } from 'path';
 import {
 	ALLOWED_IMAGE_TYPES,
@@ -18,6 +17,9 @@ import {
 	DEVLOG_MAX_TIME,
 	DEVLOG_MIN_TIME
 } from '$lib/defs';
+import { S3 } from '$lib/server/s3';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { env } from '$env/dynamic/private';
 
 export async function load({ params }) {
 	const id: number = parseInt(params.id);
@@ -160,8 +162,7 @@ export const actions = {
 			});
 		}
 
-		const imagePath = `/images/${crypto.randomUUID()}${extname(imageFile.name)}`;
-		const imageFilename = `${process.env.UPLOADS_PATH ?? './uploads'}${imagePath}`;
+		const imagePath = `images/${crypto.randomUUID()}${extname(imageFile.name)}`;
 
 		// Validate model
 		let modelPath = null;
@@ -184,22 +185,32 @@ export const actions = {
 				});
 			}
 
-			modelPath = `/models/${crypto.randomUUID()}${extname(modelFile.name)}`;
+			modelPath = `models/${crypto.randomUUID()}${extname(modelFile.name)}`;
 
-			const modelFilename = `${process.env.UPLOADS_PATH ?? './uploads'}${modelPath}`;
-			await writeFile(modelFilename, Buffer.from(await modelFile.arrayBuffer()));
+			const modelCommand = new PutObjectCommand({
+				Bucket: env.S3_BUCKET_NAME,
+				Key: modelPath,
+				Body: Buffer.from(await modelFile.arrayBuffer())
+			});
+			await S3.send(modelCommand);
 		}
 
 		// Remove Exif metadata and save (we don't want another Hack Club classic PII leak :D)
 		const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
-		await writeFile(imageFilename, await sharp(imageBuffer).toBuffer());
+
+		const imageCommand = new PutObjectCommand({
+			Bucket: env.S3_BUCKET_NAME,
+			Key: imagePath,
+			Body: await sharp(imageBuffer).toBuffer()
+		});
+		await S3.send(imageCommand);
 
 		await db.insert(devlog).values({
 			userId: locals.user.id,
 			projectId: queriedProject.id,
 			description: description.toString().trim(),
-			image: '/uploads' + imagePath,
-			model: modelPath ? '/uploads' + modelPath : null,
+			image: imagePath,
+			model: modelPath ? modelPath : null,
 			timeSpent: parseInt(timeSpent.toString()),
 			createdAt: new Date(Date.now()),
 			updatedAt: new Date(Date.now())

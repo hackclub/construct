@@ -100,7 +100,7 @@ export async function GET(event) {
 		const redirectURL = new URL(`${url.protocol}//${url.host}/auth/failed`);
 		return redirect(302, redirectURL);
 	}
-	
+
 	const slackProfile = slackProfileResJSON['user'];
 
 	const profilePic = slackProfile['profile']['image_1024'];

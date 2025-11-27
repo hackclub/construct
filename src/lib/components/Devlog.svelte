@@ -7,6 +7,7 @@
 	import { OBJLoader, STLLoader, ThreeMFLoader } from 'three/examples/jsm/Addons.js';
 	import { OrbitControls } from 'three/examples/jsm/Addons.js';
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 
 	let { devlog, projectId, showModifyButtons, allowDelete = true, projectName = null } = $props();
 
@@ -40,7 +41,7 @@
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 		// There's no reason to set the aspect here because we're going
-		// to set it every frame anyway so we'll set it to 2 since 2
+		// to set it every frame anyway so we'l`${page.data.s3PublicUrl}/${devlog.image}`l set it to 2 since 2
 		// is the the aspect for the canvas default size (300w/150h = 2)
 		const camera = new THREE.PerspectiveCamera(40, 2, 1, 1000);
 		camera.rotation.x = -45 * degree;
@@ -264,10 +265,8 @@
 				return;
 		}
 
-		console.log('model: ', devlog.model);
-
 		loader.load(
-			devlog.model,
+			page.data.s3PublicUrl + '/' + devlog.model,
 			(geoOrObject) =>
 				geoOrObject instanceof THREE.BufferGeometry
 					? parseGeometry(geoOrObject)
@@ -316,7 +315,7 @@
 		>
 			<div class="flex justify-center">
 				<img
-					src={`${devlog.image}`}
+					src={`${page.data.s3PublicUrl}/${devlog.image}`}
 					alt="Journal image"
 					class="max-h-full max-w-full object-contain"
 				/>
@@ -330,7 +329,10 @@
 	</div>
 	{#if showModifyButtons}
 		<div class="mt-1 flex flex-row gap-1">
-			<a href={`/dashboard/projects/${projectId}/devlog/${devlog.id}/edit`} class="button xs primary">
+			<a
+				href={`/dashboard/projects/${projectId}/devlog/${devlog.id}/edit`}
+				class="button xs primary"
+			>
 				<SquarePen />
 				Edit
 			</a>

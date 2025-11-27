@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/private';
 import { redirect } from '@sveltejs/kit';
 
 export function load({ locals }) {
@@ -14,7 +15,8 @@ export function load({ locals }) {
 			hasT1Review: locals.user.hasT1Review,
 			hasT2Review: locals.user.hasT2Review,
 			hasProjectAuditLogs: locals.user.hasProjectAuditLogs,
-			hasSessionAuditLogs: locals.user.hasSessionAuditLogs,
-		}
+			hasSessionAuditLogs: locals.user.hasSessionAuditLogs
+		},
+		s3PublicUrl: env.S3_PUBLIC_URL
 	};
 }
