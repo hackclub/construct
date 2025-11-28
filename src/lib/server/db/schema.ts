@@ -36,6 +36,8 @@ export const user = pgTable('user', {
 	hasT1Review: boolean().notNull().default(false), // Has access to t1 review
 	hasT2Review: boolean().notNull().default(false), // Has access to t2 review
 
+	hasAdmin: boolean().notNull().default(false), // Has access to admin section
+
 	createdAt: timestamp().notNull().defaultNow(), // Account creation timestamp
 	lastLoginAt: timestamp().notNull().defaultNow() // Last login timestamp
 });
