@@ -57,7 +57,7 @@ services:
     env_file:
       - .env
     pull_policy: always
-    image: ghcr.io/arcaege/construct:latest
+    image: ghcr.io/hackclub/construct:latest
 networks: {}
 volumes:
   constructdb:
