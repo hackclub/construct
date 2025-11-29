@@ -7,12 +7,13 @@
 	import Shop from './Shop.svelte';
 	import Footer from './Footer.svelte';
 
-	import model from '$lib/assets/keyring.obj?url';
+	import model from '$lib/assets/Construct Logo.3mf?url';
+	import modelImage from '$lib/assets/model.png';
 
 	let { data } = $props();
 
 	import * as THREE from 'three';
-	import { OBJLoader } from 'three/examples/jsm/Addons.js';
+	import { ThreeMFLoader } from 'three/examples/jsm/Addons.js';
 	import { OrbitControls } from 'three/examples/jsm/Addons.js';
 	import { onMount } from 'svelte';
 	import Head from '$lib/components/Head.svelte';
@@ -59,21 +60,21 @@
 		controls.enablePan = false;
 		controls.dampingFactor = 0.1;
 		controls.enableDamping = true;
-		controls.autoRotate = true;
+		controls.autoRotate = false;
 		controls.autoRotateSpeed = 2;
 		controls.update();
 
 		// Lighting
-		const hemisphere = new THREE.HemisphereLight(0xffffff, 0xffffff, 1.1);
+		const hemisphere = new THREE.HemisphereLight(0xffffff, 0xffffff, 4);
 		scene.add(hemisphere);
 
-		const directional = new THREE.DirectionalLight(0xffffff, 1.1);
+		const directional = new THREE.DirectionalLight(0xffffff, 1);
 		directional.castShadow = true;
 		directional.shadow.mapSize.width = 2048;
 		directional.shadow.mapSize.height = 2048;
 		scene.add(directional);
 
-		const directional2 = new THREE.DirectionalLight(0xffffff, 1.1);
+		const directional2 = new THREE.DirectionalLight(0xffffff, 1);
 		directional2.castShadow = true;
 		directional2.shadow.mapSize.width = 2048;
 		directional2.shadow.mapSize.height = 2048;
@@ -92,20 +93,20 @@
 			}
 		}
 
-		var meshMaterial = new THREE.MeshStandardMaterial({
-			transparent: true,
-			opacity: 0.9,
-			color: 0xb2a090,
-			roughness: 0.5,
-			flatShading: false,
-			side: THREE.DoubleSide
-		});
+		// var meshMaterial = new THREE.MeshStandardMaterial({
+		// 	transparent: true,
+		// 	opacity: 1,
+		// 	color: 0xb2a090,
+		// 	roughness: 0.5,
+		// 	flatShading: false,
+		// 	side: THREE.DoubleSide
+		// });
 
 		function parseObject(object: THREE.Group<THREE.Object3DEventMap>) {
 			object = object as THREE.Group<THREE.Object3DEventMap> & { children: THREE.Mesh[] };
 
 			object.rotation.x = THREE.MathUtils.degToRad(-90);
-			object.rotation.z = THREE.MathUtils.degToRad(-25);
+			// object.rotation.z = THREE.MathUtils.degToRad(-25);
 
 			const aabb = new THREE.Box3().setFromObject(object);
 			const center = aabb.getCenter(new THREE.Vector3());
@@ -121,8 +122,8 @@
 			box.getSize(size);
 			const largestDimension = Math.max(size.x, size.y, size.z);
 
-			camera.position.z = largestDimension * 0.6;
-			camera.position.y = largestDimension * 1.4;
+			camera.position.z = largestDimension * 0.3;
+			camera.position.y = largestDimension * 1.38;
 
 			directional.position.set(largestDimension * 2, largestDimension * 2, largestDimension * 2);
 			directional2.position.set(-largestDimension * 2, largestDimension * 2, -largestDimension * 2);
@@ -155,11 +156,11 @@
 				// 	material.needsUpdate = true;
 				// }
 
-				if (Array.isArray(mesh.material)) {
-					mesh.material = meshMaterial;
-				} else if (mesh.material instanceof THREE.Material) {
-					mesh.material = meshMaterial;
-				}
+				// if (Array.isArray(mesh.material)) {
+				// 	mesh.material = meshMaterial;
+				// } else if (mesh.material instanceof THREE.Material) {
+				// 	mesh.material = meshMaterial;
+				// }
 
 				const edges = new THREE.EdgesGeometry(mesh.geometry);
 				const lines = new THREE.LineSegments(
@@ -187,7 +188,7 @@
 			scene.add(object);
 		}
 
-		var loader = new OBJLoader();
+		var loader = new ThreeMFLoader();
 
 		loader.load(
 			model,
@@ -217,24 +218,40 @@
 
 <div class="flex w-full flex-col items-center justify-center px-10 lg:flex-row">
 	<div class="mt-30">
-		<div class="flex flex-row">
-			<a class="mb-5 flex h-7 flex-row items-center gap-2 hover:opacity-50 transition-opacity shrink pr-2" href="https://hackclub.com">
+		<div class="relative z-1 flex flex-row">
+			<a
+				class="mb-1 flex h-7 shrink flex-row items-center gap-2 pr-2 transition-opacity hover:opacity-50"
+				href="https://hackclub.com"
+			>
 				<img src="https://assets.hackclub.com/icon-rounded.svg" alt="Hack Club logo" class="h-7" />
-				<p class="text-lg font-semibold"><span class="text-hc-red-500">Hack Club</span> presents...</p>
+				<p class="text-lg font-semibold">
+					<span class="font-bold text-hc-red-500">Hack Club</span> presents...
+				</p>
 			</a>
 		</div>
-		<h1 class="font-hero text-4xl text-primary-500 sm:text-5xl md:text-6xl">Construct</h1>
-		<p class="my-3 text-xl font-medium">Spend 50 hours doing CAD projects, get a 3D printer!</p>
-		{#if data.loggedIn}
-			<Button text="Go to dashboard" href="/dashboard" />
-		{:else}
-			<Button text="Login with Hack Club" href="/auth/idv" />
-		{/if}
-		<p class="text-md my-3">Ages 13-18, launching [TBD]!</p>
-	</div>
-	<div class="mt-12 flex h-100 w-80 flex-col md:w-100">
-		<canvas class="h-full w-full" id={`canvas`}></canvas>
-		<p class="mt-2 w-full text-center text-sm">interact with me!</p>
+		<div class="hidden sm:block">
+			<div
+				class="group z-0 flex flex-col overflow-clip transition-all hover:h-130 sm:h-25 sm:w-150 md:h-30 md:w-160 lg:h-35 lg:w-200"
+			>
+				<canvas
+					class="h-200 w-full transition-transform sm:translate-y-[-255px] sm:group-hover:-translate-y-15 md:translate-y-[-255px] md:group-hover:-translate-y-15 lg:translate-y-[-330px] lg:group-hover:-translate-y-35"
+					width="200"
+					height="200"
+					id={`canvas`}
+				></canvas>
+			</div>
+			<p class="relative z-1 mt-2 w-full animate-pulse text-center text-sm">interact with me!</p>
+		</div>
+		<img src={modelImage} alt="construct model logo" class="mt-3 mb-6 sm:hidden" />
+		<div class="relative z-1 w-full text-center">
+			<p class="my-3 text-xl font-medium">Spend 50 hours doing CAD projects, get a 3D printer!</p>
+			{#if data.loggedIn}
+				<Button text="Go to dashboard" href="/dashboard" />
+			{:else}
+				<Button text="Login with Hack Club" href="/auth/idv" />
+			{/if}
+			<p class="text-md my-3">Ages 13-18, launching [TBD]!</p>
+		</div>
 	</div>
 </div>
 
@@ -284,6 +301,17 @@
 				</a>.
 			</p>
 		</Accordion>
+	</div>
+</div>
+
+<div class="mt-15 mb-30 flex flex-col items-center justify-center gap-5 px-10">
+	<h1 class="text-center text-3xl font-bold sm:text-4xl">Ready?</h1>
+	<div class="w-full max-w-2xl text-center">
+		{#if data.loggedIn}
+			<Button text="Go to dashboard" href="/dashboard" />
+		{:else}
+			<Button text="Login with Hack Club" href="/auth/idv" />
+		{/if}
 	</div>
 </div>
 

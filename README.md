@@ -42,6 +42,7 @@ Use the following `docker-compose.yaml` file to deploy:
 ```yaml
 services:
   db:
+    restart: always
     image: postgres:latest
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust # fine for testing, ideally add a password before deployment
