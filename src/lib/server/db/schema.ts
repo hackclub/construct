@@ -30,7 +30,6 @@ export const user = pgTable('user', {
 
 	hasBasePrinter: boolean().notNull().default(false),
 
-	hasSessionAuditLogs: boolean().notNull().default(false), // Has access to session audit logs
 	hasProjectAuditLogs: boolean().notNull().default(false), // Has access to project audit logs
 
 	hasT1Review: boolean().notNull().default(false), // Has access to t1 review

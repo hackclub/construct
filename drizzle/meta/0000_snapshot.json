@@ -1,5 +1,5 @@
 {
-  "id": "dfb546c6-445e-4182-a5fc-a7e86af24239",
+  "id": "b66eed48-ea19-49f0-9540-11d963c5c5f7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -507,8 +507,8 @@
           "notNull": true,
           "default": 0
         },
-        "hasSessionAuditLogs": {
-          "name": "hasSessionAuditLogs",
+        "hasBasePrinter": {
+          "name": "hasBasePrinter",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
@@ -530,6 +530,13 @@
         },
         "hasT2Review": {
           "name": "hasT2Review",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "hasAdmin": {
+          "name": "hasAdmin",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
