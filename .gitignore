@@ -30,3 +30,7 @@ uploads/models/*-*.*
 
 # no leaky
 *.NOLEAKY.*
+
+# Python
+__pycache__/
+bot/__pycache__
