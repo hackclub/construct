@@ -187,7 +187,7 @@
 						{/if}
 					</label>
 					<label class="flex grow flex-col gap-1">
-						3D model (optional)
+						3D model
 						<input
 							type="file"
 							name="model"
