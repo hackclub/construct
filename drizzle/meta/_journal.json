@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1764355873506,
-      "tag": "0000_magical_dreaming_celestial",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1764358224379,
-      "tag": "0001_marvelous_human_robot",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1764360655893,
-      "tag": "0002_elite_morg",
+      "when": 1764458914870,
+      "tag": "0000_lean_black_bolt",
       "breakpoints": true
     }
   ]

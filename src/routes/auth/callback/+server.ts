@@ -142,6 +142,8 @@ export async function GET(event) {
 			})
 			.where(eq(user.idvId, id));
 	} else {
+		const isSuperAdmin = slack_id === env.SUPER_ADMIN_SLACK_ID;
+
 		// Create user
 		await db.insert(user).values({
 			idvId: id,
@@ -151,12 +153,11 @@ export async function GET(event) {
 			createdAt: new Date(Date.now()),
 			lastLoginAt: new Date(Date.now()),
 			hackatimeTrust,
-			// TODO: remove these after siege
-			hasT1Review: true,
-			hasT2Review: true,
-			hasProjectAuditLogs: true,
-			hasSessionAuditLogs: true,
-			hasAdmin: true
+
+			hasT1Review: isSuperAdmin,
+			hasT2Review: isSuperAdmin,
+			hasProjectAuditLogs: isSuperAdmin,
+			hasAdmin: isSuperAdmin
 		});
 
 		[databaseUser] = await db.select().from(user).where(eq(user.idvId, id)).limit(1);
