@@ -21,7 +21,7 @@ export async function load({ locals, params }) {
 		})
 		.from(user)
 		.leftJoin(devlog, eq(devlog.userId, user.id))
-		.where(eq(user.id, 1))
+		.where(eq(user.id, id))
 		.groupBy(user.id)) ?? [{ devlogCount: 0 }];
 
 	if (!queriedUser) {
@@ -50,6 +50,8 @@ export const actions = {
 		const hasT2Review = data.get('has_t2_review');
 		const hasAdmin = data.get('has_admin');
 		const hasProjectAuditLogs = data.get('has_project_audit_logs');
+
+		// TODO: add check to disable un-admining superadmin
 
 		await db
 			.update(user)
