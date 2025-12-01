@@ -7,4 +7,10 @@ services:
       - .env
     pull_policy: always
     image: ghcr.io/hackclub/construct:staging
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 networks: {}

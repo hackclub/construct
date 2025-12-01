@@ -19,4 +19,6 @@ ENV DATABASE_HOST=localhost
 ENV BODY_SIZE_LIMIT=80M
 EXPOSE 3000
 ENV NODE_ENV=production
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=5 \
+  CMD node -e "require('http').get('http://localhost:3000', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
 CMD ["sh","-c","mkdir -p /uploads/images && mkdir -p /uploads/models && npm run db:migrate && node server.js"]
