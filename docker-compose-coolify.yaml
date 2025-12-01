@@ -3,8 +3,11 @@ services:
     restart: always
     expose:
       - 3000
-    env_file:
-      - .env
     pull_policy: always
+    networks:
+      - coolify
     image: ghcr.io/hackclub/construct:production
-networks: {}
+
+networks:
+  coolify:
+    external: true

@@ -6,5 +6,10 @@ services:
     env_file:
       - .env
     pull_policy: always
+    networks:
+      - coolify
     image: ghcr.io/hackclub/construct:staging
-networks: {}
+
+networks:
+  coolify:
+    external: true
