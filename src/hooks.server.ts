@@ -1,3 +1,5 @@
+import { sequence } from '@sveltejs/kit/hooks';
+import * as Sentry from '@sentry/sveltekit';
 import { redirect, type Handle } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth';
 
@@ -33,8 +35,10 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-export const handle: Handle = handleAuth;
+export const handle: Handle = sequence(Sentry.sentryHandle(), handleAuth);
 
 function routeRequiresAuth(route: string) {
 	return route.startsWith('/dashboard');
 }
+
+export const handleError = Sentry.handleErrorWithSentry();
