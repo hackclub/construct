@@ -97,6 +97,8 @@ export async function GET(event) {
 	const slackProfileResJSON = await slackProfileRes.json();
 
 	if (!slackProfileResJSON.ok) {
+		console.error('Failed to fetch user profile');
+
 		const redirectURL = new URL(`${url.protocol}//${url.host}/auth/failed`);
 		return redirect(302, redirectURL);
 	}
@@ -121,6 +123,8 @@ export async function GET(event) {
 		const channelMembersResJSON = await channelMembersRes.json();
 
 		if (!channelMembersResJSON.ok) {
+			console.error('Failed to fetch channel members');
+
 			const redirectURL = new URL(`${url.protocol}//${url.host}/auth/failed`);
 			return redirect(302, redirectURL);
 		}
