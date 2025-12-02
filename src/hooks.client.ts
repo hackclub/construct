@@ -2,14 +2,12 @@ import { handleErrorWithSentry, replayIntegration } from '@sentry/sveltekit';
 import * as Sentry from '@sentry/sveltekit';
 
 Sentry.init({
-	dsn: process.env.SENTRY_DSN,
+	dsn: 'https://7caab434460a1585f4c87baa1a692427@o40609.ingest.us.sentry.io/4510461147742208',
 
 	tracesSampleRate: 1.0,
 
 	// Enable logs to be sent to Sentry
 	enableLogs: true,
-
-	environment: process.env.SENTRY_ENVIRONMENT,
 
 	// This sets the sample rate to be 10%. You may want this to be 100% while
 	// in development and sample at a lower rate in production

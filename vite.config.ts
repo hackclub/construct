@@ -8,7 +8,8 @@ export default defineConfig({
 		sentrySvelteKit({
 			sourceMapsUploadOptions: {
 				org: 'hack-club',
-				project: 'construct'
+				project: 'construct',
+				authToken: process.env.SENTRY_AUTH_TOKEN
 			}
 		}),
 		tailwindcss(),
