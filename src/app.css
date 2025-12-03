@@ -233,7 +233,7 @@
 
 		&:disabled,
 		&.disabled {
-			@apply cursor-not-allowed opacity-80 hover:outline-0;
+			@apply cursor-not-allowed opacity-70 hover:outline-0;
 		}
 
 		&.red {
@@ -255,6 +255,10 @@
 
 	.themed-input-light {
 		@apply border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 placeholder:text-primary-700 active:ring-3;
+	}
+
+	.themed-input-on-box {
+		@apply bg-primary-900 border-3 border-primary-800 ring-primary-700 focus:ring-2 transition-shadow rounded-lg placeholder:text-primary-700;
 	}
 
 	.checkbox {

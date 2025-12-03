@@ -9,6 +9,7 @@
 	let user = $derived(form?.queriedUser ?? data.queriedUser);
 
 	let hackatimePending = $state(false);
+	let currencyPending = $state(false);
 	let privilegesPending = $state(false);
 	let logoutPending = $state(false);
 </script>
@@ -29,6 +30,8 @@
 			</div>
 
 			<div class="flex flex-row flex-wrap gap-3">
+				<a href={`/dashboard/users/${user.id}`} class="button md primary">Public profile page</a>
+
 				<div>
 					<form
 						action="?/refreshHackatime"
@@ -108,6 +111,66 @@
 				<DataCard title="Devlog count">
 					{data.devlogCount}
 				</DataCard>
+			</div>
+
+			<h2 class="mt-2 text-2xl font-bold">Currency stuff</h2>
+			<div class="themed-box flex flex-col gap-3 p-3 shadow-lg">
+				<form
+					action="?/currency"
+					method="POST"
+					use:enhance={() => {
+						currencyPending = true;
+						return async ({ update }) => {
+							await update({ reset: false });
+							currencyPending = false;
+						};
+					}}
+				>
+					<div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
+						<label class="flex flex-col gap-1">
+							<span class="font-medium text-sm">Clay</span>
+							<input
+								type="number"
+								name="clay"
+								value={form?.currency?.fields.clay ?? user.clay}
+								class="themed-input-on-box"
+								placeholder="Clay"
+								step="0.1"
+								required
+							/>
+						</label>
+						<label class="flex flex-col gap-1">
+							<span class="font-medium text-sm">Brick</span>
+							<input
+								type="number"
+								name="brick"
+								value={form?.currency?.fields.brick ?? user.brick}
+								class="themed-input-on-box"
+								placeholder="Brick"
+								step="0.1"
+								required
+							/>
+						</label>
+						<label class="flex flex-col gap-1">
+							<span class="font-medium text-sm">Market score</span>
+							<input
+								type="number"
+								name="market_score"
+								value={form?.currency?.fields.shopScore ?? user.shopScore}
+								class="themed-input-on-box"
+								placeholder="Market score"
+								step="0.1"
+								required
+							/>
+						</label>
+					</div>
+					{#if form?.currency?.invalidFields}
+						<p class="w-full text-center text-sm">Invalid fields</p>
+					{/if}
+					<button type="submit" class="button md primary mt-3 w-full" disabled={currencyPending}
+						>Apply!</button
+					>
+				</form>
 			</div>
 
 			<h2 class="mt-2 text-2xl font-bold">Privileges</h2>

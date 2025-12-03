@@ -46,11 +46,6 @@ export async function load({ params, locals }) {
 		throw error(404);
 	}
 
-	// Make sure it has actual devlogs before shipping
-	if (queriedProject.devlogCount == 0) {
-		return error(400, { message: 'project has no devlogs' });
-	}
-
 	return {
 		project: queriedProject
 	};
@@ -67,6 +62,8 @@ export const actions = {
 		const [queriedProject] = await db
 			.select({
 				id: project.id,
+				description: project.description,
+				url: project.url,
 				timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
 				devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`
 			})
@@ -80,16 +77,20 @@ export const actions = {
 					or(eq(project.status, 'building'), eq(project.status, 'rejected'))
 				)
 			)
-			.groupBy(project.id)
+			.groupBy(project.id, project.description, project.url)
 			.limit(1);
 
 		if (!queriedProject) {
 			return error(404, { message: 'project not found' });
 		}
 
-		// Make sure it has actual devlogs before shipping
-		if (queriedProject.devlogCount == 0) {
-			return error(400, { message: 'project has no devlogs' });
+		// Make sure it has atleast 2h
+		if (queriedProject.timeSpent < 120) {
+			return error(400, { message: 'minimum 2h needed to ship' });
+		}
+
+		if (queriedProject.description == '' || queriedProject.url == '') {
+			return error(400, { message: 'project must have a description and Printables url' });
 		}
 
 		await db

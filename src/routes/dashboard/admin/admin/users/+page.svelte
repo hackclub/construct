@@ -9,12 +9,10 @@
 
 	let userSearch = $state('');
 
-	let users = $derived(data.users); //form?.users ?? 
+	let users = $derived(data.users); //form?.users ??
 
 	let filteredProjects = $derived(
-		data.users.filter((user) =>
-			user.name?.toLowerCase().includes(userSearch.toLowerCase())
-		)
+		data.users.filter((user) => user.name?.toLowerCase().includes(userSearch.toLowerCase()))
 	);
 	let filteredUsers = $derived(
 		data.users.filter((user) => user.name.toLowerCase().includes(userSearch.toLowerCase()))
@@ -27,92 +25,6 @@
 
 <div class="flex h-full flex-col">
 	<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Users</h1>
-
-	<!--<div class="flex flex-col-reverse gap-5 lg:flex-row">
-		<div class="themed-box grow p-3">
-			<h2 class="mb-2 text-xl font-bold">Filter & Sort</h2>
-			<form
-				method="POST"
-				use:enhance={() => {
-					formPending = true;
-					return async ({ update }) => {
-						await update();
-						formPending = false;
-					};
-				}}
-			>
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-					<!-- Project status --/>
-					<label class="flex flex-col gap-1">
-						<span class="font-medium">Status</span>
-						<select
-							class="h-40 grow border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 placeholder:text-primary-900 active:ring-3"
-							name="status"
-							value={form?.fields.status ?? ['submitted']}
-							multiple
-						>
-							<option value="building" class="truncate">Building</option>
-							<option value="submitted" class="truncate">Submitted</option>
-							<option value="t1_approved" class="truncate">Review approved</option>
-							<option value="t2_approved" class="truncate">YSWS review approved</option>
-							<option value="finalized" class="truncate">Finalized</option>
-							<option value="rejected" class="truncate">Rejected</option>
-							<option value="rejected_locked" class="truncate">Rejected (locked)</option>
-						</select>
-					</label>
-
-					<!-- Project --/>
-					<label class="flex flex-col">
-						<span class="mb-1 font-medium">Project</span>
-						<div class="flex h-40 flex-col">
-							<input
-								type="text"
-								placeholder="search"
-								bind:value={projectSearch}
-								class="themed-input-light border-b-0 py-1.5"
-							/>
-							<select
-								class="themed-input-light grow"
-								name="project"
-								value={form?.fields.project ?? []}
-								multiple
-							>
-								{#each filteredProjects as project}
-									<option value={project.id} class="truncate">{project.name}</option>
-								{/each}
-							</select>
-						</div>
-					</label>
-
-					<!-- User --/>
-					<label class="flex flex-col">
-						<span class="mb-1 font-medium">User</span>
-						<div class="flex h-40 flex-col">
-							<input
-								type="text"
-								placeholder="search"
-								bind:value={userSearch}
-								class="themed-input-light border-b-0 py-1.5"
-							/>
-							<select
-								class="themed-input-light grow"
-								name="user"
-								value={form?.fields.user ?? []}
-								multiple
-							>
-								{#each filteredUsers as user}
-									<option value={user?.id} class="truncate">{user?.name}</option>
-								{/each}
-							</select>
-						</div>
-					</label>
-				</div>
-				<button type="submit" class="button md primary mt-3 w-full" disabled={formPending}>Apply!</button>
-			</form>
-		</div>
-	</div>
-
-	<h2 class="mt-4 mb-2 text-2xl font-bold">Filtered users</h2>-->
 
 	{#if users.length == 0}
 		<div class="flex grow items-center justify-center">
@@ -135,44 +47,29 @@
 					<a
 						class="absolute inset-0 z-1"
 						href={`/dashboard/admin/admin/users/${user.id}`}
-						aria-label="project"
+						aria-label="user"
 					>
 					</a>
 					<h1 class="flex flex-row gap-1 text-xl font-semibold">
 						<span class="grow truncate">{user.name}</span>
 					</h1>
-					<!-- <p class="text-sm">
-						by <a class="relative z-2 underline" href={`/dashboard/users/${project.user?.id}`}
-							>{project.user?.name}</a
+					<p>
+						<span class="rounded-sm bg-primary-800 px-1 text-nowrap"
+							>{user.hasT1Review ? 't1 review' : '-'}</span
+						>
+						<span class="rounded-sm bg-primary-700 px-1 text-nowrap"
+							>{user.hasT2Review ? 't2 review' : '-'}</span
+						>
+						<span class="rounded-sm bg-primary-600 px-1 text-nowrap"
+							>{user.hasAdmin ? 'admin' : '-'}</span
 						>
 					</p>
-					<p class="grow">{project.project.description}</p>
-					{#if project.project.url && project.project.url.length > 0}
-						<div class="my-2 flex">
-							<a class="button sm primary relative z-2" href={project.project.url} target="_blank">
-								<ExternalLink />
-								Link to project
-							</a>
-						</div>
-					{:else}
-						<div class="mb-2"></div>
-					{/if}
-					<p class="text-sm">
-						{project.devlogCount} journal{project.devlogCount !== 1 ? 's' : ''} ∙ {Math.floor(
-							project.timeSpent / 60
-						)}h {project.timeSpent % 60}min
-					</p>
-					<div class="flex flex-row gap-4">
-						<p class="grow text-sm">
-							Created <abbr
-								title={`${project.project.createdAt.toUTCString()}`}
-								class="relative z-2"
-							>
-								{relativeDate(project.project.createdAt)}
-							</abbr>
-						</p>
-						<p class="text-sm">{projectStatuses[project.project.status]}</p>
-					</div> -->
+					<code>
+						{user.slackId}
+					</code>
+					<p>Hackatime: {user.hackatimeTrust}</p>
+					<p>Trust: {user.trust}</p>
+					<p>{user.clay} clay, {user.brick} brick, {user.shopScore} market</p>
 				</div>
 			{/each}
 		</div>

@@ -165,6 +165,11 @@ export async function GET(event) {
 		return redirect(302, 'https://fraud.land');
 	}
 
+	const isSuperAdmin =
+		env.SUPER_ADMIN_SLACK_ID != undefined &&
+		env.SUPER_ADMIN_SLACK_ID.length > 0 &&
+		slack_id === env.SUPER_ADMIN_SLACK_ID;
+
 	if (databaseUser) {
 		// Update user (update name and profile picture and lastLoginAt on login)
 		await db
@@ -173,12 +178,11 @@ export async function GET(event) {
 				name: username,
 				profilePicture: profilePic,
 				lastLoginAt: new Date(Date.now()),
-				hackatimeTrust
+				hackatimeTrust,
+				hasAdmin: isSuperAdmin ? true : undefined
 			})
 			.where(eq(user.idvId, id));
 	} else {
-		const isSuperAdmin = slack_id === env.SUPER_ADMIN_SLACK_ID;
-
 		// Create user
 		await db.insert(user).values({
 			idvId: id,

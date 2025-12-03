@@ -24,8 +24,14 @@
 	clickable={false}
 />
 <p class="mt-3">
-	Are you sure you want to ship "{data.project.name}"? You won't be able to edit it or journal again
-	unless it gets rejected.
+	{#if data.project.timeSpent < 120}
+		You need at least 2h to ship
+	{:else if data.project.description == '' || data.project.url == ''}
+		Project must have a description and Printables URL to ship
+	{:else}
+		Are you sure you want to ship "{data.project.name}"? You won't be able to edit it or journal
+		again unless it gets rejected.
+	{/if}
 </p>
 <form
 	method="POST"
@@ -39,7 +45,13 @@
 	}}
 >
 	<a href={`/dashboard/projects/${data.project.id}`} class="button sm primary">Cancel</a>
-	<button class="button sm orange" disabled={formPending}>
+	<button
+		class="button sm orange"
+		disabled={formPending ||
+			data.project.timeSpent < 120 ||
+			data.project.url == '' ||
+			data.project.description == ''}
+	>
 		<Ship />
 		Ship
 	</button>

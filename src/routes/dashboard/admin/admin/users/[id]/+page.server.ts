@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
 import { user, devlog, session } from '$lib/server/db/schema.js';
-import { error } from '@sveltejs/kit';
-import { eq, sql } from 'drizzle-orm';
+import { error, fail } from '@sveltejs/kit';
+import { and, eq, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
 
 export async function load({ locals, params }) {
@@ -20,7 +20,7 @@ export async function load({ locals, params }) {
 			devlogCount: sql`COALESCE(COUNT(${devlog.id}), 0)`
 		})
 		.from(user)
-		.leftJoin(devlog, eq(devlog.userId, user.id))
+		.leftJoin(devlog, and(eq(devlog.userId, user.id), eq(devlog.deleted, false)))
 		.where(eq(user.id, id))
 		.groupBy(user.id)) ?? [{ devlogCount: 0 }];
 
@@ -51,8 +51,6 @@ export const actions = {
 		const hasAdmin = data.get('has_admin');
 		const hasProjectAuditLogs = data.get('has_project_audit_logs');
 
-		// TODO: add check to disable un-admining superadmin
-
 		await db
 			.update(user)
 			.set({
@@ -60,6 +58,57 @@ export const actions = {
 				hasT2Review: hasT2Review === 'on',
 				hasAdmin: hasAdmin === 'on',
 				hasProjectAuditLogs: hasProjectAuditLogs === 'on'
+			})
+			.where(eq(user.id, id));
+
+		const [queriedUser] = await db.select().from(user).where(eq(user.id, id));
+
+		if (!queriedUser) {
+			throw error(404, { message: 'user not found' });
+		}
+
+		return {
+			queriedUser
+		};
+	},
+
+	currency: async ({ locals, request, params }) => {
+		if (!locals.user) {
+			throw error(500);
+		}
+		if (!locals.user.hasAdmin) {
+			throw error(403, { message: 'get out, peasant' });
+		}
+
+		const id: number = parseInt(params.id);
+
+		const data = await request.formData();
+		const clay = data.get('clay');
+		const brick = data.get('brick');
+		const shopScore = data.get('market_score');
+
+		if (
+			!clay ||
+			isNaN(parseFloat(clay.toString())) ||
+			!brick ||
+			isNaN(parseFloat(brick.toString())) ||
+			!shopScore ||
+			isNaN(parseFloat(shopScore.toString()))
+		) {
+			return fail(400, {
+				currency: {
+					fields: { clay, brick, shopScore },
+					invalidFields: true
+				}
+			});
+		}
+
+		await db
+			.update(user)
+			.set({
+				clay: parseFloat(clay.toString()),
+				brick: parseFloat(brick.toString()),
+				shopScore: parseFloat(shopScore.toString())
 			})
 			.where(eq(user.id, id));
 
