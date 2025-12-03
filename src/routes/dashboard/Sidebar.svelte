@@ -60,7 +60,7 @@
 			<p class="truncate font-medium">
 				{user.name}
 			</p>
-			<p class="text-sm">{user.clay} clay · {user.brick} brick</p>
+			<p class="text-sm">{Math.floor(user.clay)} clay · {Math.floor(user.brick)} brick</p>
 		</div>
 	</a>
 	<SidebarButton icon={LogOut} href="/auth/logout">Log out</SidebarButton>
