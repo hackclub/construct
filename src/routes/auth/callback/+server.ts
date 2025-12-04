@@ -106,7 +106,10 @@ export async function GET(event) {
 	const slackProfile = slackProfileResJSON['user'];
 
 	const profilePic = slackProfile['profile']['image_1024'];
-	const username = slackProfile['profile']['display_name'];
+	const username =
+		slackProfile['profile']['display_name'] !== ''
+			? slackProfile['profile']['display_name']
+			: slackProfile['profile']['real_name'];
 
 	if (env.BETA_CHANNEL_ID && env.BETA_CHANNEL_ID.length > 0) {
 		const channelMembersURL = new URL('https://slack.com/api/conversations.members');
