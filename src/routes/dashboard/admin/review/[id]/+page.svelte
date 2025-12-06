@@ -2,6 +2,7 @@
 	import relativeDate from 'tiny-relative-date';
 	import Devlog from '$lib/components/Devlog.svelte';
 	import Head from '$lib/components/Head.svelte';
+	import { ExternalLink } from '@lucide/svelte';
 
 	let { data } = $props();
 </script>
@@ -30,6 +31,14 @@
 						{data.project.devlogCount} logs ∙ {Math.floor(data.project.timeSpent / 60)}h {data
 							.project.timeSpent % 60}min
 					</p>
+					{#if data.project.project.url && data.project.project.url.length > 0}
+						<div class="mt-1 flex">
+							<a class="button sm primary" href={data.project.project.url} target="_blank">
+								<ExternalLink />
+								Link to project
+							</a>
+						</div>
+					{/if}
 				</div>
 
 				<div>
