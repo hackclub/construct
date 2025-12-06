@@ -1,4 +1,4 @@
-import { PUBLIC_ENV } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 import * as Sentry from '@sentry/sveltekit';
 
 Sentry.init({
@@ -8,7 +8,7 @@ Sentry.init({
 
 	tracesSampleRate: 1.0,
 
-	environment: PUBLIC_ENV ?? 'dev',
+	environment: env.PUBLIC_ENV ?? 'dev',
 
 	// Enable logs to be sent to Sentry
 	enableLogs: true

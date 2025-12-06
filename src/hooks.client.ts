@@ -1,6 +1,6 @@
 import { handleErrorWithSentry, replayIntegration } from '@sentry/sveltekit';
 import * as Sentry from '@sentry/sveltekit';
-import { PUBLIC_ENV } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 
 Sentry.init({
 	dsn: 'https://7caab434460a1585f4c87baa1a692427@o40609.ingest.us.sentry.io/4510461147742208',
@@ -11,7 +11,7 @@ Sentry.init({
 	enableLogs: true,
 
 	// Environment
-	environment: PUBLIC_ENV ?? 'dev',
+	environment: env.PUBLIC_ENV ?? 'dev',
 
 	// This sets the sample rate to be 10%. You may want this to be 100% while
 	// in development and sample at a lower rate in production
