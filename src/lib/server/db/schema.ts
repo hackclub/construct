@@ -30,8 +30,6 @@ export const user = pgTable('user', {
 
 	hasBasePrinter: boolean().notNull().default(false),
 
-	hasProjectAuditLogs: boolean().notNull().default(false), // Has access to project audit logs
-
 	hasT1Review: boolean().notNull().default(false), // Has access to t1 review
 	hasT2Review: boolean().notNull().default(false), // Has access to t2 review
 
@@ -54,6 +52,9 @@ export const projectStatusEnum = pgEnum('status', [
 	'building',
 	'submitted',
 	't1_approved',
+	'print_queue',
+	'printing',
+	'printed',
 	't2_approved',
 	'finalized',
 	'rejected',
@@ -83,28 +84,12 @@ export const projectAuditLogTypeEnum = pgEnum('project_audit_log_type', [
 	'delete'
 ]);
 
-// TODO: implement this
-export const projectAuditLog = pgTable('project_audit_log', {
-	id: serial().primaryKey(),
-	userId: integer()
-		.notNull()
-		.references(() => user.id), // Project owner
-	actionUserId: integer()
-		.notNull()
-		.references(() => user.id), // User who carried out the action (can be different to userId if it was done by an admin)
-	projectId: integer()
-		.notNull()
-		.references(() => project.id),
-	type: projectAuditLogTypeEnum().notNull(),
-
-	name: text(),
-	description: text(),
-	url: text(),
-
-	timestamp: timestamp().notNull().defaultNow()
-});
-
-export const t1ReviewActionEnum = pgEnum('t1_review_action', ['approve', 'reject', 'reject_lock']);
+export const t1ReviewActionEnum = pgEnum('t1_review_action', [
+	'approve',
+	'approve_no_print',
+	'reject',
+	'reject_lock'
+]);
 
 // T1 review: approve/reject
 // TODO: implement this
@@ -161,8 +146,6 @@ export const devlog = pgTable('devlog', {
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type Project = typeof project.$inferSelect;
-
-export type ProjectAuditLog = typeof projectAuditLog.$inferSelect;
 
 export type T1Review = typeof t1Review.$inferSelect;
 // export type T2Review = typeof t2Review.$inferSelect;

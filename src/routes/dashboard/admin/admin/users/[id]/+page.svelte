@@ -186,7 +186,7 @@
 						};
 					}}
 				>
-					<div class="grid grid-cols-2 lg:grid-cols-4">
+					<div class="grid grid-cols-2 lg:grid-cols-3">
 						<label class="flex flex-row items-center gap-1">
 							<input
 								type="checkbox"
@@ -208,15 +208,6 @@
 						<label class="flex flex-row items-center gap-1">
 							<input type="checkbox" name="has_admin" checked={user.hasAdmin} class="checkbox" />
 							<span class="font-medium">Has admin</span>
-						</label>
-						<label class="flex flex-row items-center gap-1">
-							<input
-								type="checkbox"
-								name="has_project_audit_logs"
-								checked={user.hasProjectAuditLogs}
-								class="checkbox"
-							/>
-							<span class="font-medium">Has project audit logs</span>
 						</label>
 					</div>
 					<button type="submit" class="button md primary mt-3 w-full" disabled={privilegesPending}

@@ -52,13 +52,9 @@
 							value={form?.fields.status ?? ['submitted']}
 							multiple
 						>
-							<option value="building" class="truncate">Building</option>
-							<option value="submitted" class="truncate">Submitted</option>
-							<option value="t1_approved" class="truncate">Review approved</option>
-							<option value="t2_approved" class="truncate">YSWS review approved</option>
-							<option value="finalized" class="truncate">Finalized</option>
-							<option value="rejected" class="truncate">Rejected</option>
-							<option value="rejected_locked" class="truncate">Rejected (locked)</option>
+							{#each Object.entries(projectStatuses) as [status, longStatus]}
+								<option value={status} class="truncate">{longStatus}</option>
+							{/each}
 						</select>
 					</label>
 
@@ -108,7 +104,9 @@
 						</div>
 					</label>
 				</div>
-				<button type="submit" class="button md primary mt-3 w-full" disabled={formPending}>Apply!</button>
+				<button type="submit" class="button md primary mt-3 w-full" disabled={formPending}
+					>Apply!</button
+				>
 			</form>
 		</div>
 		<div class="themed-box grow p-3 lg:min-w-[30%]">

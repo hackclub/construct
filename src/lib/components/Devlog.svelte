@@ -147,8 +147,8 @@
 			lines.rotation.x = THREE.MathUtils.degToRad(-90);
 			lines.rotation.z = THREE.MathUtils.degToRad(-25);
 
-			camera.position.z = largestDimension * 3;
-			camera.position.y = largestDimension * 2;
+			camera.position.z = largestDimension * 1;
+			camera.position.y = largestDimension * 1;
 
 			directional.position.set(largestDimension * 2, largestDimension * 2, largestDimension * 2);
 			directional2.position.set(-largestDimension * 2, largestDimension * 2, -largestDimension * 2);
@@ -327,7 +327,7 @@
 			</div>
 		</div>
 		{#if devlog.model}
-			<div class="max-h-100 w-100 grow border-3 border-primary-900 lg:max-w-[60%]">
+			<div class="max-h-100 w-full lg:w-100 grow border-3 border-primary-900 lg:max-w-[60%]">
 				<canvas class="h-full w-full" id={`canvas-${devlog.id}`}></canvas>
 			</div>
 		{/if}

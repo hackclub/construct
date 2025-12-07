@@ -49,7 +49,6 @@ export const actions = {
 		const hasT1Review = data.get('has_t1_review');
 		const hasT2Review = data.get('has_t2_review');
 		const hasAdmin = data.get('has_admin');
-		const hasProjectAuditLogs = data.get('has_project_audit_logs');
 
 		await db
 			.update(user)
@@ -57,7 +56,6 @@ export const actions = {
 				hasT1Review: hasT1Review === 'on',
 				hasT2Review: hasT2Review === 'on',
 				hasAdmin: hasAdmin === 'on',
-				hasProjectAuditLogs: hasProjectAuditLogs === 'on'
 			})
 			.where(eq(user.id, id));
 

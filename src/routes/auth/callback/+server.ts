@@ -180,7 +180,6 @@ export async function GET(event) {
 
 			hasT1Review: isSuperAdmin,
 			hasT2Review: isSuperAdmin,
-			hasProjectAuditLogs: isSuperAdmin,
 			hasAdmin: isSuperAdmin
 		});
 
