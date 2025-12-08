@@ -27,10 +27,8 @@ export default defineConfig({
 		}
 	},
 	server: {
-		fs: {
-			allow: ['uploads']
-		},
 		host: true,
+		// allowedHosts: ['cb7487613e18.ngrok-free.app'],
 		port: 5173,
 		strictPort: true,
 		watch: {

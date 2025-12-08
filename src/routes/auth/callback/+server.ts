@@ -88,9 +88,19 @@ export async function GET(event) {
 		return redirect(302, '/auth/failed');
 	}
 
+	console.log(slackProfileResJSON);
+
 	const slackProfile = slackProfileResJSON['user'];
 
-	const profilePic = slackProfile['profile']['image_1024'];
+	const profilePic =
+		slackProfile['profile']['image_1024'] ??
+		slackProfile['profile']['image_512'] ??
+		slackProfile['profile']['image_192'] ??
+		slackProfile['profile']['image_72'] ??
+		slackProfile['profile']['image_48'] ??
+		slackProfile['profile']['image_32'] ??
+		slackProfile['profile']['image_24'];
+
 	const username =
 		slackProfile['profile']['display_name'] !== ''
 			? slackProfile['profile']['display_name']
@@ -129,7 +139,7 @@ export async function GET(event) {
 	)['trust_level'];
 
 	if (!hackatimeTrust) {
-		console.error()
+		console.error();
 		return error(503, {
 			message: 'failed to fetch hackatime trust factor, please try again later'
 		});
@@ -154,6 +164,8 @@ export async function GET(event) {
 		env.SUPER_ADMIN_SLACK_ID != undefined &&
 		env.SUPER_ADMIN_SLACK_ID.length > 0 &&
 		slack_id === env.SUPER_ADMIN_SLACK_ID;
+
+	console.log(id, slack_id, username, profilePic, isSuperAdmin, hackatimeTrust);
 
 	if (databaseUser) {
 		// Update user (update name and profile picture and lastLoginAt on login)
