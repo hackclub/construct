@@ -9,7 +9,7 @@
 
 	import model from '$lib/assets/Construct Logo.3mf?url';
 	import modelImage from '$lib/assets/model.png';
-	import keyringModel from '$lib/assets/keyring.obj?url';
+	import keyringModel from '$lib/assets/keyring_colored.3mf?url';
 	import sticker1Image from '$lib/assets/sticker1.png';
 	import sticker2Image from '$lib/assets/sticker2.png';
 
@@ -17,7 +17,6 @@
 
 	import * as THREE from 'three';
 	import { ThreeMFLoader } from 'three/examples/jsm/Addons.js';
-	import { OBJLoader } from 'three/examples/jsm/Addons.js';
 	import { OrbitControls } from 'three/examples/jsm/Addons.js';
 	import { onMount } from 'svelte';
 	import Head from '$lib/components/Head.svelte';
@@ -355,9 +354,9 @@
 				keyringScene.add(object);
 			}
 
-			var objLoader = new OBJLoader();
+			var threemfLoader = new ThreeMFLoader();
 
-			objLoader.load(
+			threemfLoader.load(
 				keyringModel,
 				parseKeyringObject,
 				(xhr) => {
