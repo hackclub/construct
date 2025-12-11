@@ -144,12 +144,13 @@ export const actions = {
 				break;
 		}
 
-		await db
-			.update(project)
-			.set({
-				status
-			})
-			.where(eq(project.id, id));
+		if (status)
+			await db
+				.update(project)
+				.set({
+					status
+				})
+				.where(eq(project.id, id));
 
 		return redirect(302, '/dashboard/admin/review');
 	}

@@ -113,7 +113,7 @@
 
 					<label class="flex flex-col gap-1">
 						<span class="font-medium">Feedback <span class="opacity-50">(public)</span></span>
-						<textarea name="feedback" class="themed-input-on-box"></textarea>
+						<textarea name="feedback" class="themed-input-on-box">{data.t1Reviews.length > 0 ? data.t1Reviews[data.t1Reviews.length - 1].feedback : ''}</textarea>
 					</label>
 
 					<button type="submit" class="button md primary w-full" disabled={formPending}>
