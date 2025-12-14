@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CharCountedTextarea from '$lib/components/CharCountedTextarea.svelte';
 
-	import { SquarePen, ExternalLink, Trash, Ship, Lock } from '@lucide/svelte';
+	import { SquarePen, ExternalLink, Trash, Ship, Lock, Download, Link } from '@lucide/svelte';
 	import relativeDate from 'tiny-relative-date';
 	import type { PageProps } from './$types';
 	import Devlog from '$lib/components/Devlog.svelte';
@@ -52,14 +52,32 @@
 	∙ {Math.floor(data.project.timeSpent / 60)}h {data.project.timeSpent % 60}min
 </p>
 <p class="mt-0.5">Status: {projectStatuses[data.project.status]}</p>
-{#if data.project.url && data.project.url.length > 0}
-	<div class="my-2 flex">
-		<a class="button sm primary" href={data.project.url} target="_blank">
-			<ExternalLink />
-			Printables page
-		</a>
-	</div>
-{/if}
+
+<div class="my-2 flex flex-row gap-2">
+	{#if data.project.url && data.project.url.length > 0}
+		<div class="flex">
+			<a class="button sm primary" href={data.project.url} target="_blank">
+				<ExternalLink />
+				Printables page
+			</a>
+		</div>
+	{/if}
+	{#if data.project.editorFileType === 'upload'}
+		<div class="flex">
+			<a class="button sm primary" href={`${data.s3PublicUrl}/${data.project.uploadedFileUrl}`} target="_blank">
+				<Download />
+				Project file
+			</a>
+		</div>
+	{:else if data.project.editorFileType === 'url'}
+		<div class="flex">
+			<a class="button sm primary" href={data.project.editorUrl} target="_blank">
+				<Link />
+				Project link
+			</a>
+		</div>
+	{/if}
+</div>
 <p class="mt-6">{data.project.description}</p>
 
 {#if data.project.userId === data.user.id}
