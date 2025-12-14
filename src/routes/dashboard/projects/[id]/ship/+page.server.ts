@@ -5,6 +5,12 @@ import { eq, and, or, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
 import { isValidUrl } from '$lib/utils';
+import { MAX_UPLOAD_SIZE } from '../config';
+import { extname } from 'path';
+import { env } from '$env/dynamic/private';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3 } from '$lib/server/s3';
+import { ship } from '$lib/server/db/schema.js';
 
 export async function load({ params, locals }) {
 	const id: number = parseInt(params.id);
@@ -18,7 +24,11 @@ export async function load({ params, locals }) {
 			id: project.id,
 			name: project.name,
 			description: project.description,
+
 			url: project.url,
+			editorUrl: project.editorUrl,
+			editorFileType: project.editorFileType,
+
 			createdAt: project.createdAt,
 			status: project.status,
 			timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
@@ -62,7 +72,72 @@ export const actions = {
 		const id: number = parseInt(params.id);
 
 		const data = await request.formData();
-		const url = data.get('url');
+		const printablesUrl = data.get('printables_url');
+		const editorUrl = data.get('editor_url');
+		const editorFile = data.get('editor_file') as File;
+		const modelFile = data.get('model_file') as File;
+
+		const printablesUrlValid =
+			printablesUrl &&
+			printablesUrl.toString() &&
+			printablesUrl.toString().trim().length < 8000 &&
+			isValidUrl(printablesUrl.toString().trim());
+
+		if (!printablesUrlValid) {
+			return fail(400, {
+				invalid_printables_url: true
+			});
+		}
+
+		// Editor URL
+		const editorUrlExists = editorUrl && editorUrl.toString();
+		const editorUrlValid =
+			editorUrlExists &&
+			editorUrl.toString().trim().length < 8000 &&
+			isValidUrl(editorUrl.toString().trim());
+
+		if (editorUrlExists && !editorUrlValid) {
+			return fail(400, {
+				invalid_editor_url: true
+			});
+		}
+
+		// Editor file
+		const editorFileExists = editorFile instanceof File && editorFile.size > 0;
+		const editorFileValid = editorFileExists && editorFile.size <= MAX_UPLOAD_SIZE;
+
+		if (!editorUrlExists && !editorFileExists) {
+			return error(400, { message: "editor file or url doesn't exist" });
+		}
+
+		if (editorUrlExists && editorFileExists) {
+			return error(400, { message: 'editor file or url both exist' });
+		}
+
+		if (!editorFileValid) {
+			return fail(400, {
+				invalid_editor_file: true
+			});
+		}
+
+		// Model file
+		const modelFileValid =
+			modelFile instanceof File &&
+			editorFile.size > 0 &&
+			modelFile.size <= MAX_UPLOAD_SIZE &&
+			extname(modelFile.name).toLowerCase() == '.3mf' &&
+			[
+				'model/3mf',
+				'application/vnd.ms-package.3dmanufacturing-3dmodel+xml',
+				'application/octet-stream',
+				'text/plain'
+			].includes(modelFile.type);
+
+		if (!modelFileValid) {
+			return fail(400, {
+				invalid_model_file: true
+			});
+		}
 
 		const [queriedProject] = await db
 			.select({
@@ -96,21 +171,41 @@ export const actions = {
 		}
 
 		if (queriedProject.description == '') {
-			return error(400, { message: 'project must have a description and Printables url' });
+			return error(400, { message: 'project must have a description' });
 		}
 
-		if (!(!url || (url.toString().trim().length < 8000 && isValidUrl(url.toString().trim())))) {
-			return fail(400, {
-				fields: { url },
-				invalid_url: true
+		// Editor file
+		const editorFilePath = `ships/editor-files/${crypto.randomUUID()}${extname(editorFile.name)}`;
+
+		if (editorFileExists) {
+			const editorFileCommand = new PutObjectCommand({
+				Bucket: env.S3_BUCKET_NAME,
+				Key: editorFilePath,
+				Body: Buffer.from(await editorFile.arrayBuffer())
 			});
+			await S3.send(editorFileCommand);
 		}
+
+		// Models
+		const modelPath = `ships/models/${crypto.randomUUID()}${extname(modelFile.name).toLowerCase()}`;
+
+		const modelCommand = new PutObjectCommand({
+			Bucket: env.S3_BUCKET_NAME,
+			Key: modelPath,
+			Body: Buffer.from(await modelFile.arrayBuffer())
+		});
+		await S3.send(modelCommand);
 
 		await db
 			.update(project)
 			.set({
-				url: url?.toString(),
-				status: 'submitted'
+				status: 'submitted',
+				url: printablesUrl.toString(),
+				editorFileType: editorUrlExists ? 'url' : 'upload',
+				editorUrl: editorUrlExists ? editorUrl.toString() : undefined,
+				uploadedFileUrl: editorFileExists ? editorFilePath : undefined,
+
+				modelFile: modelPath
 			})
 			.where(
 				and(
@@ -119,6 +214,18 @@ export const actions = {
 					eq(project.deleted, false)
 				)
 			);
+
+		await db.insert(ship).values({
+			userId: locals.user.id,
+			projectId: queriedProject.id,
+			url: printablesUrl.toString(),
+
+			editorFileType: editorUrlExists ? 'url' : 'upload',
+			editorUrl: editorUrlExists ? editorUrl.toString() : undefined,
+			uploadedFileUrl: editorFileExists ? editorFilePath : undefined,
+
+			modelFile: modelPath
+		});
 
 		await sendSlackDM(
 			locals.user.slackId,

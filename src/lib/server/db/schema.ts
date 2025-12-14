@@ -20,7 +20,6 @@ export const user = pgTable('user', {
 	name: text().notNull(), // Username on Slack
 
 	hackatimeTrust: hackatimeTrustEnum().notNull(), // Hackatime trust
-	// TODO: implement this properly everywhere
 	trust: trustEnum().notNull().default('blue'), // User trust, used if hackatime trust can't be used
 
 	clay: real().notNull().default(0),
@@ -62,6 +61,8 @@ export const projectStatusEnum = pgEnum('status', [
 	'rejected_locked'
 ]); // rejected == can still re-ship, rejected_locked == can't re-ship
 
+export const editorFileEnum = pgEnum('editor_file_type', ['url', 'upload']);
+
 export const project = pgTable('project', {
 	id: serial().primaryKey(),
 	userId: integer()
@@ -70,7 +71,14 @@ export const project = pgTable('project', {
 
 	name: text(),
 	description: text(),
+
 	url: text(),
+
+	editorFileType: editorFileEnum(),
+	editorUrl: text(),
+	uploadedFileUrl: text(),
+
+	modelFile: text(),
 
 	status: projectStatusEnum().notNull().default('building'),
 	printedBy: integer().references(() => user.id),
@@ -87,6 +95,26 @@ export const projectAuditLogTypeEnum = pgEnum('project_audit_log_type', [
 	'delete'
 ]);
 
+export const ship = pgTable('ship', {
+	id: serial().primaryKey(),
+	userId: integer()
+		.notNull()
+		.references(() => user.id),
+	projectId: integer()
+		.notNull()
+		.references(() => project.id),
+
+	url: text().notNull(),
+
+	editorFileType: editorFileEnum().notNull(),
+	editorUrl: text(),
+	uploadedFileUrl: text(),
+
+	modelFile: text().notNull(),
+
+	timestamp: timestamp().notNull().defaultNow()
+});
+
 export const t1ReviewActionEnum = pgEnum('t1_review_action', [
 	'approve',
 	'approve_no_print',
@@ -96,7 +124,6 @@ export const t1ReviewActionEnum = pgEnum('t1_review_action', [
 ]);
 
 // T1 review: approve/reject
-// TODO: implement this
 export const t1Review = pgTable('t1_review', {
 	id: serial().primaryKey(),
 	userId: integer()

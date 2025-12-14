@@ -254,11 +254,15 @@
 	}
 
 	.themed-input-light {
-		@apply border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 placeholder:text-primary-700 active:ring-3;
+		@apply border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 placeholder:text-primary-700 active:ring-3 outline-transparent;
+	}
+
+	.themed-input {
+		@apply bg-primary-950 border-3 border-primary-900 ring-primary-700 focus:ring-2 transition-shadow rounded-lg placeholder:text-primary-800 outline-transparent;
 	}
 
 	.themed-input-on-box {
-		@apply bg-primary-900 border-3 border-primary-800 ring-primary-700 focus:ring-2 transition-shadow rounded-lg placeholder:text-primary-700;
+		@apply bg-primary-900 border-3 border-primary-800 ring-primary-700 focus:ring-2 transition-shadow rounded-lg placeholder:text-primary-700 outline-transparent;
 	}
 
 	.checkbox {
