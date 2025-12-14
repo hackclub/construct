@@ -43,7 +43,7 @@
 
 <h1 class="mt-5 mb-2 font-hero text-3xl font-medium">{data.project.name}</h1>
 
-<div class="flex flex-row">
+<div class="flex flex-col xl:flex-row gap-3">
 	<div class="mb-6 grow">
 		<p class="text-sm">
 			Created
@@ -105,7 +105,7 @@
 	</div>
 
 	{#if data.project.modelFile}
-		<div class="max-h-120 min-h-full w-[60%]">
+		<div class="max-h-120 min-h-full w-full xl:w-[60%]">
 			<ThreeMFPreview
 				identifier="project-model"
 				modelUrl={data.s3PublicUrl + '/' + data.project.modelFile}
