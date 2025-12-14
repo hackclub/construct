@@ -3,16 +3,17 @@ import { project, user, devlog } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, and, sql, ne, inArray } from 'drizzle-orm';
 import type { Actions } from './$types';
+import { getCurrentlyPrinting } from './utils';
 
 export async function load({ locals }) {
 	if (!locals.user) {
 		throw error(500);
 	}
-	if (!locals.user.hasT1Review) {
+	if (!locals.user.isPrinter) {
 		throw error(403, { message: 'get out, peasant' });
 	}
 
-	const projects = await getProjects(['submitted'], [], []);
+	const projects = await getProjects(['t1_approved'], [], []);
 
 	const allProjects = await db
 		.select({
@@ -30,10 +31,13 @@ export async function load({ locals }) {
 		.from(user)
 		.where(and(ne(user.trust, 'red'), ne(user.hackatimeTrust, 'red'))); // hide banned users
 
+	const currentlyPrinting = getCurrentlyPrinting(locals.user);
+
 	return {
 		allProjects,
 		projects,
-		users
+		users,
+		currentlyPrinting
 	};
 }
 
@@ -42,7 +46,7 @@ export const actions = {
 		if (!locals.user) {
 			throw error(500);
 		}
-		if (!locals.user.hasT1Review) {
+		if (!locals.user.isPrinter) {
 			throw error(403, { message: 'get out, peasant' });
 		}
 

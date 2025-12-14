@@ -24,10 +24,10 @@
 	let formPending = $state(false);
 </script>
 
-<Head title="Review" />
+<Head title="Print" />
 
 <div class="flex h-full flex-col">
-	<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Review</h1>
+	<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Print</h1>
 
 	<div class="flex flex-col-reverse gap-5 lg:flex-row">
 		<div class="themed-box grow p-3">
@@ -49,7 +49,7 @@
 						<select
 							class="h-40 grow border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 placeholder:text-primary-900 active:ring-3"
 							name="status"
-							value={form?.fields.status ?? ['submitted']}
+							value={form?.fields.status ?? ['t1_approved']}
 							multiple
 						>
 							{#each Object.entries(projectStatuses) as [status, longStatus]}
@@ -153,7 +153,7 @@
 				>
 					<a
 						class="absolute inset-0 z-1"
-						href={`/dashboard/admin/review/${project.project.id}`}
+						href={`/dashboard/admin/print/${project.project.id}`}
 						aria-label="project"
 					>
 					</a>

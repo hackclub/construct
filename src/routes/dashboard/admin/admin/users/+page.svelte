@@ -11,11 +11,8 @@
 
 	let users = $derived(data.users); //form?.users ??
 
-	let filteredProjects = $derived(
-		data.users.filter((user) => user.name?.toLowerCase().includes(userSearch.toLowerCase()))
-	);
 	let filteredUsers = $derived(
-		data.users.filter((user) => user.name.toLowerCase().includes(userSearch.toLowerCase()))
+		data.users.filter((user) => user.name?.toLowerCase().includes(userSearch.toLowerCase()))
 	);
 
 	let formPending = $state(false);
@@ -26,7 +23,11 @@
 <div class="flex h-full flex-col">
 	<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Users</h1>
 
-	{#if users.length == 0}
+	<p class="mb-3 text-lg">Showing {filteredUsers.length} users</p>
+
+	<input class="themed-box p-2 mb-3 w-full" placeholder="Search users..." bind:value={userSearch} />
+
+	{#if filteredUsers.length == 0}
 		<div class="flex grow items-center justify-center">
 			<div>
 				<p class="themed-box p-3 shadow-lg/20">
@@ -40,7 +41,7 @@
 		</div>
 	{:else}
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-			{#each users as user}
+			{#each filteredUsers as user}
 				<div
 					class="themed-box relative flex flex-col p-3 shadow-lg/20 transition-all hover:scale-102"
 				>
@@ -54,6 +55,9 @@
 						<span class="grow truncate">{user.name}</span>
 					</h1>
 					<p>
+						{#if user.isPrinter}
+							<span class="rounded-sm bg-primary-900 px-1 text-nowrap">printer</span>
+						{/if}
 						{#if user.hasT1Review}
 							<span class="rounded-sm bg-primary-800 px-1 text-nowrap">t1 review</span>
 						{/if}

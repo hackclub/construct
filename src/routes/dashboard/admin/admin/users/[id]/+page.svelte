@@ -186,7 +186,16 @@
 						};
 					}}
 				>
-					<div class="grid grid-cols-2 lg:grid-cols-3">
+					<div class="grid grid-cols-2 lg:grid-cols-4">
+						<label class="flex flex-row items-center gap-1">
+							<input
+								type="checkbox"
+								name="is_printer"
+								checked={user.isPrinter}
+								class="checkbox"
+							/>
+							<span class="font-medium">Is printer</span>
+						</label>
 						<label class="flex flex-row items-center gap-1">
 							<input
 								type="checkbox"

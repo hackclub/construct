@@ -24,7 +24,7 @@
 >
 	<div>
 		<label class="flex flex-col gap-1">
-			Project name*
+			Project name
 			<input
 				type="text"
 				name="name"
@@ -40,7 +40,9 @@
 	</div>
 	<div>
 		<label class="flex flex-col gap-1">
-			Description
+			<span>
+				Description <span class="inline opacity-50">(optional for now)</span>
+			</span>
 			<textarea
 				name="description"
 				placeholder="A couple sentences to describe your project"
@@ -50,21 +52,6 @@
 		</label>
 		{#if form?.invalid_description}
 			<p class="text-sm">Invalid description, must be at most 1000 characters</p>
-		{/if}
-	</div>
-	<div>
-		<label class="flex flex-col gap-1">
-			Printables URL
-			<input
-				type="text"
-				name="url"
-				placeholder="A link to your design"
-				value={form?.fields?.url ?? data.project.url}
-				class="themed-box ring-primary-900 placeholder:text-primary-900 active:ring-3"
-			/>
-		</label>
-		{#if form?.invalid_url}
-			<p class="text-sm">Invalid URL</p>
 		{/if}
 	</div>
 	<button type="submit" class="button md primary mt-3" disabled={formPending}>

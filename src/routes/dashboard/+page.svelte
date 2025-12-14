@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Head from '$lib/components/Head.svelte';
-	import ChecklistItem from './ChecklistItem.svelte';
+	import ChecklistItem from '$lib/components/ChecklistItem.svelte';
 
 	let { data } = $props();
 </script>

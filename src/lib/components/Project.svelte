@@ -1,20 +1,37 @@
 <script lang="ts">
 	import { projectStatuses } from '$lib/utils';
-	import { ExternalLink, Lock } from '@lucide/svelte';
+	import { Download, ExternalLink, Link, Lock } from '@lucide/svelte';
 	import relativeDate from 'tiny-relative-date';
+	import { page } from '$app/state';
+	import ProjectLinks from './ProjectLinks.svelte';
 
 	interface Props {
 		id: number;
 		name: string | null;
 		description: string | null;
 		url: string | null;
+		editorFileType: string | null;
+		editorUrl: string | null;
+		uploadedFileUrl: string | null;
 		createdAt: Date;
 		timeSpent: number;
 		status: keyof typeof projectStatuses;
 		clickable: boolean;
 	}
 
-	let { id, name, description, url, createdAt, timeSpent, status, clickable }: Props = $props();
+	let {
+		id,
+		name,
+		description,
+		url,
+		editorFileType,
+		editorUrl,
+		uploadedFileUrl,
+		createdAt,
+		timeSpent,
+		status,
+		clickable
+	}: Props = $props();
 </script>
 
 <div
@@ -39,17 +56,10 @@
 			</span>
 		{/if}
 	</h1>
-	<p class="grow">{description}</p>
-	{#if url && url.length > 0}
-		<div class="my-2 flex">
-			<a class="button sm primary relative z-2" href={url} target="_blank">
-				<ExternalLink />
-				Link to project
-			</a>
-		</div>
-	{:else}
-		<div class="mb-2"></div>
-	{/if}
+	<p class="mb-2 grow">{description}</p>
+	<div class="mb-2">
+		<ProjectLinks {url} {editorFileType} {editorUrl} {uploadedFileUrl} />
+	</div>
 	<div class="flex flex-row gap-4">
 		<p class="grow text-sm">
 			Created <abbr title={`${createdAt.toUTCString()}`} class="relative z-2">

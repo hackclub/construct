@@ -88,8 +88,6 @@ export async function GET(event) {
 		return redirect(302, '/auth/failed');
 	}
 
-	console.log(slackProfileResJSON);
-
 	const slackProfile = slackProfileResJSON['user'];
 
 	const profilePic =
@@ -164,8 +162,6 @@ export async function GET(event) {
 		env.SUPER_ADMIN_SLACK_ID != undefined &&
 		env.SUPER_ADMIN_SLACK_ID.length > 0 &&
 		slack_id === env.SUPER_ADMIN_SLACK_ID;
-
-	console.log(id, slack_id, username, profilePic, isSuperAdmin, hackatimeTrust);
 
 	if (databaseUser) {
 		// Update user (update name and profile picture and lastLoginAt on login)

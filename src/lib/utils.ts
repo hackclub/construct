@@ -11,11 +11,10 @@ export function isValidUrl(string: string) {
 export const projectStatuses = {
 	building: 'Building',
 	submitted: 'Submitted',
-	t1_approved: 'Review approved',
-	print_queue: 'On print queue',
+	t1_approved: 'On print queue',
 	printing: 'Being printed',
 	printed: 'Printed',
-	t2_approved: 'YSWS review approved',
+	t2_approved: 'Approved',
 	finalized: 'Finalized',
 	rejected: 'Rejected',
 	rejected_locked: 'Rejected (locked)'

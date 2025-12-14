@@ -9,7 +9,7 @@
 			<h3 class="mb-1 text-lg font-semibold">Eligibility</h3>
 			<ul class="list-inside list-disc text-sm">
 				<li>You must be 13-18 years old.</li>
-				<li>You cannot be banned from HackaTime.</li>
+				<li>You cannot be banned from Hackatime.</li>
 				<li>
 					You must be part of the <a
 						href="https://hackclub.com/slack/"

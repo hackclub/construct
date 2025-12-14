@@ -11,6 +11,16 @@ Stack:
 - PostgreSQL
 - Cloudflare R2
 
+## Slack Bot
+
+For the Slack integration to work, set up a Slack app with these bot token scopes:
+
+- `chat:write`: To send direct messages
+- `users:read`: To fetch user profiles
+- `channels:read` or `groups:read`: To check channel membership (use `groups:read` if your beta channel is private)
+
+Add the `SLACK_BOT_TOKEN` to your `.env` file.
+
 ## Developing
 
 The recommended and easiest way to develop is to use a devcontainer to automatically set up a dev environment.

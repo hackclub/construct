@@ -15,6 +15,7 @@ export function load({ locals }) {
 			clay: locals.user.clay,
 			brick: locals.user.brick,
 			shopScore: locals.user.shopScore,
+			isPrinter: locals.user.isPrinter,
 			hasT1Review: locals.user.hasT1Review,
 			hasT2Review: locals.user.hasT2Review,
 			hasAdmin: locals.user.hasAdmin

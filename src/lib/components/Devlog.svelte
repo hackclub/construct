@@ -57,16 +57,16 @@
 		controls.update();
 
 		// Lighting
-		const hemisphere = new THREE.HemisphereLight(0xffffff, 0xffffff, 1.1);
+		const hemisphere = new THREE.HemisphereLight(0xffffff, 0xffffff, 1.6);
 		scene.add(hemisphere);
 
-		const directional = new THREE.DirectionalLight(0xffffff, 1.1);
+		const directional = new THREE.DirectionalLight(0xffffff, 2);
 		directional.castShadow = true;
 		directional.shadow.mapSize.width = 2048;
 		directional.shadow.mapSize.height = 2048;
 		scene.add(directional);
 
-		const directional2 = new THREE.DirectionalLight(0xffffff, 1.1);
+		const directional2 = new THREE.DirectionalLight(0xffffff, 2);
 		directional2.castShadow = true;
 		directional2.shadow.mapSize.width = 2048;
 		directional2.shadow.mapSize.height = 2048;
@@ -88,7 +88,7 @@
 		var meshMaterial = new THREE.MeshStandardMaterial({
 			transparent: true,
 			opacity: 0.9,
-			color: 0xb2a090,
+			color: 0xc2b0a0,
 			roughness: 0.5,
 			flatShading: false,
 			side: THREE.DoubleSide
@@ -135,7 +135,7 @@
 			const lines = new THREE.LineSegments(
 				edges,
 				new THREE.LineBasicMaterial({
-					color: 0xf3dcc6,
+					color: 0x94857d,
 					linewidth: 1,
 					polygonOffset: true,
 					polygonOffsetFactor: -1,
@@ -187,7 +187,7 @@
 			directional2.position.set(-largestDimension * 2, largestDimension * 2, -largestDimension * 2);
 
 			camera.near = largestDimension * 0.001;
-			camera.far = largestDimension * 10;
+			camera.far = largestDimension * 100;
 			camera.updateProjectionMatrix();
 
 			const edgeLines: { lines: THREE.LineSegments; mesh: THREE.Mesh }[] = [];
@@ -227,7 +227,7 @@
 				const lines = new THREE.LineSegments(
 					edges,
 					new THREE.LineBasicMaterial({
-						color: 0xf3dcc6,
+						color: 0x94857d,
 						linewidth: 1,
 						polygonOffset: true,
 						polygonOffsetFactor: -1,

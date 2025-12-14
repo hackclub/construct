@@ -42,6 +42,9 @@
 					name={project.name}
 					description={project.description}
 					url={project.url}
+					editorFileType={project.editorFileType}
+					editorUrl={project.editorUrl}
+					uploadedFileUrl={project.uploadedFileUrl}
 					createdAt={project.createdAt}
 					timeSpent={project.timeSpent}
 					status={project.status}

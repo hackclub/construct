@@ -18,6 +18,22 @@
 				class="aspect-square h-30 rounded-lg border-3 border-primary-800"
 			/>
 			<h1 class="truncate text-2xl font-bold">{data.requestedUser.name}</h1>
+
+			<p class="text-center">
+				{#if data.requestedUser.isPrinter}
+					<span class="rounded-sm bg-primary-900 px-1 text-nowrap">printer</span>
+				{/if}
+				{#if data.requestedUser.hasT1Review}
+					<span class="rounded-sm bg-primary-800 px-1 text-nowrap">T1 review</span>
+				{/if}
+				{#if data.requestedUser.hasT2Review}
+					<span class="rounded-sm bg-primary-700 px-1 text-nowrap">T2 review</span>
+				{/if}
+				{#if data.requestedUser.hasAdmin}
+					<span class="rounded-sm bg-primary-600 px-1 text-nowrap">admin</span>
+				{/if}
+			</p>
+
 			<Calendar />
 			<div class="items-center text-center">
 				<p>

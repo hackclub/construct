@@ -46,6 +46,7 @@ export const actions = {
 		const id: number = parseInt(params.id);
 
 		const data = await request.formData();
+		const isPrinter = data.get('is_printer');
 		const hasT1Review = data.get('has_t1_review');
 		const hasT2Review = data.get('has_t2_review');
 		const hasAdmin = data.get('has_admin');
@@ -53,6 +54,7 @@ export const actions = {
 		await db
 			.update(user)
 			.set({
+				isPrinter: isPrinter === 'on',
 				hasT1Review: hasT1Review === 'on',
 				hasT2Review: hasT2Review === 'on',
 				hasAdmin: hasAdmin === 'on',

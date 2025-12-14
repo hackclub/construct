@@ -47,6 +47,12 @@ export async function load({ locals, params }) {
 			slackId: requestedUser.slackId,
 			profilePicture: requestedUser.profilePicture,
 			name: requestedUser.name,
+			
+			isPrinter: requestedUser.isPrinter,
+			hasT1Review: requestedUser.hasT1Review,
+			hasT2Review: requestedUser.hasT2Review,
+			hasAdmin: requestedUser.hasAdmin,
+
 			createdAt: requestedUser.createdAt,
 			lastLoginAt: requestedUser.id === locals.user?.id ? requestedUser.lastLoginAt : null
 		},

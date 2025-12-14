@@ -52,21 +52,6 @@
 			<p class="text-sm">Invalid description, must be at most 1000 characters</p>
 		{/if}
 	</div>
-	<div>
-		<label class="flex flex-col gap-1">
-			<span>Printables URL <span class="inline opacity-50">(optional)</span></span>
-			<input
-				type="text"
-				name="url"
-				placeholder="A link to your design on printables.com"
-				value={form?.fields?.url ?? ''}
-				class="themed-box ring-primary-900 placeholder:text-primary-900 active:ring-3"
-			/>
-		</label>
-		{#if form?.invalid_url}
-			<p class="text-sm">Invalid URL</p>
-		{/if}
-	</div>
 	<button type="submit" class="button md primary mt-3 shadow-lg" disabled={formPending}>
 		Create!
 	</button>

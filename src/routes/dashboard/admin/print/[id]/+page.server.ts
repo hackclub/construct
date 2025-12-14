@@ -3,13 +3,12 @@ import { project, user, devlog, t1Review } from '$lib/server/db/schema.js';
 import { error, redirect } from '@sveltejs/kit';
 import { eq, and, asc, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
-import { sendSlackDM } from '$lib/server/slack.js';
 
 export async function load({ locals, params }) {
 	if (!locals.user) {
 		throw error(500);
 	}
-	if (!locals.user.hasT1Review) {
+	if (!locals.user.isPrinter) {
 		throw error(403, { message: 'get out, peasant' });
 	}
 
@@ -21,13 +20,7 @@ export async function load({ locals, params }) {
 				id: project.id,
 				name: project.name,
 				description: project.description,
-
 				url: project.url,
-				editorFileType: project.editorFileType,
-				editorUrl: project.editorUrl,
-				uploadedFileUrl: project.uploadedFileUrl,
-				modelFile: project.modelFile,
-
 				createdAt: project.createdAt,
 				updatedAt: project.updatedAt,
 				status: project.status
@@ -51,10 +44,6 @@ export async function load({ locals, params }) {
 			project.name,
 			project.description,
 			project.url,
-			project.editorFileType,
-			project.editorUrl,
-			project.uploadedFileUrl,
-			project.modelFile,
 			project.createdAt,
 			project.status,
 			user.id,
@@ -104,7 +93,7 @@ export const actions = {
 		if (!locals.user) {
 			throw error(500);
 		}
-		if (!locals.user.hasT1Review) {
+		if (!locals.user.isPrinter) {
 			throw error(403, { message: 'get out, peasant' });
 		}
 
@@ -112,9 +101,7 @@ export const actions = {
 
 		const [queriedProject] = await db
 			.select({
-				id: project.id,
-				name: project.name,
-				userId: project.userId
+				id: project.id
 			})
 			.from(project)
 			.where(and(eq(project.deleted, false), eq(project.id, id)));
@@ -141,52 +128,29 @@ export const actions = {
 		});
 
 		let status: typeof project.status._.data | undefined = undefined;
-		let statusMessage = '';
 
 		switch (action) {
 			case 'approve':
 				status = 't1_approved';
-				statusMessage = 'approved! :woah-dino:';
 				break;
 			case 'approve_no_print':
 				status = 'printed';
-				statusMessage = 'approved (no printing required)! :woah-dino:';
 				break;
 			case 'reject':
 				status = 'rejected';
-				statusMessage = "rejected. :sad_pepe:\nYou can still re-ship this when you're ready.";
 				break;
 			case 'reject_lock':
 				status = 'rejected_locked';
-				statusMessage = "rejected.\nYou can't re-ship this project.";
 				break;
 		}
 
-		const [projectUser] = await db
-			.select({
-				slackId: user.slackId
+		await db
+			.update(project)
+			.set({
+				status
 			})
-			.from(user)
-			.where(eq(user.id, queriedProject.userId));
+			.where(eq(project.id, id));
 
-		if (projectUser && status) {
-			await db
-				.update(project)
-				.set({
-					status
-				})
-				.where(eq(project.id, id));
-
-			const feedbackText = feedback
-				? `\n\nHere's what they said about your project:\n${feedback}`
-				: '';
-
-			await sendSlackDM(
-				projectUser.slackId,
-				`Your project <https://construct.hackclub.com/dashboard/projects/${queriedProject.id}|${queriedProject.name}> has been ${statusMessage}${feedbackText}`
-			);
-		}
-
-		return redirect(302, '/dashboard/admin/review');
+		return redirect(302, '/dashboard/admin/print');
 	}
 } satisfies Actions;

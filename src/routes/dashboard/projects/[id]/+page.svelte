@@ -1,7 +1,7 @@
 <script lang="ts">
 	import CharCountedTextarea from '$lib/components/CharCountedTextarea.svelte';
 
-	import { SquarePen, ExternalLink, Trash, Ship, Lock } from '@lucide/svelte';
+	import { SquarePen, ExternalLink, Trash, Ship, Lock, Download, Link } from '@lucide/svelte';
 	import relativeDate from 'tiny-relative-date';
 	import type { PageProps } from './$types';
 	import Devlog from '$lib/components/Devlog.svelte';
@@ -9,6 +9,8 @@
 	import { projectStatuses } from '$lib/utils';
 	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
+	import ThreeMFPreview from '$lib/components/ThreeMFPreview.svelte';
+	import ProjectLinks from '$lib/components/ProjectLinks.svelte';
 
 	const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
@@ -17,7 +19,6 @@
 	let sortDevlogsAscending = $derived.by(() => sortDropdownValue == 'ascending');
 
 	let editable = $derived(data.project.status == 'building' || data.project.status == 'rejected');
-	let shippable = $derived(data.devlogs.length > 0);
 
 	let description = $state(form?.fields?.description ?? '');
 
@@ -41,61 +42,81 @@
 <Head title={data.project.name} />
 
 <h1 class="mt-5 mb-2 font-hero text-3xl font-medium">{data.project.name}</h1>
-<p class="text-sm">
-	Created
-	<abbr title={`${data.project.createdAt.toUTCString()}`}>
-		{relativeDate(data.project.createdAt)}
-	</abbr>
-	∙ Updated
-	<abbr title={`${new Date(data.project.updatedAt).toUTCString()}`}>
-		{relativeDate(data.project.updatedAt)}
-	</abbr>
-	∙ {Math.floor(data.project.timeSpent / 60)}h {data.project.timeSpent % 60}min
-</p>
-<p class="mt-0.5">Status: {projectStatuses[data.project.status]}</p>
-{#if data.project.url && data.project.url.length > 0}
-	<div class="my-2 flex">
-		<a class="button sm primary" href={data.project.url} target="_blank">
-			<ExternalLink />
-			Link to project
-		</a>
+
+<div class="flex flex-col xl:flex-row gap-3">
+	<div class="mb-6 grow">
+		<p class="text-sm">
+			Created
+			<abbr title={`${data.project.createdAt.toUTCString()}`}>
+				{relativeDate(data.project.createdAt)}
+			</abbr>
+			∙ Updated
+			<abbr title={`${new Date(data.project.updatedAt).toUTCString()}`}>
+				{relativeDate(data.project.updatedAt)}
+			</abbr>
+			∙ {Math.floor(data.project.timeSpent / 60)}h {data.project.timeSpent % 60}min
+		</p>
+		<p class="mt-0.5">Status: {projectStatuses[data.project.status]}</p>
+
+		<div class="my-2">
+			<ProjectLinks
+				url={data.project.url}
+				editorFileType={data.project.editorFileType}
+				editorUrl={data.project.editorUrl}
+				uploadedFileUrl={data.project.uploadedFileUrl}
+			/>
+		</div>
+
+		<p class="mt-2">
+			{#each data.project.description?.split('\n') as descriptionSection}
+				{descriptionSection}
+				<br />
+			{/each}
+		</p>
+
+		{#if data.project.userId === data.user.id}
+			<div class="mt-3 flex gap-2">
+				<a
+					href={editable ? `/dashboard/projects/${data.project.id}/edit` : null}
+					class={`button sm primary ${editable ? '' : 'disabled'}`}
+					title={editable ? null : 'Currently locked as the project has been shipped'}
+				>
+					<SquarePen />
+					Edit
+				</a>
+				<a
+					href={editable ? `/dashboard/projects/${data.project.id}/ship` : null}
+					class={`button sm orange ${editable ? '' : 'disabled'}`}
+					title={editable ? null : 'Currently locked as the project has been shipped'}
+				>
+					<Ship />
+					Ship
+				</a>
+				<a
+					href={editable ? `/dashboard/projects/${data.project.id}/delete` : null}
+					class={`button sm dark-red ${editable ? '' : 'disabled'}`}
+					title={editable ? null : 'Currently locked as the project has been shipped'}
+				>
+					<Trash />
+					Delete
+				</a>
+			</div>
+		{/if}
 	</div>
-{/if}
-<p class="mt-6">{data.project.description}</p>
+
+	{#if data.project.modelFile}
+		<div class="max-h-120 min-h-full w-full xl:w-[60%]">
+			<ThreeMFPreview
+				identifier="project-model"
+				modelUrl={data.s3PublicUrl + '/' + data.project.modelFile}
+				lineColor={0x94857d}
+			/>
+		</div>
+	{/if}
+</div>
 
 {#if data.project.userId === data.user.id}
-	<div class="mt-3 flex gap-2">
-		<a
-			href={editable ? `/dashboard/projects/${data.project.id}/edit` : null}
-			class={`button sm primary ${editable ? '' : 'disabled'}`}
-			title={editable ? null : 'Currently locked as the project has been shipped'}
-		>
-			<SquarePen />
-			Edit
-		</a>
-		<a
-			href={editable && shippable ? `/dashboard/projects/${data.project.id}/ship` : null}
-			class={`button sm orange ${editable && shippable ? '' : 'disabled'}`}
-			title={editable && shippable
-				? null
-				: shippable
-					? 'Currently locked as the project has been shipped'
-					: 'Currently locked as you need at least one journal entry to ship'}
-		>
-			<Ship />
-			Ship
-		</a>
-		<a
-			href={editable ? `/dashboard/projects/${data.project.id}/delete` : null}
-			class={`button sm dark-red ${editable ? '' : 'disabled'}`}
-			title={editable ? null : 'Currently locked as the project has been shipped'}
-		>
-			<Trash />
-			Delete
-		</a>
-	</div>
-
-	<h3 class="mt-6 mb-1 text-xl font-semibold">Add entry</h3>
+	<h3 class="mt-1 mb-1 text-xl font-semibold">Add entry</h3>
 	{#if !editable}
 		<div class="flex gap-1">
 			<Lock size={20} />

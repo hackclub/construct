@@ -5,7 +5,7 @@
 	let timeLeft = $state({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 	let interval: ReturnType<typeof setInterval>;
 
-	const targetDate = new Date('2025-12-15T23:59:00-05:00').getTime();
+	const targetDate = new Date('2025-12-15T00:00:00-05:00').getTime();
 
 	function updateTimer() {
 		const now = new Date().getTime();

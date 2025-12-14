@@ -1,0 +1,2 @@
+ALTER TABLE "project" ADD COLUMN "printedBy" serial NOT NULL;--> statement-breakpoint
+ALTER TABLE "project" ADD CONSTRAINT "project_printedBy_user_id_fk" FOREIGN KEY ("printedBy") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;

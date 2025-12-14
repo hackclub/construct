@@ -17,6 +17,7 @@
 	<ul class="list-inside list-disc">
 		<li>Fusion 360</li>
 		<li>Onshape</li>
+		<li>Shapr3D</li>
 		<li class="group relative">
 			Solidworks <img
 				src="https://emoji.slack-edge.com/T0266FRGM/thinkies/12dbe989643f6f35.png"
@@ -38,7 +39,6 @@
 				!!
 			</span>
 		</li>
-		<li>Rhino</li>
 		<li>Blender</li>
 	</ul>
 	<p class="mt-2">No TinkerCAD please.</p>

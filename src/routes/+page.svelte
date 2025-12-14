@@ -9,24 +9,23 @@
 
 	import model from '$lib/assets/Construct Logo.3mf?url';
 	import modelImage from '$lib/assets/model.png';
-	import keyringModel from '$lib/assets/keyring_colored.3mf?url';
+	import keyringModel from '$lib/assets/keyring.3mf?url';
 	import sticker1Image from '$lib/assets/sticker1.png';
 	import sticker2Image from '$lib/assets/sticker2.png';
 
 	let { data } = $props();
 
 	import * as THREE from 'three';
-	import { ThreeMFLoader } from 'three/examples/jsm/Addons.js';
-	import { OrbitControls } from 'three/examples/jsm/Addons.js';
+	import { ThreeMFLoader, OrbitControls } from 'three/examples/jsm/Addons.js';
 	import { onMount } from 'svelte';
 	import Head from '$lib/components/Head.svelte';
+	import ThreeMFPreview from '$lib/components/ThreeMFPreview.svelte';
 
 	let degree = Math.PI / 180;
 	let showStickersSection = $state(false);
 	let keyringInitialized = false;
 
 	const scene = new THREE.Scene();
-	const keyringScene = new THREE.Scene();
 
 	onMount(() => {
 		if (!model) {
@@ -214,205 +213,42 @@
 		};
 		animate();
 	});
-
-	$effect(() => {
-		if (!showStickersSection) {
-			return;
-		}
-
-		if (keyringInitialized || !keyringModel) {
-			return;
-		}
-
-		setTimeout(() => {
-			let keyringCanvas = document.querySelector(`#keyring-canvas`);
-
-			if (!keyringCanvas) {
-				return;
-			}
-
-			keyringInitialized = true;
-
-			const keyringRenderer = new THREE.WebGLRenderer({
-				canvas: keyringCanvas,
-				antialias: true,
-				alpha: true
-			});
-
-			keyringRenderer.setClearColor(0xffffff, 0);
-			keyringRenderer.setPixelRatio(window.devicePixelRatio);
-			keyringRenderer.shadowMap.enabled = true;
-			keyringRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-			const keyringCamera = new THREE.PerspectiveCamera(40, 2, 1, 1000);
-			keyringCamera.rotation.x = -45 * degree;
-
-			let keyringControls = new OrbitControls(keyringCamera, keyringRenderer.domElement);
-			keyringControls.target.set(0, 0, 0);
-			keyringControls.rotateSpeed = 0.6;
-			keyringControls.enablePan = false;
-			keyringControls.dampingFactor = 0.1;
-			keyringControls.enableDamping = true;
-			keyringControls.autoRotate = true;
-			keyringControls.autoRotateSpeed = 3;
-			keyringControls.update();
-
-			const keyringHemisphere = new THREE.HemisphereLight(0xffffff, 0xffffff, 4);
-			keyringScene.add(keyringHemisphere);
-
-			const keyringDirectional = new THREE.DirectionalLight(0xffffff, 1);
-			keyringDirectional.castShadow = true;
-			keyringDirectional.shadow.mapSize.width = 2048;
-			keyringDirectional.shadow.mapSize.height = 2048;
-			keyringScene.add(keyringDirectional);
-
-			const keyringDirectional2 = new THREE.DirectionalLight(0xffffff, 1);
-			keyringDirectional2.castShadow = true;
-			keyringDirectional2.shadow.mapSize.width = 2048;
-			keyringDirectional2.shadow.mapSize.height = 2048;
-			keyringScene.add(keyringDirectional2);
-
-			function resizeKeyringCanvasToDisplaySize() {
-				const canvas = keyringRenderer.domElement;
-				const width = canvas.clientWidth;
-				const height = canvas.clientHeight;
-				if (canvas.width !== width || canvas.height !== height) {
-					keyringRenderer.setSize(width, height, false);
-					keyringRenderer.setPixelRatio(window.devicePixelRatio);
-					keyringCamera.aspect = width / height;
-					keyringCamera.updateProjectionMatrix();
-				}
-			}
-
-			function parseKeyringObject(object: THREE.Group<THREE.Object3DEventMap>) {
-				object = object as THREE.Group<THREE.Object3DEventMap> & { children: THREE.Mesh[] };
-
-				object.rotation.x = THREE.MathUtils.degToRad(-90);
-
-				const aabb = new THREE.Box3().setFromObject(object);
-				const center = aabb.getCenter(new THREE.Vector3());
-
-				object.position.x += object.position.x - center.x;
-				object.position.y += object.position.y - center.y;
-				object.position.z += object.position.z - center.z;
-
-				keyringControls.reset();
-
-				var box = new THREE.Box3().setFromObject(object);
-				const size = new THREE.Vector3();
-				box.getSize(size);
-				const largestDimension = Math.max(size.x, size.y, size.z);
-
-				keyringCamera.position.z = largestDimension * 0.3;
-				keyringCamera.position.y = largestDimension * 1.38;
-
-				keyringDirectional.position.set(
-					largestDimension * 2,
-					largestDimension * 2,
-					largestDimension * 2
-				);
-				keyringDirectional2.position.set(
-					-largestDimension * 2,
-					largestDimension * 2,
-					-largestDimension * 2
-				);
-
-				keyringCamera.near = largestDimension * 0.001;
-				keyringCamera.far = largestDimension * 10;
-				keyringCamera.updateProjectionMatrix();
-
-				const edgeLines: { lines: THREE.LineSegments; mesh: THREE.Mesh }[] = [];
-
-				object.traverse(function (child) {
-					child.castShadow = true;
-					child.receiveShadow = true;
-
-					const mesh = child as THREE.Mesh;
-
-					const edges = new THREE.EdgesGeometry(mesh.geometry);
-					const lines = new THREE.LineSegments(
-						edges,
-						new THREE.LineBasicMaterial({
-							color: 0xf3dcc6,
-							linewidth: 1,
-							polygonOffset: true,
-							polygonOffsetFactor: -1,
-							polygonOffsetUnits: -1
-						})
-					);
-
-					lines.position.copy(mesh.position);
-					lines.rotation.copy(mesh.rotation);
-
-					edgeLines.push({ lines, mesh });
-				});
-
-				edgeLines.forEach(({ lines, mesh }) => {
-					mesh.add(lines);
-				});
-
-				keyringScene.add(object);
-			}
-
-			var threemfLoader = new ThreeMFLoader();
-
-			threemfLoader.load(
-				keyringModel,
-				parseKeyringObject,
-				(xhr) => {
-					console.log('Keyring: ' + (xhr.loaded / xhr.total) * 100 + '% loaded');
-				},
-				(error) => {
-					console.error('Keyring error:', error);
-				}
-			);
-
-			const animateKeyring = function () {
-				requestAnimationFrame(animateKeyring);
-				keyringControls.update();
-				keyringRenderer.render(keyringScene, keyringCamera);
-				resizeKeyringCanvasToDisplaySize();
-			};
-			animateKeyring();
-		}, 100);
-	});
 </script>
 
 <Head title="" />
 
 {#if !showStickersSection}
 	<button
-		class="button md fixed top-4 right-4 z-50 border-3 border-orange-900 bg-orange-800 outline-orange-50 transition-all hover:scale-105 hover:bg-orange-700 animate-[bounce_2.5s_ease-in-out_infinite]"
-		style="transform: rotate(-2deg);"
+		class="button md primary absolute top-4 right-4 z-50 animate-[bounce_2s_infinite]"
 		onclick={() => {
 			keyringInitialized = false;
 			showStickersSection = !showStickersSection;
 		}}
 	>
-		Free swag!
+		Free stickers + keyring!
 	</button>
 {/if}
 
 {#if showStickersSection}
 	<div
-			class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-70 p-4"
-			role="dialog"
-			aria-modal="true"
-			tabindex="0"
-			onclick={(e) => {
-				if (e.target === e.currentTarget) {
-					showStickersSection = false;
-				}
-			}}
-			onkeydown={(e) => e.key === 'Escape' && (showStickersSection = false)}
+		class="fixed inset-0 z-1000 flex items-center justify-center bg-black/70 p-4"
+		role="dialog"
+		aria-modal="true"
+		tabindex="0"
+		onclick={(e) => {
+			if (e.target === e.currentTarget) {
+				showStickersSection = false;
+			}
+		}}
+		onkeydown={(e) => e.key === 'Escape' && (showStickersSection = false)}
 	>
 		<div
-				class="relative max-h-[95vh] w-full max-w-5xl overflow-y-auto rounded-lg border-3 border-primary-900 bg-primary-950 p-8 shadow-2xl"
-				role="document"
-				tabindex="-1"
+			class="relative max-h-[95vh] w-full max-w-5xl overflow-y-auto rounded-lg border-3 border-primary-900 bg-primary-950 p-8 shadow-2xl"
+			role="document"
+			tabindex="-1"
 		>
 			<button
-				class="button sm absolute top-4 right-4 z-10 border-2 border-primary-900 bg-primary-800 outline-primary-50 hover:bg-primary-700"
+				class="button md primary absolute top-4 right-4 z-10"
 				onclick={() => (showStickersSection = false)}
 				aria-label="Close dialog"
 			>
@@ -421,9 +257,7 @@
 
 			<div class="mx-auto max-w-4xl">
 				<div class="mb-8 text-center">
-					<h2 class="mb-2 text-2xl font-bold sm:text-3xl">
-						Free swag with your first submission
-					</h2>
+					<h2 class="mb-2 text-2xl font-bold sm:text-3xl">Free swag with your first submission</h2>
 					<p class="text-lg font-medium text-primary-300">
 						Ship a project, get exclusive Construct goodies
 					</p>
@@ -431,7 +265,9 @@
 
 				<div class="grid gap-6 sm:grid-cols-2">
 					<div class="themed-box p-6">
-						<div class="mb-4 flex h-56 items-center justify-center gap-3 overflow-hidden rounded-lg border-2 border-primary-900 bg-primary-900">
+						<div
+							class="mb-4 flex h-56 items-center justify-center gap-3 overflow-hidden rounded-lg border-2 border-primary-900 bg-primary-900"
+						>
 							<img
 								src={sticker1Image}
 								alt="Construct sticker 1"
@@ -447,29 +283,32 @@
 						</div>
 						<div class="text-center">
 							<h3 class="mb-2 text-xl font-bold">Sticker Pack</h3>
-							<p class="text-sm text-primary-300">
-								Sticker 1 and Sticker 2—both included
-							</p>
+							<p class="text-sm text-primary-300">yay stickers!!!</p>
 						</div>
 					</div>
 
 					<div class="themed-box p-6">
-						<div class="mb-4 flex h-56 items-center justify-center overflow-hidden rounded-lg border-2 border-primary-900 bg-primary-900">
-							<canvas class="h-full w-full" width="200" height="200" id="keyring-canvas"></canvas>
+						<div
+							class="mb-4 flex h-56 items-center justify-center overflow-hidden rounded-lg border-2 border-primary-900 bg-primary-900"
+						>
+							<ThreeMFPreview identifier="keyring" modelUrl={keyringModel} lineColor={0x94857d} />
 						</div>
 						<div class="text-center">
-							<h3 class="mb-2 text-xl font-bold">3D Keychain</h3>
+							<h3 class="mb-2 text-xl font-bold">Construct Keyring</h3>
 							<p class="text-sm text-primary-300">
-								Custom 3D printed keychain
+								even more yay keyring
+								<img
+									src="https://emoji.slack-edge.com/T09V59WQY1E/yayayayayay/203666b7424ee7a7.gif"
+									alt="yay"
+									class="inline h-6"
+								/>
 							</p>
 						</div>
 					</div>
 				</div>
 
 				<div class="themed-box mt-6 p-6 text-center">
-					<p class="font-medium">
-						<strong>How it works:</strong> Submit your first CAD project and we'll mail these to you—completely free!
-					</p>
+					<p class="font-medium">Ship your first project and we'll mail these to you!</p>
 				</div>
 			</div>
 		</div>
