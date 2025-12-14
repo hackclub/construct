@@ -18,6 +18,9 @@
 	name={data.project.name}
 	description={data.project.description}
 	url={data.project.url}
+	editorFileType={data.project.editorFileType}
+	editorUrl={data.project.editorUrl}
+	uploadedFileUrl={data.project.uploadedFileUrl}
 	timeSpent={data.project.timeSpent}
 	createdAt={data.project.createdAt}
 	status={data.project.status}

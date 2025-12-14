@@ -17,6 +17,11 @@ export async function load({ params, locals }) {
 			name: project.name,
 			description: project.description,
 			url: project.url,
+
+			editorFileType: project.editorFileType,
+			editorUrl: project.editorUrl,
+			uploadedFileUrl: project.uploadedFileUrl,
+
 			createdAt: project.createdAt,
 			status: project.status,
 			timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`
