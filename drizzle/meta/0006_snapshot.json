@@ -1,6 +1,6 @@
 {
-  "id": "3da61c80-84ad-466d-a2f9-f0a5bfbbe420",
-  "prevId": "dd1faf34-f215-4e5a-95a9-66c21e151248",
+  "id": "c12618f2-0cfc-40f2-9a9a-dbf644650700",
+  "prevId": "0b35966d-3a50-463e-8218-bfc4320586bc",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -149,6 +149,12 @@
           "notNull": true,
           "default": "'building'"
         },
+        "printedBy": {
+          "name": "printedBy",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "deleted": {
           "name": "deleted",
           "type": "boolean",
@@ -179,6 +185,19 @@
           "tableTo": "user",
           "columnsFrom": [
             "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "project_printedBy_user_id_fk": {
+          "name": "project_printedBy_user_id_fk",
+          "tableFrom": "project",
+          "tableTo": "user",
+          "columnsFrom": [
+            "printedBy"
           ],
           "columnsTo": [
             "id"

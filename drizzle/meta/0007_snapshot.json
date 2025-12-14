@@ -1,6 +1,6 @@
 {
-  "id": "3da61c80-84ad-466d-a2f9-f0a5bfbbe420",
-  "prevId": "dd1faf34-f215-4e5a-95a9-66c21e151248",
+  "id": "44bbbdb5-f715-4c21-8bcc-426aa05e11d0",
+  "prevId": "c12618f2-0cfc-40f2-9a9a-dbf644650700",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -141,6 +141,25 @@
           "primaryKey": false,
           "notNull": false
         },
+        "editorFileType": {
+          "name": "editorFileType",
+          "type": "editor_file_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "editorUrl": {
+          "name": "editorUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "uploadedFileUrl": {
+          "name": "uploadedFileUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "status": {
           "name": "status",
           "type": "status",
@@ -148,6 +167,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'building'"
+        },
+        "printedBy": {
+          "name": "printedBy",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         },
         "deleted": {
           "name": "deleted",
@@ -179,6 +204,19 @@
           "tableTo": "user",
           "columnsFrom": [
             "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "project_printedBy_user_id_fk": {
+          "name": "project_printedBy_user_id_fk",
+          "tableFrom": "project",
+          "tableTo": "user",
+          "columnsFrom": [
+            "printedBy"
           ],
           "columnsTo": [
             "id"
@@ -473,6 +511,14 @@
     }
   },
   "enums": {
+    "public.editor_file_type": {
+      "name": "editor_file_type",
+      "schema": "public",
+      "values": [
+        "url",
+        "upload"
+      ]
+    },
     "public.hackatime_trust": {
       "name": "hackatime_trust",
       "schema": "public",

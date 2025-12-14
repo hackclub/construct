@@ -24,8 +24,6 @@ export async function ensureAiReviewsForProject({
 		return { projectReview: null, devlogReviews: [] };
 	}
 
-	const devlogIds = devlogs.map((log) => log.id);
-
 	const existingDevlogReviews = await db
 		.select()
 		.from(aiDevlogReview)
@@ -62,49 +60,52 @@ export async function ensureAiReviewsForProject({
 
 	const { projectReview, devlogReviews } = await reviewDevlogs({ project, devlogs });
 
-	for (const review of devlogReviews) {
-		await db
-			.insert(aiDevlogReview)
+	await db.transaction(async (tx) => {
+		await Promise.all(
+			devlogReviews.map((review) =>
+				tx
+					.insert(aiDevlogReview)
+					.values({
+						devlogId: review.devlogId,
+						projectId: review.projectId,
+						approved: review.approved,
+						rationale: review.rationale,
+						prompt: review.prompt,
+						model: review.model
+					})
+					.onConflictDoUpdate({
+						target: aiDevlogReview.devlogId,
+						set: {
+							projectId: review.projectId,
+							approved: review.approved,
+							rationale: review.rationale,
+							prompt: review.prompt,
+							model: review.model,
+							updatedAt: sql`now()`
+						}
+					})
+		)
+	);
+		await tx
+			.insert(aiProjectReview)
 			.values({
-				devlogId: review.devlogId,
-				projectId: review.projectId,
-				approved: review.approved,
-				rationale: review.rationale,
-				prompt: review.prompt,
-				model: review.model
-			})
-			.onConflictDoUpdate({
-				target: aiDevlogReview.devlogId,
-				set: {
-					projectId: review.projectId,
-					approved: review.approved,
-					rationale: review.rationale,
-					prompt: review.prompt,
-					model: review.model,
-					updatedAt: sql`now()`
-				}
-			});
-	}
-
-	await db
-		.insert(aiProjectReview)
-		.values({
-			projectId: project.id,
-			overallApproved: projectReview.overallApproved,
-			summary: projectReview.summary,
-			prompt: projectReview.prompt,
-			model: projectReview.model
-		})
-		.onConflictDoUpdate({
-			target: aiProjectReview.projectId,
-			set: {
+				projectId: project.id,
 				overallApproved: projectReview.overallApproved,
 				summary: projectReview.summary,
 				prompt: projectReview.prompt,
-				model: projectReview.model,
-				updatedAt: sql`now()`
-			}
-		});
+				model: projectReview.model
+			})
+			.onConflictDoUpdate({
+				target: aiProjectReview.projectId,
+				set: {
+					overallApproved: projectReview.overallApproved,
+					summary: projectReview.summary,
+					prompt: projectReview.prompt,
+					model: projectReview.model,
+					updatedAt: sql`now()`
+				}
+			});
+	});
 
 	const latestDevlogReviews = await db
 		.select()

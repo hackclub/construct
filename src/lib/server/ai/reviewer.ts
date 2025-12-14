@@ -92,7 +92,7 @@ ${JSON.stringify(payload, null, 2)}`;
 	const rawContent = await callHackClubAI(userPrompt);
 	const sanitizedContent = rawContent.replace(/```json|```/g, '').trim();
 	let parsed: { overallVerdict: 'approve' | 'flag'; overview: string };
-	try { parsed = JSON.parse(sanitizedContent); } catch { throw new Error(`AI response was not JSON: ${rawContent}`); }
+	try { parsed = JSON.parse(sanitizedContent); } catch { throw new Error(`AI response was not JSON. First 200 chars: ${rawContent.slice(0, 200)}`); }
 	return {
 		overallApproved: parsed.overallVerdict === 'approve',
 		summary: parsed.overview,
@@ -116,7 +116,7 @@ ${JSON.stringify(payload, null, 2)}`;
 	const rawContent = await callHackClubAI(userPrompt);
 	const sanitizedContent = rawContent.replace(/```json|```/g, '').trim();
 	let parsed: ReviewResponse['devlogs'][number];
-	try { parsed = JSON.parse(sanitizedContent); } catch { throw new Error(`AI response was not JSON: ${rawContent}`); }
+	try { parsed = JSON.parse(sanitizedContent); } catch { throw new Error(`AI response was not JSON. First 200 chars: ${rawContent.slice(0, 200)}`); }
 	return {
 		devlogId: parsed.id,
 		projectId,
@@ -132,10 +132,6 @@ export async function reviewDevlogs({ project, devlogs }: ReviewInput): Promise<
 	devlogReviews: Pick<AiDevlogReview, 'devlogId' | 'projectId' | 'approved' | 'rationale' | 'prompt' | 'model'>[];
 }> {
 	const projectReview = await reviewProjectOverall(project, devlogs);
-	const devlogReviews: Pick<AiDevlogReview, 'devlogId' | 'projectId' | 'approved' | 'rationale' | 'prompt' | 'model'>[] = [];
-	for (const log of devlogs) {
-		const r = await reviewSingleDevlog(project.id, log);
-		devlogReviews.push(r);
-	}
+	const devlogReviews = await Promise.all(devlogs.map(log => reviewSingleDevlog(project.id, log)));
 	return { projectReview, devlogReviews };
 }

@@ -23,6 +23,6 @@ CREATE TABLE "ai_project_review" (
 	CONSTRAINT "ai_project_review_projectId_unique" UNIQUE("projectId")
 );
 --> statement-breakpoint
-ALTER TABLE "ai_devlog_review" ADD CONSTRAINT "ai_devlog_review_devlogId_devlog_id_fk" FOREIGN KEY ("devlogId") REFERENCES "public"."devlog"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ai_devlog_review" ADD CONSTRAINT "ai_devlog_review_projectId_project_id_fk" FOREIGN KEY ("projectId") REFERENCES "public"."project"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ai_devlog_review" ADD CONSTRAINT "ai_devlog_review_devlogId_devlog_id_fk" FOREIGN KEY ("devlogId") REFERENCES "public"."devlog"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ai_devlog_review" ADD CONSTRAINT "ai_devlog_review_projectId_project_id_fk" FOREIGN KEY ("projectId") REFERENCES "public"."project"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ai_project_review" ADD CONSTRAINT "ai_project_review_projectId_project_id_fk" FOREIGN KEY ("projectId") REFERENCES "public"."project"("id") ON DELETE no action ON UPDATE no action;

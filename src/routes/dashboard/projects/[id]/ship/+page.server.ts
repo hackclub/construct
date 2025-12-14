@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db/index.js';
 import { devlog, project, user } from '$lib/server/db/schema.js';
 import { error, redirect } from '@sveltejs/kit';
-import { eq, and, or, sql } from 'drizzle-orm';
+import { eq, and, or, sql, desc } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
 import { ensureAiReviewsForProject } from '$lib/server/ai/ensure.js';
@@ -101,7 +101,7 @@ export const actions = {
 			.select()
 			.from(devlog)
 			.where(and(eq(devlog.projectId, queriedProject.id), eq(devlog.deleted, false)))
-			.orderBy(devlog.createdAt);
+			.orderBy(desc(devlog.createdAt));
 
 		await db
 			.update(project)

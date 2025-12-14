@@ -61,7 +61,6 @@
 			{/if}
 
 
-
 			<h2 class="mt-2 text-2xl font-bold">Project details</h2>
 			<div class="themed-box flex flex-col gap-3 p-3">
 				<div>
