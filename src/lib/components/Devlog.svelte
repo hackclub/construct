@@ -187,7 +187,7 @@
 			directional2.position.set(-largestDimension * 2, largestDimension * 2, -largestDimension * 2);
 
 			camera.near = largestDimension * 0.001;
-			camera.far = largestDimension * 10;
+			camera.far = largestDimension * 100;
 			camera.updateProjectionMatrix();
 
 			const edgeLines: { lines: THREE.LineSegments; mesh: THREE.Mesh }[] = [];

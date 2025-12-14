@@ -9,6 +9,7 @@
 	import { projectStatuses } from '$lib/utils';
 	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
+	import ThreeMFPreview from '$lib/components/ThreeMFPreview.svelte';
 
 	const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
@@ -40,75 +41,100 @@
 <Head title={data.project.name} />
 
 <h1 class="mt-5 mb-2 font-hero text-3xl font-medium">{data.project.name}</h1>
-<p class="text-sm">
-	Created
-	<abbr title={`${data.project.createdAt.toUTCString()}`}>
-		{relativeDate(data.project.createdAt)}
-	</abbr>
-	∙ Updated
-	<abbr title={`${new Date(data.project.updatedAt).toUTCString()}`}>
-		{relativeDate(data.project.updatedAt)}
-	</abbr>
-	∙ {Math.floor(data.project.timeSpent / 60)}h {data.project.timeSpent % 60}min
-</p>
-<p class="mt-0.5">Status: {projectStatuses[data.project.status]}</p>
 
-<div class="my-2 flex flex-row gap-2">
-	{#if data.project.url && data.project.url.length > 0}
-		<div class="flex">
-			<a class="button sm primary" href={data.project.url} target="_blank">
-				<ExternalLink />
-				Printables page
-			</a>
+<div class="flex flex-row">
+	<div class="mb-6 grow">
+		<p class="text-sm">
+			Created
+			<abbr title={`${data.project.createdAt.toUTCString()}`}>
+				{relativeDate(data.project.createdAt)}
+			</abbr>
+			∙ Updated
+			<abbr title={`${new Date(data.project.updatedAt).toUTCString()}`}>
+				{relativeDate(data.project.updatedAt)}
+			</abbr>
+			∙ {Math.floor(data.project.timeSpent / 60)}h {data.project.timeSpent % 60}min
+		</p>
+		<p class="mt-0.5">Status: {projectStatuses[data.project.status]}</p>
+
+		<div class="my-2 flex flex-row gap-2">
+			{#if data.project.url && data.project.url.length > 0}
+				<div class="flex">
+					<a class="button sm primary" href={data.project.url} target="_blank">
+						<ExternalLink />
+						Printables page
+					</a>
+				</div>
+			{/if}
+			{#if data.project.editorFileType === 'upload'}
+				<div class="flex">
+					<a
+						class="button sm primary"
+						href={`${data.s3PublicUrl}/${data.project.uploadedFileUrl}`}
+						target="_blank"
+					>
+						<Download />
+						Project file
+					</a>
+				</div>
+			{:else if data.project.editorFileType === 'url'}
+				<div class="flex">
+					<a class="button sm primary" href={data.project.editorUrl} target="_blank">
+						<Link />
+						Project link
+					</a>
+				</div>
+			{/if}
 		</div>
-	{/if}
-	{#if data.project.editorFileType === 'upload'}
-		<div class="flex">
-			<a class="button sm primary" href={`${data.s3PublicUrl}/${data.project.uploadedFileUrl}`} target="_blank">
-				<Download />
-				Project file
-			</a>
-		</div>
-	{:else if data.project.editorFileType === 'url'}
-		<div class="flex">
-			<a class="button sm primary" href={data.project.editorUrl} target="_blank">
-				<Link />
-				Project link
-			</a>
+		<p class="mt-2">
+			{#each data.project.description?.split('\n') as descriptionSection}
+				{descriptionSection}
+				<br />
+			{/each}
+		</p>
+
+		{#if data.project.userId === data.user.id}
+			<div class="mt-3 flex gap-2">
+				<a
+					href={editable ? `/dashboard/projects/${data.project.id}/edit` : null}
+					class={`button sm primary ${editable ? '' : 'disabled'}`}
+					title={editable ? null : 'Currently locked as the project has been shipped'}
+				>
+					<SquarePen />
+					Edit
+				</a>
+				<a
+					href={editable ? `/dashboard/projects/${data.project.id}/ship` : null}
+					class={`button sm orange ${editable ? '' : 'disabled'}`}
+					title={editable ? null : 'Currently locked as the project has been shipped'}
+				>
+					<Ship />
+					Ship
+				</a>
+				<a
+					href={editable ? `/dashboard/projects/${data.project.id}/delete` : null}
+					class={`button sm dark-red ${editable ? '' : 'disabled'}`}
+					title={editable ? null : 'Currently locked as the project has been shipped'}
+				>
+					<Trash />
+					Delete
+				</a>
+			</div>
+		{/if}
+	</div>
+
+	{#if data.project.modelFile}
+		<div class="max-h-120 min-h-full w-[60%]">
+			<ThreeMFPreview
+				identifier="project-model"
+				modelUrl={data.s3PublicUrl + '/' + data.project.modelFile}
+			/>
 		</div>
 	{/if}
 </div>
-<p class="mt-6">{data.project.description}</p>
 
 {#if data.project.userId === data.user.id}
-	<div class="mt-3 flex gap-2">
-		<a
-			href={editable ? `/dashboard/projects/${data.project.id}/edit` : null}
-			class={`button sm primary ${editable ? '' : 'disabled'}`}
-			title={editable ? null : 'Currently locked as the project has been shipped'}
-		>
-			<SquarePen />
-			Edit
-		</a>
-		<a
-			href={editable ? `/dashboard/projects/${data.project.id}/ship` : null}
-			class={`button sm orange ${editable ? '' : 'disabled'}`}
-			title={editable ? null : 'Currently locked as the project has been shipped'}
-		>
-			<Ship />
-			Ship
-		</a>
-		<a
-			href={editable ? `/dashboard/projects/${data.project.id}/delete` : null}
-			class={`button sm dark-red ${editable ? '' : 'disabled'}`}
-			title={editable ? null : 'Currently locked as the project has been shipped'}
-		>
-			<Trash />
-			Delete
-		</a>
-	</div>
-
-	<h3 class="mt-6 mb-1 text-xl font-semibold">Add entry</h3>
+	<h3 class="mt-1 mb-1 text-xl font-semibold">Add entry</h3>
 	{#if !editable}
 		<div class="flex gap-1">
 			<Lock size={20} />

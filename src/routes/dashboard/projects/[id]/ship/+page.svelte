@@ -103,7 +103,7 @@
 					</label>
 					<div>
 						<button
-							class="h-full rounded-lg bg-primary-800 px-2"
+							class="h-full cursor-pointer rounded-lg bg-primary-800 px-2 outline-primary-50 hover:bg-primary-700 hover:outline-3 focus:outline-3"
 							onclick={() => {
 								editorUploadFile = null;
 							}}>Clear</button

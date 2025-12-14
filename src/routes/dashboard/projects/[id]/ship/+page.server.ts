@@ -116,7 +116,7 @@ export const actions = {
 			return error(400, { message: 'editor file or url both exist' });
 		}
 
-		if (!editorFileValid) {
+		if (editorFileExists && !editorFileValid) {
 			return fail(400, {
 				invalid_editor_file: true
 			});
@@ -125,7 +125,7 @@ export const actions = {
 		// Model file
 		const modelFileValid =
 			modelFile instanceof File &&
-			editorFile.size > 0 &&
+			modelFile.size > 0 &&
 			modelFile.size <= MAX_UPLOAD_SIZE &&
 			extname(modelFile.name).toLowerCase() == '.3mf' &&
 			[
@@ -134,7 +134,7 @@ export const actions = {
 				'application/octet-stream',
 				'text/plain'
 			].includes(modelFile.type);
-
+		
 		if (!modelFileValid) {
 			return fail(400, {
 				invalid_model_file: true
