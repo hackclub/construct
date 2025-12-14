@@ -143,9 +143,43 @@ export const devlog = pgTable('devlog', {
 	updatedAt: timestamp().notNull().defaultNow()
 });
 
+export const aiDevlogReview = pgTable('ai_devlog_review', {
+	id: serial().primaryKey(),
+	devlogId: integer()
+		.notNull()
+		.references(() => devlog.id)
+		.unique(),
+	projectId: integer()
+		.notNull()
+		.references(() => project.id),
+	approved: boolean().notNull(),
+	rationale: text().notNull(),
+	prompt: text().notNull(),
+	model: text().notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow()
+});
+
+export const aiProjectReview = pgTable('ai_project_review', {
+	id: serial().primaryKey(),
+	projectId: integer()
+		.notNull()
+		.references(() => project.id)
+		.unique(),
+	overallApproved: boolean().notNull(),
+	summary: text().notNull(),
+	prompt: text().notNull(),
+	model: text().notNull(),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow()
+});
+
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type Project = typeof project.$inferSelect;
+export type Devlog = typeof devlog.$inferSelect;
 
 export type T1Review = typeof t1Review.$inferSelect;
+export type AiDevlogReview = typeof aiDevlogReview.$inferSelect;
+export type AiProjectReview = typeof aiProjectReview.$inferSelect;
 // export type T2Review = typeof t2Review.$inferSelect;

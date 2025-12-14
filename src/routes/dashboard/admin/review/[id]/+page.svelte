@@ -2,13 +2,21 @@
 	import relativeDate from 'tiny-relative-date';
 	import Devlog from '$lib/components/Devlog.svelte';
 	import Head from '$lib/components/Head.svelte';
-	import { ExternalLink } from '@lucide/svelte';
+	import { AlertCircle, CheckCircle2, ExternalLink } from '@lucide/svelte';
 	import { enhance } from '$app/forms';
 	import { projectStatuses } from '$lib/utils.js';
 
 	let { data } = $props();
 
 	let formPending = $state(false);
+
+	const aiDevlogMap = $derived(
+		Object.fromEntries((data.ai?.devlogReviews ?? []).map((review) => [review.devlogId, review]))
+	);
+
+	const totalDevlogs = $derived((data.ai?.devlogReviews ?? []).length);
+	const totalApproved = $derived((data.ai?.devlogReviews ?? []).filter((r) => r.approved).length);
+	const totalFlagged = $derived(totalDevlogs - totalApproved);
 </script>
 
 <Head title={'Review: ' + data.project.project.name} />
@@ -17,6 +25,42 @@
 	<div class="grow overflow-scroll">
 		<div class="flex grow flex-col gap-3">
 			<h1 class="mt-5 font-hero text-2xl font-medium">{data.project.project.name}</h1>
+
+			{#if data.ai?.projectReview}
+				<div class="themed-box flex items-start gap-2 p-3">
+					{#if data.ai.projectReview.overallApproved}
+						<CheckCircle2 class="text-green-400" />
+						<div>
+							<p class="font-bold text-green-100">AI pre-review: approveable</p>
+							<p class="text-sm">{data.ai.projectReview.summary}</p>
+
+							{#if totalDevlogs > 0}
+								<p class="mt-1 text-xs opacity-80">
+									{totalApproved === totalDevlogs
+										? 'All devlogs approved by AI.'
+										: `${totalApproved}/${totalDevlogs} devlogs approved by AI`}
+								</p>
+							{/if}
+						</div>
+					{:else}
+						<AlertCircle class="text-amber-400" />
+						<div>
+							<p class="font-bold text-amber-100">AI pre-review: needs attention</p>
+							<p class="text-sm">{data.ai.projectReview.summary}</p>
+
+							{#if totalDevlogs > 0}
+								<p class="mt-1 text-xs opacity-80">
+									{totalFlagged === 0
+										? 'All devlogs approved by AI.'
+										: `${totalFlagged} devlog${totalFlagged === 1 ? '' : 's'} flagged by AI`}
+								</p>
+							{/if}
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+
 
 			<h2 class="mt-2 text-2xl font-bold">Project details</h2>
 			<div class="themed-box flex flex-col gap-3 p-3">
@@ -125,7 +169,12 @@
 			<h2 class="mt-2 text-2xl font-bold">Journal logs</h2>
 			<div class="mb-5 flex flex-col gap-5">
 				{#each data.devlogs as devlog}
-					<Devlog {devlog} projectId={devlog.projectId} showModifyButtons={false} />
+					<Devlog
+						{devlog}
+						projectId={devlog.projectId}
+						showModifyButtons={false}
+						aiReview={aiDevlogMap[devlog.id]}
+					/>
 				{/each}
 			</div>
 		</div>

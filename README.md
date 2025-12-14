@@ -43,6 +43,11 @@ You can also run this to get a GUI for the database:
 npm run db:studio
 ```
 
+### AI prereview (devlogs)
+
+- The review panel now shows an AI pre-check on shipped projects’ devlogs. It only flags obvious over-reporting of time.
+- Set `AI_API_KEY` to your Hack Club AI key (it uses the https://ai.hackclub.com proxy under the hood). No key = no AI hints in review.
+
 ## Deploying
 
 Create a `.env` file containing all the required credentials, look at `.env.example` for an example.

@@ -1,9 +1,20 @@
+import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db/index.js';
-import { project, user, devlog, t1Review } from '$lib/server/db/schema.js';
+import { aiDevlogReview, aiProjectReview, devlog, project, t1Review, user } from '$lib/server/db/schema.js';
 import { error, redirect } from '@sveltejs/kit';
-import { eq, and, asc, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
+import { ensureAiReviewsForProject } from '$lib/server/ai/ensure.js';
+
+const REVIEWABLE_STATUSES = new Set([
+	'submitted',
+	't1_approved',
+	'printing',
+	'printed',
+	't2_approved',
+	'finalized'
+]);
 
 export async function load({ locals, params }) {
 	if (!locals.user) {
@@ -63,7 +74,55 @@ export async function load({ locals, params }) {
 		.select()
 		.from(devlog)
 		.where(and(eq(devlog.projectId, queriedProject.project.id), eq(devlog.deleted, false)))
-		.orderBy(asc(devlog.createdAt));
+		.orderBy(desc(devlog.createdAt));
+
+	const devlogIds = devlogs.map((log) => log.id);
+
+	let latestDevlogReviews: typeof aiDevlogReview.$inferSelect[] = [];
+	let latestProjectReview: typeof aiProjectReview.$inferSelect | undefined;
+
+	try {
+		latestDevlogReviews = await db
+			.select()
+			.from(aiDevlogReview)
+			.where(eq(aiDevlogReview.projectId, queriedProject.project.id));
+
+		// filter reviews to only those matching current devlogs
+		const devlogIdSet = new Set(devlogIds);
+		latestDevlogReviews = latestDevlogReviews.filter((r) => devlogIdSet.has(r.devlogId));
+
+		[latestProjectReview] = await db
+			.select()
+			.from(aiProjectReview)
+			.where(eq(aiProjectReview.projectId, queriedProject.project.id));
+	} catch (err) {
+		console.error('AI review read failed', err);
+		latestDevlogReviews = [];
+		latestProjectReview = undefined;
+	}
+
+	if (REVIEWABLE_STATUSES.has(queriedProject.project.status)) {
+		try {
+			const ensured = await ensureAiReviewsForProject({
+				project: {
+					id: queriedProject.project.id,
+					name: queriedProject.project.name,
+					description: queriedProject.project.description,
+					status: queriedProject.project.status,
+					updatedAt: queriedProject.project.updatedAt
+				},
+				devlogs: devlogs.map((log) => ({
+					...log,
+					s3PublicUrl: env.S3_PUBLIC_URL ?? ''
+				}))
+			});
+
+			latestDevlogReviews = ensured.devlogReviews;
+			latestProjectReview = ensured.projectReview ?? latestProjectReview;
+		} catch (err) {
+			console.error('AI review ensure failed', err);
+		}
+	}
 
 	const t1Reviews = await db
 		.select({
@@ -85,7 +144,11 @@ export async function load({ locals, params }) {
 	return {
 		project: queriedProject,
 		devlogs,
-		t1Reviews
+		t1Reviews,
+		ai: {
+			projectReview: latestProjectReview ?? null,
+			devlogReviews: latestDevlogReviews
+		}
 	};
 }
 

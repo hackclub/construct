@@ -1,9 +1,11 @@
+import { env } from '$env/dynamic/private';
 import { db } from '$lib/server/db/index.js';
 import { devlog, project, user } from '$lib/server/db/schema.js';
 import { error, redirect } from '@sveltejs/kit';
 import { eq, and, or, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
+import { ensureAiReviewsForProject } from '$lib/server/ai/ensure.js';
 
 export async function load({ params, locals }) {
 	const id: number = parseInt(params.id);
@@ -95,6 +97,12 @@ export const actions = {
 			return error(400, { message: 'project must have a description and Printables url' });
 		}
 
+		const projectDevlogs = await db
+			.select()
+			.from(devlog)
+			.where(and(eq(devlog.projectId, queriedProject.id), eq(devlog.deleted, false)))
+			.orderBy(devlog.createdAt);
+
 		await db
 			.update(project)
 			.set({
@@ -112,6 +120,23 @@ export const actions = {
 			locals.user.slackId,
 			`Hiya :wave: Your project <https://construct.hackclub.com/dashboard/projects/${queriedProject.id}|${queriedProject.name}> has been shipped and is now under review. We'll take a look and get back to you soon! :rocket:`
 		);
+
+		if (projectDevlogs.length > 0) {
+			// Fire-and-forget AI pre-review so moderators have context ready.
+			ensureAiReviewsForProject({
+				project: {
+					id: queriedProject.id,
+					name: queriedProject.name,
+					description: queriedProject.description,
+					status: 'submitted',
+					updatedAt: new Date()
+				},
+				devlogs: projectDevlogs.map((log) => ({
+					...log,
+					s3PublicUrl: env.S3_PUBLIC_URL ?? ''
+				}))
+			}).catch((err) => console.error('AI pre-review failed', err));
+		}
 
 		return redirect(303, '/dashboard/projects');
 	}

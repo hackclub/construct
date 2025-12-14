@@ -2,14 +2,22 @@
 	// https://github.com/3daddict/stl-viewer/ and https://tonybox.net/posts/simple-stl-viewer/ for stl viewer code
 
 	import relativeDate from 'tiny-relative-date';
-	import { SquarePen, Trash } from '@lucide/svelte';
+	import { AlertCircle, CheckCircle2, SquarePen, Trash } from '@lucide/svelte';
 	import * as THREE from 'three';
 	import { OBJLoader, STLLoader, ThreeMFLoader } from 'three/examples/jsm/Addons.js';
 	import { OrbitControls } from 'three/examples/jsm/Addons.js';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 
-	let { devlog, projectId, showModifyButtons, allowDelete = true, projectName = null, user = null } = $props();
+	let {
+		devlog,
+		projectId,
+		showModifyButtons,
+		allowDelete = true,
+		projectName = null,
+		user = null,
+		aiReview = null
+	} = $props();
 
 	// Necessary for camera/plane rotation
 	let degree = Math.PI / 180;
@@ -294,6 +302,17 @@
 	class="themed-box relative flex flex-col p-3 shadow-lg/20 transition-all"
 	id={`devlog-${devlog.id}`}
 >
+	{#if aiReview}
+		<div class="absolute right-3 top-3 flex flex-row items-center gap-1 text-xs font-semibold">
+			{#if aiReview.approved}
+				<CheckCircle2 class="text-green-400" size={16} />
+				<span class="text-green-100">AI ok</span>
+			{:else}
+				<AlertCircle class="text-amber-400" size={16} />
+				<span class="text-amber-100">AI flagged</span>
+			{/if}
+		</div>
+	{/if}
 	<p class="mb-0.5 text-sm opacity-90">
 		{#if user}
 			<a href={`/dashboard/users/${user.id}#devlog-${devlog.id}`} class="truncate underline"
@@ -349,6 +368,14 @@
 				<Trash />
 				Delete
 			</a>
+		</div>
+	{/if}
+	{#if aiReview && !aiReview.approved && aiReview.rationale}
+		<div class="mt-2 rounded border-3 border-red-700 bg-red-900/30 p-2">
+			<div class="flex items-start gap-2">
+				<AlertCircle class="text-red-400" size={18} />
+				<div class="text-sm text-red-100">{aiReview.rationale}</div>
+			</div>
 		</div>
 	{/if}
 </div>
