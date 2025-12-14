@@ -28,7 +28,7 @@ export async function load() {
 		.innerJoin(user, eq(devlog.userId, user.id))
         .where(eq(devlog.deleted, false))
         .orderBy(desc(devlog.createdAt))
-        .limit(100);
+        .limit(15);
 
 	return {
 		devlogs
