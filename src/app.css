@@ -274,4 +274,8 @@
 	.themed-box {
 		@apply rounded-lg border-3 border-dashed border-primary-900 bg-primary-950;
 	}
+
+	.center {
+		@apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2;
+	}
 }

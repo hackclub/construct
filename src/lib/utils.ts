@@ -2,7 +2,7 @@ export function isValidUrl(string: string) {
 	try {
 		new URL(string);
 		return true;
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (err) {
 		return false;
 	}
@@ -19,3 +19,35 @@ export const projectStatuses = {
 	rejected: 'Rejected',
 	rejected_locked: 'Rejected (locked)'
 };
+
+export default function fileSizeFromUrl(url: string): Promise<number> {
+	return new Promise((resolve, reject) => {
+		if (!url) {
+			return reject(new Error('Invalid URL'));
+		}
+
+		fetch(url, { method: 'HEAD' })
+			.then((response) => {
+				if (!response.ok) {
+					return reject(new Error(`Failed to get file size, status code: ${response.status}`));
+				}
+
+				const contentLength = response.headers.get('content-length');
+
+				if (!contentLength) {
+					return reject(new Error("Couldn't retrieve file size from headers"));
+				}
+
+				const size: number = parseInt(contentLength, 10);
+
+				if (isNaN(size)) {
+					return reject(new Error("Couldn't retrieve file size from headers"));
+				}
+
+				resolve(size);
+			})
+			.catch((err) => {
+				reject(err);
+			});
+	});
+}

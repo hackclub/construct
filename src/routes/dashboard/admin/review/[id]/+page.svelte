@@ -5,7 +5,7 @@
 	import { enhance } from '$app/forms';
 	import { projectStatuses } from '$lib/utils.js';
 	import ProjectLinks from '$lib/components/ProjectLinks.svelte';
-	import ThreeMFPreview from '$lib/components/ThreeMFPreview.svelte';
+	import Spinny3DPreview from '$lib/components/Spinny3DPreview.svelte';
 	import { Download } from '@lucide/svelte';
 
 	let { data } = $props();
@@ -97,9 +97,10 @@
 			</div>
 
 			<div class="themed-box flex h-100 flex-col gap-3 overflow-clip">
-				<ThreeMFPreview
+				<Spinny3DPreview
 					identifier="model"
 					modelUrl={`${data.s3PublicUrl}/${data.project.project.modelFile}`}
+					sizeCutoff={8*1024*1024}
 				/>
 			</div>
 

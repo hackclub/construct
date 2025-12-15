@@ -19,7 +19,7 @@
 	import { ThreeMFLoader, OrbitControls } from 'three/examples/jsm/Addons.js';
 	import { onMount } from 'svelte';
 	import Head from '$lib/components/Head.svelte';
-	import ThreeMFPreview from '$lib/components/ThreeMFPreview.svelte';
+	import Spinny3DPreview from '$lib/components/Spinny3DPreview.svelte';
 
 	let degree = Math.PI / 180;
 	let showStickersSection = $state(false);
@@ -291,7 +291,11 @@
 						<div
 							class="mb-4 flex h-56 items-center justify-center overflow-hidden rounded-lg border-2 border-primary-900 bg-primary-900"
 						>
-							<ThreeMFPreview identifier="keyring" modelUrl={keyringModel} lineColor={0x94857d} />
+							<Spinny3DPreview
+								identifier="keyring"
+								modelUrl={keyringModel}
+								sizeCutoff={8 * 1024 * 1024}
+							/>
 						</div>
 						<div class="text-center">
 							<h3 class="mb-2 text-xl font-bold">Construct Keyring</h3>

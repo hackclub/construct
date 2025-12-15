@@ -9,8 +9,8 @@
 	import { projectStatuses } from '$lib/utils';
 	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
-	import ThreeMFPreview from '$lib/components/ThreeMFPreview.svelte';
 	import ProjectLinks from '$lib/components/ProjectLinks.svelte';
+	import Spinny3DPreview from '$lib/components/Spinny3DPreview.svelte';
 
 	const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
@@ -106,10 +106,10 @@
 
 	{#if data.project.modelFile}
 		<div class="max-h-120 min-h-full w-full xl:w-[60%]">
-			<ThreeMFPreview
+			<Spinny3DPreview
 				identifier="project-model"
 				modelUrl={data.s3PublicUrl + '/' + data.project.modelFile}
-				lineColor={0x94857d}
+				sizeCutoff={8*1024*1024}
 			/>
 		</div>
 	{/if}

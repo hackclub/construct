@@ -9,7 +9,7 @@ Stack:
 - SvelteKit
 - Drizzle ORM
 - PostgreSQL
-- Cloudflare R2
+- Cloudflare R2 (make sure you've configured CORS to allow GET and HEAD requests)
 
 ## Slack Bot
 
