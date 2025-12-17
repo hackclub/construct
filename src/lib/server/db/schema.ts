@@ -84,7 +84,7 @@ export const project = pgTable('project', {
 	printedBy: integer().references(() => user.id),
 
 	submittedToAirtable: boolean().default(false),
-	
+
 	deleted: boolean().notNull().default(false), // Projects aren't actually deleted, just marked as deleted (I cba to deal with foreign key delete issues for audit logs)
 
 	createdAt: timestamp().notNull().defaultNow(),
@@ -142,14 +142,6 @@ export const t1Review = pgTable('t1_review', {
 	timestamp: timestamp().notNull().defaultNow()
 });
 
-export const t2ReviewActionEnum = pgEnum('t2_review_action', [
-	'approve',
-	// 'approve_no_print',
-	// 'add_comment',
-	'reject',
-	// 'reject_lock'
-]);
-
 export const t2Review = pgTable('t2_review', {
 	id: serial().primaryKey(),
 	userId: integer()
@@ -161,7 +153,6 @@ export const t2Review = pgTable('t2_review', {
 
 	feedback: text(),
 	notes: text(),
-	action: t2ReviewActionEnum().notNull(),
 	currencyMultiplier: real().notNull().default(1.0),
 
 	timestamp: timestamp().notNull().defaultNow()

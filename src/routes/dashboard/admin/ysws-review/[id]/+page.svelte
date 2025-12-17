@@ -121,15 +121,6 @@
 					}}
 				>
 					<label class="flex flex-col gap-1">
-						<span class="font-medium">Action</span>
-						<select class="themed-input-on-box text-sm" name="action" required>
-							<option disabled selected>Select review action</option>
-							<option value="approve">Approve</option>
-							<option value="reject">Reject</option>
-						</select>
-					</label>
-
-					<label class="flex flex-col gap-1">
 						<span class="font-medium"
 							>Airtable notes <span class="opacity-50">(justification)</span></span
 						>

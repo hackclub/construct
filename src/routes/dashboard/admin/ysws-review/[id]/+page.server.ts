@@ -4,8 +4,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { eq, and, asc, sql, desc } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
-import { airtableDB } from '$lib/server/airtable';
-import { YswsProjectSubmissionTable } from '$lib/server/airtableTypes';
+import { airtableBase } from '$lib/server/airtable';
 import { env } from '$env/dynamic/private';
 
 export async function load({ locals, params }) {
@@ -163,75 +162,62 @@ export const actions = {
 		}
 
 		const data = await request.formData();
-		const action = data.get('action') as typeof t2Review.action._.data;
 		const notes = data.get('notes')?.toString();
 		const feedback = data.get('feedback')?.toString();
 
-		if (action === null || notes === null || feedback === null) {
+		if (notes === null || feedback === null) {
 			return error(400);
 		}
 
-		let status: typeof project.status._.data | undefined = undefined;
-		// let statusMessage = '';
+		const status: typeof project.status._.data | undefined = 'finalized';
+		const statusMessage = 'finalised! :woah-dino:';
 
-		switch (action) {
-			case 'approve':
-				status = 'finalized';
-				// statusMessage = 'approved! :woah-dino:';
-				break;
-			case 'reject':
-				status = 'rejected';
-				// statusMessage = "rejected. :sad_pepe:\nYou can still re-ship this when you're ready.";
-				break;
-		}
-
-		if (airtableDB && action === 'approve' && !queriedProject.project.submittedToAirtable) {
-			// const [latestDevlog] = await db
-			// 	.select({
-			// 		image: devlog.image
-			// 	})
-			// 	.from(devlog)
-			// 	.where(and(eq(devlog.projectId, id), eq(devlog.deleted, false)))
-			// 	.orderBy(desc(devlog.createdAt))
-			// 	.limit(1);
+		if (airtableBase && !queriedProject.project.submittedToAirtable) {
+			const [latestDevlog] = await db
+				.select({
+					image: devlog.image
+				})
+				.from(devlog)
+				.where(and(eq(devlog.projectId, id), eq(devlog.deleted, false)))
+				.orderBy(desc(devlog.createdAt))
+				.limit(1);
 
 			const repoUrl =
 				queriedProject.project.editorFileType === 'upload'
 					? `${env.S3_PUBLIC_URL}/${queriedProject.project.uploadedFileUrl}`
 					: queriedProject.project.editorFileType === 'url'
 						? queriedProject.project.editorUrl
-						: null;
+						: '';
 
 			const justificationAppend = `Project has ${queriedProject.devlogCount} ${queriedProject.devlogCount == 1 ? 'journal' : 'journals'} over ${Math.floor(
 				queriedProject.timeSpent / 60
 			)}h ${queriedProject.timeSpent % 60}min, each one with a 3d model file to show progress.\nAll journals can be found here: https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}`;
-			// try {
-			await airtableDB.insert(YswsProjectSubmissionTable, {
-				demoUrl: queriedProject.project.url,
-				repositoryUrl: repoUrl,
 
-				slackUsername: queriedProject.user?.name,
-				hoursEstimate: queriedProject.timeSpent / 60,
-				optionalOverrideHoursSpent: queriedProject.timeSpent / 60,
-				optionalOverrideHoursSpentJustification: notes
+			await airtableBase('YSWS Project Submission').create({
+				'Repository URL': repoUrl ?? '',
+				'Demo URL': queriedProject.project.url ?? '',
+				Description: queriedProject.project.description ?? '',
+				'Hours estimate': queriedProject.timeSpent / 60,
+				'Optional - Override Hours Spent': queriedProject.timeSpent / 60,
+				'Optional - Override Hours Spent Justification': notes
 					? notes + '\n' + justificationAppend
 					: justificationAppend,
-
-				description: queriedProject.project.description,
-
-				tempHold: false,
-				identityVerified: true,
-				idvRec: queriedProject.user?.idvId
+				Screenshot: [
+					{
+						url: env.S3_PUBLIC_URL + '/' + latestDevlog.image
+					}
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				] as any,
+				'Slack Username': queriedProject.user?.name,
+				idv_rec: queriedProject.user?.idvId,
+				'Identity Verified': true,
+				'Temp hold': false
 			});
-			// } catch {
-			// 	return error(500, { message: 'airtable submission error' });
-			// }
 		}
 
 		await db.insert(t2Review).values({
 			projectId: id,
 			userId: locals.user.id,
-			action,
 			currencyMultiplier: 1.0, // TODO: implement
 			notes,
 			feedback
@@ -246,13 +232,12 @@ export const actions = {
 			.where(eq(project.id, id));
 
 		if (queriedProject.user) {
-			// const feedbackText = feedback
-			// 	? `\n\nHere's what they said about your project:\n${feedback}`
-			// 	: '';
-			// await sendSlackDM(
-			// 	queriedProject.user.slackId,
-			// 	`Your project <https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}|${queriedProject.project.name}> has been ${statusMessage}${feedbackText}`
-			// );
+			const feedbackText = feedback ? `\n\nHere's what they said:\n${feedback}` : '';
+
+			await sendSlackDM(
+				queriedProject.user.slackId,
+				`Your project <https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}|${queriedProject.project.name}> has been ${statusMessage}${feedbackText}`
+			);
 		}
 
 		return redirect(302, '/dashboard/admin/review');
