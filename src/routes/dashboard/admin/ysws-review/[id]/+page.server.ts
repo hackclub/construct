@@ -201,22 +201,28 @@ export const actions = {
 					: queriedProject.project.editorFileType === 'url'
 						? queriedProject.project.editorUrl
 						: null;
+
+			const justificationAppend = `Project has ${queriedProject.devlogCount} ${queriedProject.devlogCount == 1 ? 'journal' : 'journals'} over ${Math.floor(
+				queriedProject.timeSpent / 60
+			)}h ${queriedProject.timeSpent % 60}min, each one with a 3d model file to show progress.\nAll journals can be found here: https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}`;
 			// try {
-				await airtableDB.insert(YswsProjectSubmissionTable, {
-					demoUrl: queriedProject.project.url,
-					repositoryUrl: repoUrl,
+			await airtableDB.insert(YswsProjectSubmissionTable, {
+				demoUrl: queriedProject.project.url,
+				repositoryUrl: repoUrl,
 
-					slackUsername: queriedProject.user?.name,
-					hoursEstimate: queriedProject.timeSpent / 60,
-					optionalOverrideHoursSpent: queriedProject.timeSpent / 60,
-					optionalOverrideHoursSpentJustification: notes,
+				slackUsername: queriedProject.user?.name,
+				hoursEstimate: queriedProject.timeSpent / 60,
+				optionalOverrideHoursSpent: queriedProject.timeSpent / 60,
+				optionalOverrideHoursSpentJustification: notes
+					? notes + '\n' + justificationAppend
+					: justificationAppend,
 
-					description: queriedProject.project.description,
+				description: queriedProject.project.description,
 
-					tempHold: false,
-					identityVerified: true,
-					idvRec: queriedProject.user?.idvId
-				});
+				tempHold: false,
+				identityVerified: true,
+				idvRec: queriedProject.user?.idvId
+			});
 			// } catch {
 			// 	return error(500, { message: 'airtable submission error' });
 			// }
@@ -243,7 +249,6 @@ export const actions = {
 			// const feedbackText = feedback
 			// 	? `\n\nHere's what they said about your project:\n${feedback}`
 			// 	: '';
-
 			// await sendSlackDM(
 			// 	queriedProject.user.slackId,
 			// 	`Your project <https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}|${queriedProject.project.name}> has been ${statusMessage}${feedbackText}`
