@@ -20,6 +20,10 @@
 	let controls: OrbitControls | null = null;
 	let camera: THREE.PerspectiveCamera | null = null;
 	let animationId: number | null = null;
+	let isVisible: boolean = false;
+	let isModelLoaded: boolean = false;
+	let containerElement: HTMLDivElement | null = null;
+	let observer: IntersectionObserver | null = null;
 
 	function loadModel() {
 		if (!modelUrl) {
@@ -56,7 +60,7 @@
 		controls.rotateSpeed = 0.5;
 		controls.dampingFactor = 0.1;
 		controls.enableDamping = true;
-		controls.autoRotate = true;
+		controls.autoRotate = false;
 		controls.autoRotateSpeed = 4;
 		controls.update();
 
@@ -286,15 +290,93 @@
 		);
 
 		const animate = function () {
+			if (!isVisible) {
+				animationId = null;
+				return;
+			}
+			
 			animationId = requestAnimationFrame(animate);
-			controls?.update();
+			
+			if (controls && isVisible) {
+				controls.autoRotate = true;
+				controls.update();
+			}
+			
 			renderer?.render(scene, camera!);
 			resizeCanvasToDisplaySize();
 		};
-		animate();
+		
+		isModelLoaded = true;
+		if (isVisible) {
+			animate();
+		}
+	}
+
+	function startAnimation() {
+		if (animationId === null && isModelLoaded && isVisible && renderer && controls && camera) {
+			const animate = function () {
+				if (!isVisible) {
+					animationId = null;
+					return;
+				}
+				
+				animationId = requestAnimationFrame(animate);
+				
+				if (controls && isVisible) {
+					controls.autoRotate = true;
+					controls.update();
+				}
+				
+				renderer?.render(scene, camera!);
+				
+				const canvas = renderer?.domElement;
+				const width = canvas?.clientWidth;
+				const height = canvas?.clientHeight;
+				if (canvas?.width !== width || canvas?.height !== height) {
+					renderer?.setSize(width ?? 0, height ?? 0, false);
+					renderer?.setPixelRatio(window.devicePixelRatio);
+					if (camera) camera.aspect = (width ?? 1) / (height ?? 1);
+					camera?.updateProjectionMatrix();
+				}
+			};
+			animate();
+		}
+	}
+
+	function stopAnimation() {
+		if (animationId !== null) {
+			cancelAnimationFrame(animationId);
+			animationId = null;
+		}
+		if (controls) {
+			controls.autoRotate = false;
+		}
 	}
 
 	onMount(() => {
+		observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					const wasVisible = isVisible;
+					isVisible = entry.isIntersecting;
+					
+					if (isVisible && !wasVisible && isModelLoaded) {
+						startAnimation();
+					} else if (!isVisible && wasVisible) {
+						stopAnimation();
+					}
+				});
+			},
+			{
+				threshold: 0.01,
+				rootMargin: '50px'
+			}
+		);
+
+		if (containerElement) {
+			observer.observe(containerElement);
+		}
+
 		fileSizeFromUrl(modelUrl).then((size) => {
 			fileSize = size;
 
@@ -307,8 +389,11 @@
 	});
 
 	onDestroy(() => {
-		if (animationId !== null) {
-			cancelAnimationFrame(animationId);
+		stopAnimation();
+		
+		if (observer) {
+			observer.disconnect();
+			observer = null;
 		}
 
 		controls?.dispose();
@@ -335,10 +420,11 @@
 		renderer = null;
 		controls = null;
 		camera = null;
+		containerElement = null;
 	});
 </script>
 
-<div class="relative h-full w-full">
+<div class="relative h-full w-full" bind:this={containerElement}>
 	{#if loadedPercent < 100}
 		<div class="center flex">
 			{#if showLoadButton}
