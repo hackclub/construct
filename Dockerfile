@@ -5,6 +5,7 @@ ENV DATABASE_HOST=localhost
 RUN npm ci
 COPY . .
 ENV PUBLIC_ENV=production
+ENV APP_SECRET_KEY=building_secret
 RUN npm run build
 RUN npm prune --production
 
