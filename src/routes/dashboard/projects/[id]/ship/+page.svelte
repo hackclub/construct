@@ -67,6 +67,8 @@
 		</label>
 		{#if form?.invalid_printables_url}
 			<p class="text-sm">Invalid URL</p>
+		{:else if form?.invalid_license}
+			<p class="text-sm">License not allowed</p>
 		{/if}
 	</div>
 

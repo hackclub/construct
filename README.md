@@ -43,6 +43,20 @@ You can also run this to get a GUI for the database:
 npm run db:studio
 ```
 
+### Printables license IDs
+
+Shipping checks licenses by ID. Grab the IDs directly from the Printables GraphQL API:
+
+```json
+{
+	"operationName": "Licenses",
+	"query": "query Licenses {\n  licenses {\n    id\n    name\n    abbreviation\n    content\n    disallowRemixing\n    freeModels\n    storeModels\n    allowedLicensesAfterRemixing {\n      id\n      __typename\n    }\n    __typename\n  }\n}",
+	"variables": {}
+}
+```
+
+Use the returned `id` values in `PRINTABLES_ALLOWED_LICENSES_ID` (comma-separated) in your `.env`.
+
 ## Deploying
 
 Create a `.env` file containing all the required credentials, look at `.env.example` for an example. If you pass in Airtable tokens, the app must be marked as `hq_official` on idv.
