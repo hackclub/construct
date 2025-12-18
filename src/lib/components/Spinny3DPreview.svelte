@@ -294,18 +294,18 @@
 				animationId = null;
 				return;
 			}
-			
+
 			animationId = requestAnimationFrame(animate);
-			
+
 			if (controls && isVisible) {
 				controls.autoRotate = true;
 				controls.update();
 			}
-			
+
 			renderer?.render(scene, camera!);
 			resizeCanvasToDisplaySize();
 		};
-		
+
 		isModelLoaded = true;
 		if (isVisible) {
 			animate();
@@ -319,16 +319,16 @@
 					animationId = null;
 					return;
 				}
-				
+
 				animationId = requestAnimationFrame(animate);
-				
+
 				if (controls && isVisible) {
 					controls.autoRotate = true;
 					controls.update();
 				}
-				
+
 				renderer?.render(scene, camera!);
-				
+
 				const canvas = renderer?.domElement;
 				const width = canvas?.clientWidth;
 				const height = canvas?.clientHeight;
@@ -359,7 +359,7 @@
 				entries.forEach((entry) => {
 					const wasVisible = isVisible;
 					isVisible = entry.isIntersecting;
-					
+
 					if (isVisible && !wasVisible && isModelLoaded) {
 						startAnimation();
 					} else if (!isVisible && wasVisible) {
@@ -390,7 +390,7 @@
 
 	onDestroy(() => {
 		stopAnimation();
-		
+
 		if (observer) {
 			observer.disconnect();
 			observer = null;
