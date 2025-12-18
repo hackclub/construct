@@ -168,7 +168,7 @@ export const actions = {
 			});
 		}
 
-		const imagePath = `images/${crypto.randomUUID()}${extname(imageFile.name)}`;
+		const imagePath = `images/${crypto.randomUUID()}${extname(imageFile.name).toLowerCase()}`;
 
 		// Validate model
 		if (!(imageFile instanceof File) || modelFile.size > MAX_UPLOAD_SIZE) {
@@ -180,7 +180,7 @@ export const actions = {
 
 		if (
 			!ALLOWED_MODEL_TYPES.includes(modelFile.type) ||
-			!ALLOWED_MODEL_EXTS.includes(extname(modelFile.name))
+			!ALLOWED_MODEL_EXTS.includes(extname(modelFile.name).toLowerCase())
 		) {
 			return fail(400, {
 				fields: { description, timeSpent },
@@ -188,7 +188,7 @@ export const actions = {
 			});
 		}
 
-		const modelPath = `models/${crypto.randomUUID()}${extname(modelFile.name)}`;
+		const modelPath = `models/${crypto.randomUUID()}${extname(modelFile.name).toLowerCase()}`;
 
 		const modelCommand = new PutObjectCommand({
 			Bucket: env.S3_BUCKET_NAME,
