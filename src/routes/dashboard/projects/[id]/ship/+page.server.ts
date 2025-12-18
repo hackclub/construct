@@ -192,6 +192,7 @@ export const actions = {
 			[
 				'model/3mf',
 				'application/vnd.ms-package.3dmanufacturing-3dmodel+xml',
+				'application/vnd.ms-3mfdocument',
 				'application/octet-stream',
 				'text/plain'
 			].includes(modelFile.type);

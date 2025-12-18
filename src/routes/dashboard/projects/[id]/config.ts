@@ -7,6 +7,7 @@ export const ALLOWED_MODEL_TYPES = [
 	'application/octet-stream',
 	'model/obj',
 	'model/3mf',
+	'application/vnd.ms-3mfdocument',
 	'application/vnd.ms-package.3dmanufacturing-3dmodel+xml',
 	'text/plain'
 ];
