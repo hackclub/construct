@@ -62,12 +62,16 @@
 				name="printables_url"
 				placeholder="https://www.printables.com/model/244385-flying-orpheus"
 				bind:value={printablesUrl}
-				class="themed-input-on-box active:ring-3"
+				class={`themed-input-on-box ${form?.invalid_printables_url || form?.invalid_license ? 'border-primary-500' : ''}`}
 			/>
 		</label>
-		{#if form?.invalid_printables_url}
-			<p class="text-sm">Invalid URL</p>
-		{/if}
+		<div class="mt-1 text-primary-500">
+			{#if form?.invalid_printables_url}
+				<p class="text-sm">Invalid Printables URL</p>
+			{:else if form?.invalid_license}
+				<p class="text-sm">License not allowed, see below! You don't want Orpheus chasing you, do you?</p>
+			{/if}
+		</div>
 	</div>
 
 	<div class="mt-2">
@@ -81,11 +85,11 @@
 						name="editor_url"
 						placeholder="https://cad.onshape.com/documents/14f82e23135e1e8bfe2305e0/w/28766465f00bd1d2079ae445/e/1d112b7ff9c457c1556814fd"
 						bind:value={editorUrl}
-						class="themed-input-on-box active:ring-3"
+						class="themed-input-on-box"
 					/>
 				</label>
 				{#if form?.invalid_editor_url}
-					<p class="text-sm">Invalid URL</p>
+					<p class="mt-1 text-sm">Invalid URL</p>
 				{/if}
 			</div>
 
@@ -110,7 +114,7 @@
 						>
 					</div>
 				</div>
-				<div class="mt-0.5">
+				<div class="mt-1">
 					{#if form?.invalid_editor_file}
 						<p class="text-sm">
 							Invalid file, must be under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB. Provide a link instead!

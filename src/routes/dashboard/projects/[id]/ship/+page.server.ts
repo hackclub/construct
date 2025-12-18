@@ -91,6 +91,67 @@ export const actions = {
 			});
 		}
 
+		const printablesUrlObj = new URL(printablesUrl.toString().trim());
+
+		const pathMatch = printablesUrlObj.pathname.match(/\/model\/(\d+)/);
+		const modelId = pathMatch ? pathMatch[1] : '';
+
+		const allowedLicenseIds = (env.PRINTABLES_ALLOWED_LICENSES_ID ?? '7,1,2,9,12,10,11')
+			.split(',')
+			.map((s) => s.trim())
+			.filter((s) => s.length > 0);
+		if (allowedLicenseIds.length === 0) {
+			return error(500, { message: 'license validation not configured' });
+		}
+
+		try {
+			const graphqlResponse = await fetch('https://api.printables.com/graphql/', {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({
+					operationName: 'PrintDetail',
+					query: `query PrintDetail($id: ID!) {
+						print(id: $id) {
+							id
+							name
+							license {
+								id
+								name
+							}
+						}
+					}`,
+					variables: { id: modelId }
+				})
+			});
+			if (!graphqlResponse.ok) {
+				return fail(400, {
+					invalid_printables_url: true
+				});
+			}
+			const graphqlData = await graphqlResponse.json();
+			const license = graphqlData?.data?.print?.license;
+
+			if (!license || !license.id) {
+				return fail(400, {
+					invalid_printables_url: true
+				});
+			}
+
+			const licenseMatch = allowedLicenseIds.some((allowed) => allowed === license.id.toString());
+
+			if (!licenseMatch) {
+				return fail(400, {
+					invalid_license: true
+				});
+			}
+		} catch {
+			return fail(400, {
+				invalid_printables_url: true
+			});
+		}
+
 		// Editor URL
 		const editorUrlExists = editorUrl && editorUrl.toString();
 		const editorUrlValid =
@@ -134,7 +195,7 @@ export const actions = {
 				'application/octet-stream',
 				'text/plain'
 			].includes(modelFile.type);
-		
+
 		if (!modelFileValid) {
 			return fail(400, {
 				invalid_model_file: true
