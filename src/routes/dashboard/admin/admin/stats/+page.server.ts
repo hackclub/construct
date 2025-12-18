@@ -17,12 +17,12 @@ export async function load({ locals }) {
 			total: {
 				clay: sql<number>`sum(${user.clay})`,
 				brick: sql<number>`sum(${user.brick})`,
-				shopScore: sql<number>`sum(${user.shopScore})`,
+				shopScore: sql<number>`sum(${user.shopScore})`
 			},
 			average: {
 				clay: sql<number>`avg(${user.clay})`,
 				brick: sql<number>`avg(${user.brick})`,
-				shopScore: sql<number>`avg(${user.shopScore})`,
+				shopScore: sql<number>`avg(${user.shopScore})`
 			}
 		})
 		.from(user);
@@ -50,13 +50,6 @@ export async function load({ locals }) {
 		.from(project)
 		.where(eq(project.deleted, false));
 
-	const [shippedProjectCount] = await db
-		.select({
-			count: count()
-		})
-		.from(project)
-		.where(and(eq(project.deleted, false), ne(project.status, 'building')));
-
 	const [devlogs] = await db
 		.select({
 			count: count(),
@@ -66,11 +59,31 @@ export async function load({ locals }) {
 		.from(devlog)
 		.where(eq(devlog.deleted, false));
 
+	const shippedProjects = db
+		.select({
+			id: project.id,
+			timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`.as('time_spent'),
+			devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`.as('devlog_count')
+		})
+		.from(project)
+		.leftJoin(devlog, and(eq(project.id, devlog.projectId), eq(devlog.deleted, false)))
+		.where(and(eq(project.deleted, false), ne(project.status, 'building')))
+		.groupBy(project.id)
+		.as('shippedProjects');
+
+	const [shippedStats] = await db.select({
+		count: count(),
+		totalTimeSpent: sql<number>`sum(${shippedProjects.timeSpent})`,
+		averageTimeSpent: sql<number>`avg(${shippedProjects.timeSpent})`,
+		totalDevlogs: sql<number>`sum(${shippedProjects.devlogCount})`,
+		averageDevlogs: sql<number>`avg(${shippedProjects.devlogCount})`,
+	}).from(shippedProjects);
+
 	return {
 		users: users,
 		project: projectCount,
 		usersWithProjects,
-		shippedProjectCount: shippedProjectCount.count,
+		shippedStats,
 		devlogs
 	};
 }

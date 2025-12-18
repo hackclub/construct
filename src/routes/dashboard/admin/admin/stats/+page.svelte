@@ -42,7 +42,13 @@
 					<code>{data.devlogs.count}</code>
 				</DataCard>
 				<DataCard title="Shipped projects">
-					<code>{data.shippedProjectCount}</code>
+					<code>{data.shippedStats.count}</code>
+				</DataCard>
+				<DataCard title="Shipped devlogs">
+					<code>{data.shippedStats.totalDevlogs}</code>
+				</DataCard>
+				<DataCard title="Devlogs per project">
+					<code>{Math.round(data.shippedStats.averageDevlogs * 100) / 100}</code>
 				</DataCard>
 			</div>
 			<h3 class="mt-1 text-xl font-semibold">By status</h3>
@@ -83,6 +89,12 @@
 			>
 				<DataCard title="Total">
 					{formatMinutes(data.devlogs.totalTime)}
+				</DataCard>
+				<DataCard title="Total (shipped)">
+					{formatMinutes(data.shippedStats.totalTimeSpent)}
+				</DataCard>
+				<DataCard title="Average shipped time">
+					{formatMinutes(data.shippedStats.averageTimeSpent)}
 				</DataCard>
 				<DataCard title="Average devlog time">
 					{formatMinutes(data.devlogs.timePerDevlog)}
