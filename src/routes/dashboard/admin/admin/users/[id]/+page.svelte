@@ -278,7 +278,7 @@
 							</DataCard>
 							{#if form.fetchPII.address.line_2}
 								<DataCard title="Address line 2">
-									{form.fetchPII.address.line_1}
+									{form.fetchPII.address.line_2}
 								</DataCard>
 							{/if}
 							<DataCard title="City">
