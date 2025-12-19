@@ -32,6 +32,8 @@ export async function load({ locals, params }) {
 				uploadedFileUrl: project.uploadedFileUrl,
 				modelFile: project.modelFile,
 
+				submittedToAirtable: project.submittedToAirtable,
+
 				createdAt: project.createdAt,
 				updatedAt: project.updatedAt,
 				status: project.status
@@ -59,6 +61,7 @@ export async function load({ locals, params }) {
 			project.editorUrl,
 			project.uploadedFileUrl,
 			project.modelFile,
+			project.submittedToAirtable,
 			project.createdAt,
 			project.status,
 			user.id,
@@ -132,6 +135,7 @@ export const actions = {
 					name: user.name,
 					slackId: user.slackId,
 					idvId: user.idvId,
+					idvToken: user.idvToken,
 					trust: user.trust,
 					hackatimeTrust: user.hackatimeTrust
 				},
@@ -154,6 +158,7 @@ export const actions = {
 				user.name,
 				user.slackId,
 				user.idvId,
+				user.idvToken,
 				user.trust,
 				user.hackatimeTrust
 			)
@@ -184,13 +189,13 @@ export const actions = {
 				.orderBy(desc(devlog.createdAt))
 				.limit(1);
 
-			if (!locals.user.idvToken) {
+			if (!queriedProject.user?.idvToken) {
 				return fail(400, {
 					message: 'IDV token revoked/expired, ask them to reauthenticate'
 				});
 			}
 
-			const token = decrypt(locals.user.idvToken);
+			const token = decrypt(queriedProject.user.idvToken);
 			let userData;
 
 			try {

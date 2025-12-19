@@ -1,31 +1,47 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
-	import { projectStatuses } from '$lib/utils.js';
-	import { ExternalLink } from '@lucide/svelte';
-	import relativeDate from 'tiny-relative-date';
 
 	let { data, form } = $props();
 
 	let userSearch = $state('');
 
-	let users = $derived(data.users); //form?.users ??
-
 	let filteredUsers = $derived(
 		data.users.filter((user) => user.name?.toLowerCase().includes(userSearch.toLowerCase()))
 	);
 
-	let formPending = $state(false);
+	let logoutEveryonePending = $state(false);
 </script>
 
 <Head title="Review" />
 
 <div class="flex h-full flex-col">
-	<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Users</h1>
+	<div class="mt-5 flex flex-row">
+		<h1 class="mb-3 grow font-hero text-3xl font-medium">Users</h1>
+		<form
+			method="POST"
+			class=""
+			action="?/logoutEveryone"
+			use:enhance={() => {
+				logoutEveryonePending = true;
+				return async ({ update }) => {
+					await update({ reset: false });
+					logoutEveryonePending = false;
+				};
+			}}
+			onsubmit={() => {
+				return confirm('really really log everyone out?');
+			}}
+		>
+			<button type="submit" class="button md red w-full" disabled={logoutEveryonePending}>
+				nuke all sessions
+			</button>
+		</form>
+	</div>
 
 	<p class="mb-3 text-lg">Showing {filteredUsers.length} users</p>
 
-	<input class="themed-box p-2 mb-3 w-full" placeholder="Search users..." bind:value={userSearch} />
+	<input class="themed-box mb-3 w-full p-2" placeholder="Search users..." bind:value={userSearch} />
 
 	{#if filteredUsers.length == 0}
 		<div class="flex grow items-center justify-center">

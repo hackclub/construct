@@ -3,7 +3,15 @@ import { user, devlog, session } from '$lib/server/db/schema.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
-import { createSession, DAY_IN_MS, generateSessionToken, SESSION_EXPIRY_DAYS, setSessionTokenCookie } from '$lib/server/auth';
+import {
+	createSession,
+	DAY_IN_MS,
+	generateSessionToken,
+	SESSION_EXPIRY_DAYS,
+	setSessionTokenCookie
+} from '$lib/server/auth';
+import { decrypt } from '$lib/server/encryption';
+import { getUserData } from '$lib/server/idvUserData';
 
 export async function load({ locals, params }) {
 	if (!locals.user) {
@@ -233,5 +241,83 @@ export const actions = {
 		);
 
 		return redirect(302, '/dashboard');
+	},
+
+	fetchPII: async (event) => {
+		const { locals, params } = event;
+
+		if (!locals.user) {
+			throw error(500);
+		}
+
+		// Pretty important line
+		if (!locals.user.hasAdmin) {
+			throw error(403, { message: 'get out, peasant' });
+		}
+
+		const id: number = parseInt(params.id);
+
+		const [queriedUser] = await db
+			.select({
+				idvToken: user.idvToken
+			})
+			.from(user)
+			.where(eq(user.id, id));
+
+		if (!queriedUser) {
+			throw error(404, { message: 'user not found' });
+		}
+
+		if (!queriedUser.idvToken) {
+			return fail(400, {
+				fetchPII: {
+					success: false,
+					errorMessage: 'IDV token not found, ask them to re-login',
+					first_name: null,
+					last_name: null,
+					primary_email: null,
+					phone_number: null,
+					birthday: null,
+					address: null
+				}
+			});
+		}
+
+		const token = decrypt(queriedUser.idvToken);
+		let userData;
+
+		try {
+			userData = await getUserData(token);
+		} catch {
+			return fail(400, {
+				fetchPII: {
+					success: false,
+					errorMessage: 'IDV token revoked/expired, ask them to re-login',
+					first_name: null,
+					last_name: null,
+					primary_email: null,
+					phone_number: null,
+					birthday: null,
+					address: null
+				}
+			});
+		}
+
+		const { first_name, last_name, primary_email, birthday, phone_number, addresses } = userData;
+
+		const address = addresses?.find((address: { primary: boolean }) => address.primary);
+
+		return {
+			fetchPII: {
+				success: true,
+				errorMessage: '',
+				first_name,
+				last_name,
+				primary_email,
+				phone_number,
+				birthday,
+				address
+			}
+		};
 	}
 } satisfies Actions;

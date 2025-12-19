@@ -13,6 +13,7 @@
 	let privilegesPending = $state(false);
 	let impersonatePending = $state(false);
 	let logoutPending = $state(false);
+	let fetchPIIPending = $state(false);
 </script>
 
 <Head title={'User: ' + user.name} />
@@ -26,7 +27,7 @@
 				<img
 					src={user.profilePicture}
 					alt="user profile"
-					class="h-45 rounded-xl border-4 border-primary-800 shadow-lg aspect-square"
+					class="aspect-square h-45 rounded-xl border-4 border-primary-800 shadow-lg"
 				/>
 			</div>
 
@@ -146,7 +147,7 @@
 				>
 					<div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
 						<label class="flex flex-col gap-1">
-							<span class="font-medium text-sm">Clay</span>
+							<span class="text-sm font-medium">Clay</span>
 							<input
 								type="number"
 								name="clay"
@@ -158,7 +159,7 @@
 							/>
 						</label>
 						<label class="flex flex-col gap-1">
-							<span class="font-medium text-sm">Brick</span>
+							<span class="text-sm font-medium">Brick</span>
 							<input
 								type="number"
 								name="brick"
@@ -170,7 +171,7 @@
 							/>
 						</label>
 						<label class="flex flex-col gap-1">
-							<span class="font-medium text-sm">Market score</span>
+							<span class="text-sm font-medium">Market score</span>
 							<input
 								type="number"
 								name="market_score"
@@ -206,12 +207,7 @@
 				>
 					<div class="grid grid-cols-2 lg:grid-cols-4">
 						<label class="flex flex-row items-center gap-1">
-							<input
-								type="checkbox"
-								name="is_printer"
-								checked={user.isPrinter}
-								class="checkbox"
-							/>
+							<input type="checkbox" name="is_printer" checked={user.isPrinter} class="checkbox" />
 							<span class="font-medium">Is printer</span>
 						</label>
 						<label class="flex flex-row items-center gap-1">
@@ -241,6 +237,82 @@
 						>Apply!</button
 					>
 				</form>
+			</div>
+
+			<h2 class="mt-2 text-2xl font-bold">yummy stuff</h2>
+			<div class="mb-5">
+				{#if form?.fetchPII?.success}
+					<div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+						<DataCard title="Name">
+							{form.fetchPII.first_name}
+						</DataCard>
+						<DataCard title="Surname">
+							{form.fetchPII.last_name}
+						</DataCard>
+						<DataCard title="Email">
+							{form.fetchPII.primary_email}
+						</DataCard>
+						<DataCard title="Phone number">
+							<code>{form.fetchPII.phone_number}</code>
+						</DataCard>
+						<DataCard title="Birthday">
+							<code>{form.fetchPII.birthday}</code>
+						</DataCard>
+					</div>
+
+					<h3 class="mt-3 mb-2 text-xl font-bold">address</h3>
+
+					{#if form?.fetchPII.address}
+						<div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+							<DataCard title="Address ID">
+								<code>{form.fetchPII.address.id}</code>
+							</DataCard>
+							<DataCard title="Address first name">
+								{form.fetchPII.address.first_name}
+							</DataCard>
+							<DataCard title="Address last name">
+								{form.fetchPII.address.last_name}
+							</DataCard>
+							<DataCard title="Address line 1">
+								{form.fetchPII.address.line_1}
+							</DataCard>
+							{#if form.fetchPII.address.line_2}
+								<DataCard title="Address line 2">
+									{form.fetchPII.address.line_2}
+								</DataCard>
+							{/if}
+							<DataCard title="City">
+								{form.fetchPII.address.city}
+							</DataCard>
+							<DataCard title="State">
+								{form.fetchPII.address.state}
+							</DataCard>
+							<DataCard title="Postcode">
+								{form.fetchPII.address.postal_code}
+							</DataCard>
+							<DataCard title="Country">
+								{form.fetchPII.address.country}
+							</DataCard>
+						</div>
+					{/if}
+				{:else}
+					<form
+						action="?/fetchPII"
+						method="POST"
+						use:enhance={() => {
+							fetchPIIPending = true;
+							return async ({ update }) => {
+								await update();
+								fetchPIIPending = false;
+							};
+						}}
+					>
+						<button type="submit" class="button md primary" disabled={fetchPIIPending}
+							>go fetch</button
+						>
+						<p class="mt-1">{form?.fetchPII?.errorMessage}</p>
+					</form>
+				{/if}
 			</div>
 		</div>
 	</div>

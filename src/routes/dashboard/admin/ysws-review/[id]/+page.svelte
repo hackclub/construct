@@ -40,6 +40,7 @@
 							.project.timeSpent % 60}min
 					</p>
 					<p>Status: {projectStatuses[data.project.project.status]}</p>
+					<p>Submitted to Airtable: {data.project.project.submittedToAirtable ?? 'null (false)'}</p>
 					<div class="mt-1">
 						<ProjectLinks
 							url={data.project.project.url}
