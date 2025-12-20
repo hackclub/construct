@@ -59,7 +59,6 @@ export async function load({ locals, params }) {
 			project.editorUrl,
 			project.uploadedFileUrl,
 			project.modelFile,
-			project.submittedToAirtable,
 			project.printedBy,
 			project.createdAt,
 			project.status,
