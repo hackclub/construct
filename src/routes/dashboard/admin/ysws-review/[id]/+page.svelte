@@ -108,7 +108,9 @@
 				</div>
 			{/if}
 
-			<h2 class="mt-2 text-2xl font-bold">YSWS Review (don't use yet if you're not Arca)</h2>
+			<h2 class="mt-2 text-2xl font-bold">
+				YSWS Review (currently you need to add currency/market score manually)
+			</h2>
 			<div class="themed-box flex flex-col gap-3 p-3">
 				<form
 					method="POST"
