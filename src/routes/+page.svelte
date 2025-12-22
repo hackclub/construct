@@ -295,6 +295,7 @@
 								identifier="keyring"
 								modelUrl={keyringModel}
 								sizeCutoff={8 * 1024 * 1024}
+								respectLocalStorage={false}
 							/>
 						</div>
 						<div class="text-center">

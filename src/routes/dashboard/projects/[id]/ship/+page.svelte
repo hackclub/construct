@@ -69,7 +69,9 @@
 			{#if form?.invalid_printables_url}
 				<p class="text-sm">Invalid Printables URL</p>
 			{:else if form?.invalid_license}
-				<p class="text-sm">License not allowed, see below! You don't want Orpheus chasing you, do you?</p>
+				<p class="text-sm">
+					License not allowed, see below! You don't want Orpheus chasing you, do you?
+				</p>
 			{/if}
 		</div>
 	</div>
@@ -121,7 +123,8 @@
 						</p>
 					{:else}
 						<p class="text-sm opacity-50">
-							e.g. orpheus.f3d, monkey.blend (must be under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB)
+							e.g. orpheus.f3d, monkey.blend (must be under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB). Make
+							sure to use a format that preserves timeline if your editor supports that!
 						</p>
 					{/if}
 				</div>
@@ -156,9 +159,7 @@
 		<ChecklistItem completed={data.project.timeSpent >= 120}
 			>At least 120 minutes spent</ChecklistItem
 		>
-		<ChecklistItem completed={data.project.devlogCount >= 2}
-			>At least 2 journal logs</ChecklistItem
-		>
+		<ChecklistItem completed={data.project.devlogCount >= 2}>At least 2 journal logs</ChecklistItem>
 		<ChecklistItem completed={data.project.description != ''}>
 			Project has a description
 		</ChecklistItem>

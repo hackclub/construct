@@ -4,7 +4,13 @@
 	import { onDestroy, onMount } from 'svelte';
 	import fileSizeFromUrl from '$lib/utils';
 
-	let { identifier, modelUrl, lineColor = 0x94857d, sizeCutoff = 2.5 * 1024 * 1024 } = $props();
+	let {
+		identifier,
+		modelUrl,
+		lineColor = 0x94857d,
+		sizeCutoff = 2.5 * 1024 * 1024,
+		respectLocalStorage = true
+	} = $props();
 
 	let loadedPercent: number = $state(0);
 	let showLoadButton: boolean = $state(false);
@@ -380,7 +386,11 @@
 		fileSizeFromUrl(modelUrl).then((size) => {
 			fileSize = size;
 
-			if (size <= sizeCutoff) {
+			if (
+				size <= sizeCutoff &&
+				((respectLocalStorage && window.localStorage.getItem('enableModelRendering') !== 'false') ||
+					!respectLocalStorage)
+			) {
 				loadModel();
 			} else {
 				showLoadButton = true;
@@ -435,7 +445,9 @@
 						loadModel();
 					}}
 				>
-					Load ({Math.round((fileSize / 1024 / 1024) * 10) / 10} MiB)
+					Load ({fileSize >= 1000 * 1000
+						? `${Math.round((fileSize / 1000 / 1000) * 10) / 10} MB`
+						: `${Math.round((fileSize / 1000) * 10) / 10} kB`})
 				</button>
 			{:else}
 				<p>Loading... {Math.round(loadedPercent)}%</p>
