@@ -1,9 +1,12 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import Devlog from '$lib/components/Devlog.svelte';
 	import Head from '$lib/components/Head.svelte';
 
 	let { data } = $props();
+
+	const MAX_DEVLOGS = 60;
+	const TRIMMED_DEVLOGS = 45;
 
 	let devlogs = $state([...data.devlogs]);
 	let hasMore = $state(data.hasMore);
@@ -22,6 +25,24 @@
 				createdAt: new Date(entry.devlog.createdAt)
 			}
 		}));
+	}
+
+	async function trimDevlogsIfNeeded() {
+		await tick();
+		if (devlogs.length <= MAX_DEVLOGS) return;
+
+		const previousScroll = window.scrollY;
+		const previousHeight = document.body.scrollHeight;
+		const excess = devlogs.length - TRIMMED_DEVLOGS;
+
+		devlogs = devlogs.slice(excess);
+		await tick();
+
+		const heightDelta = previousHeight - document.body.scrollHeight;
+
+		if (heightDelta > 0) {
+			window.scrollTo({ top: Math.max(0, previousScroll - heightDelta) });
+		}
 	}
 
 	async function loadMoreDevlogs() {
@@ -44,6 +65,7 @@
 			devlogs = [...devlogs, ...incoming];
 			nextOffset = payload.nextOffset ?? nextOffset + incoming.length;
 			hasMore = Boolean(payload.hasMore);
+			await trimDevlogsIfNeeded();
 		} catch (error) {
 			console.error(error);
 			loadError = 'Could not load more right now.';
