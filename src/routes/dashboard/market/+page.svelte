@@ -20,7 +20,7 @@
 
 	<div class="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 		{#each data.marketItems as item (item.id)}
-			<MarketItem {item} userShopScore={data.user.shopScore} />
+			<MarketItem {item} userShopScore={data.user.shopScore} userBricks={data.user.brick} />
 		{/each}
 	</div>
 {/if}

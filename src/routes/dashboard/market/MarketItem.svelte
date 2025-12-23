@@ -1,5 +1,9 @@
 <script lang="ts">
-	let { item, userShopScore } = $props();
+	let { item, userShopScore, userBricks } = $props();
+
+	let disableBuy = $derived(
+		item.minRequiredShopScore > userShopScore || item.computedPrice > userBricks
+	);
 </script>
 
 <!-- <div
@@ -41,12 +45,23 @@
 			{/if}
 		</div>
 		<div>
-			{#if item.minRequiredShopScore > userShopScore}
-				<div class="mb-1 text-sm text-center">
+			<!-- {#if item.minRequiredShopScore > userShopScore}
+				<div class="mb-1 text-center text-sm">
 					{item.minRequiredShopScore - userShopScore} more market score needed
 				</div>
-			{/if}
-			<a href={`market/${item.id}`} class={`button md primary`}>Buy</a>
+			{/if} -->
+			<a
+				href={disableBuy ? null : `market/${item.id}`}
+				class={`button md primary ${disableBuy ? 'disabled' : ''}`}
+			>
+				{#if item.minRequiredShopScore > userShopScore}
+					{item.minRequiredShopScore - userShopScore} more market score needed
+				{:else if item.computedPrice > userBricks}
+					{item.computedPrice - userBricks} more bricks needed
+				{:else}
+					Buy for {item.computedPrice} bricks
+				{/if}
+			</a>
 		</div>
 	</div>
 </div>
