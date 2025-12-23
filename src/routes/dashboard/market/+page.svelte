@@ -37,9 +37,9 @@
 		return { price, save, hasDiscount, percentOff };
 	}
 
-	function formatBricks(value: number | string) {
+	function formatClays(value: number | string) {
 		const n = Number(value || 0);
-		return `${n.toLocaleString()} bricks`;
+		return `${n.toLocaleString()} clays`;
 	} 
 </script>
 
@@ -61,15 +61,15 @@
 					<p class="text-sm text-primary-300 leading-snug">{item.description}</p>
 				{#if getPriceInfo(item).hasDiscount}
 					<div class="flex items-center gap-3 mt-3">
-						<div class="text-sm text-primary-300 line-through">{formatBricks(item.maxPrice)}</div>
-						<div class="ml-auto text-lg font-bold text-emerald-500">{formatBricks(getPriceInfo(item).price)}</div>
+						<div class="text-sm text-primary-300 line-through">{formatClays(item.maxPrice)}</div>
+						<div class="ml-auto text-lg font-bold text-emerald-500">{formatClays(getPriceInfo(item).price)}</div>
 					</div>
 					<div class="flex items-center justify-between mt-1 text-sm text-primary-300">
 						<div class="inline-flex items-center gap-2 px-2 py-0.5 bg-red-100 text-red-600 rounded font-semibold">{getPriceInfo(item).percentOff}% off</div>
-						<div class="text-sm">You save {formatBricks(getPriceInfo(item).save)}</div>
+						<div class="text-sm">You save {formatClays(getPriceInfo(item).save)}</div>
 					</div>
 				{:else}
-					<div class="mt-3 text-lg font-bold">{formatBricks(getPriceInfo(item).price)}</div>
+					<div class="mt-3 text-lg font-bold">{formatClays(getPriceInfo(item).price)}</div>
 				{/if}
 				</div>
 			</div>
