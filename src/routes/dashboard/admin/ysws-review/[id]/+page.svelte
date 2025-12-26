@@ -116,14 +116,14 @@
 					method="POST"
 					class="flex flex-col gap-3"
 					use:enhance={() => {
-						if (!confirm('really submit to airtable?')) {
-							return async () => {};
-						}
 						formPending = true;
 						return async ({ update }) => {
 							await update({ reset: false });
 							formPending = false;
 						};
+					}}
+					onsubmit={() => {
+						return confirm('really submit to airtable?');
 					}}
 				>
 					<label class="flex flex-col gap-1">

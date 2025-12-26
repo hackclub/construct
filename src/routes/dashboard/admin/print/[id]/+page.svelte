@@ -165,14 +165,14 @@
 						action="?/print"
 						class="flex flex-col gap-3"
 						use:enhance={() => {
-							if (!confirm('really submit?')) {
-								return async () => {};
-							}
 							printFormPending = true;
 							return async ({ update }) => {
 								await update({ reset: false });
 								printFormPending = false;
 							};
+						}}
+						onsubmit={() => {
+							return confirm('really submit?');
 						}}
 					>
 						<label class="flex flex-col gap-1">
@@ -217,14 +217,14 @@
 						action="?/action"
 						class="flex flex-col gap-3"
 						use:enhance={() => {
-							if (!confirm('really submit?')) {
-								return async () => {};
-							}
 							actionsFormPending = true;
 							return async ({ update }) => {
 								await update({ reset: false });
 								actionsFormPending = false;
 							};
+						}}
+						onsubmit={() => {
+							return confirm('really submit?');
 						}}
 					>
 						<label class="flex flex-col gap-1">

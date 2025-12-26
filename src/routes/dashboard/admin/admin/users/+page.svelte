@@ -23,14 +23,14 @@
 			class=""
 			action="?/logoutEveryone"
 			use:enhance={() => {
-				if (!confirm('really really log everyone out?')) {
-					return async () => {};
-				}
 				logoutEveryonePending = true;
 				return async ({ update }) => {
 					await update({ reset: false });
 					logoutEveryonePending = false;
 				};
+			}}
+			onsubmit={() => {
+				return confirm('really really log everyone out?');
 			}}
 		>
 			<button type="submit" class="button md red w-full" disabled={logoutEveryonePending}>
