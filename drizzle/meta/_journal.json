@@ -141,6 +141,13 @@
       "when": 1766613085822,
       "tag": "0019_wide_gamora",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1766693140982,
+      "tag": "0020_ambitious_sugar_man",
+      "breakpoints": true
     }
   ]
 }
