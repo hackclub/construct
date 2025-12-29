@@ -224,26 +224,34 @@ export const actions = {
 		}
 
 		const data = await request.formData();
-		const filamentUsed = data.get('filament');
+		const gcodeFile = data.get('gcode');
 		const notes = data.get('notes')?.toString();
 		const feedback = data.get('feedback')?.toString();
 
-		if (notes === null || feedback === null) {
+		if (!gcodeFile || typeof gcodeFile === 'string' || notes === null || feedback === null) {
 			return error(400);
 		}
 
-		if (
-			!filamentUsed ||
-			isNaN(parseFloat(filamentUsed.toString())) ||
-			parseFloat(filamentUsed.toString()) < 0
-		) {
-			return error(400, { message: 'invalid filament used' });
+		const gcodeText = await gcodeFile.text();
+		let filamentUsed: number | undefined;
+		const match1 = gcodeText.match(/;\s*filament used\s*=\s*([\d.]+)g/i);
+		const match2 = gcodeText.match(/;\s*total filament weight \[g\]\s*:\s*([\d.]+)/i);
+		const match3 = gcodeText.match(/;[^\n]*filament[^\n]*([\d.]+)\s*g/i);
+		if (match1) {
+			filamentUsed = parseFloat(match1[1]);
+		} else if (match2) {
+			filamentUsed = parseFloat(match2[1]);
+		} else if (match3) {
+			filamentUsed = parseFloat(match3[1]);
+		}
+		if (typeof filamentUsed !== 'number' || isNaN(filamentUsed) || filamentUsed < 0) {
+			return error(400, { message: 'Could not find valid filament usage in G-code file' });
 		}
 
 		await db.insert(legionReview).values({
 			projectId: id,
 			userId: locals.user.id,
-			filamentUsed: parseFloat(filamentUsed.toString()),
+			filamentUsed: filamentUsed,
 			notes,
 			feedback,
 			action: 'print'
