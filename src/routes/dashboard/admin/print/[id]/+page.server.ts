@@ -5,7 +5,7 @@ import { eq, and, asc, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
 import { getReviewHistory } from '../../getReviewHistory.server';
-import { getCurrentlyPrinting } from '../utils.server';
+import { getCurrentlyPrinting, calculateFilamentUsage } from '../utils.server';
 
 export async function load({ locals, params }) {
 	if (!locals.user) {
@@ -233,19 +233,9 @@ export const actions = {
 		}
 
 		const gcodeText = await gcodeFile.text();
-		let filamentUsed: number | undefined;
-		const match1 = gcodeText.match(/;\s*filament used\s*=\s*([\d.]+)g/i);
-		const match2 = gcodeText.match(/;\s*total filament weight \[g\]\s*:\s*([\d.]+)/i);
-		const match3 = gcodeText.match(/;[^\n]*filament[^\n]*([\d.]+)\s*g/i);
-		if (match1) {
-			filamentUsed = parseFloat(match1[1]);
-		} else if (match2) {
-			filamentUsed = parseFloat(match2[1]);
-		} else if (match3) {
-			filamentUsed = parseFloat(match3[1]);
-		}
-		if (typeof filamentUsed !== 'number' || isNaN(filamentUsed) || filamentUsed < 0) {
-			return error(400, { message: 'Could not find valid filament usage in G-code file' });
+		const filamentUsed = calculateFilamentUsage(gcodeText);
+		if (typeof filamentUsed !== 'number' || isNaN(filamentUsed) || filamentUsed <= 0) {
+			return error(400, { message: 'Could not calculate valid filament usage from G-code file' });
 		}
 
 		await db.insert(legionReview).values({
