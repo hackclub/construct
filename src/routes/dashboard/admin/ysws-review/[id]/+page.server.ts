@@ -65,6 +65,7 @@ export async function load({ locals, params }) {
 			project.modelFile,
 			project.submittedToAirtable,
 			project.createdAt,
+			project.updatedAt,
 			project.status,
 			user.id,
 			user.name,
@@ -358,14 +359,14 @@ export const actions = {
 } satisfies Actions;
 
 async function getLatestPrintFilament(id: number) {
-	const [{ filament }] = (await db
+	const [queriedReview] = await db
 		.select({
 			filament: legionReview.filamentUsed
 		})
 		.from(legionReview)
 		.where(and(eq(legionReview.projectId, id), eq(legionReview.action, 'print')))
 		.orderBy(desc(legionReview.timestamp))
-		.limit(1)) ?? [{ filament: 0 }];
+		.limit(1);
 
-	return filament ?? 0;
+	return queriedReview?.filament ?? 0;
 }
