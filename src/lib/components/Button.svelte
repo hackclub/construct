@@ -11,7 +11,7 @@
 
 <a
 	{...other}
-	class="offset block button md lg:inline-block text-center {bgcolor} {disabled
+	class="offset button md block text-center lg:inline-block {bgcolor} {disabled
 		? 'cursor-not-allowed'
 		: `hover:${ringcolor} hover:ring-2 hover:${bgcolor_hover}`} {other.class ? other.class : ''}"
 >

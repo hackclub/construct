@@ -11,10 +11,7 @@
 				<li>You must be 13-18 years old.</li>
 				<li>You cannot be banned from Hackatime.</li>
 				<li>
-					You must be part of the <a
-						href="https://hackclub.com/slack/"
-						class="underline"
-					>
+					You must be part of the <a href="https://hackclub.com/slack/" class="underline">
 						Hack Club Slack community
 					</a>.
 				</li>
@@ -33,14 +30,12 @@
 			<ul class="list-inside list-disc text-sm">
 				<li>You should spend at least 2 hours on each individual project.</li>
 				<li>
-					You should use one of our <a href="/approved-editors" class="underline">approved editors</a>.
+					You should use one of our <a href="/approved-editors" class="underline"
+						>approved editors</a
+					>.
 				</li>
-				<li>
-					You should track your time with the journaling feature.
-				</li>
-				<li>
-					You should upload your project to Printables once done.
-				</li>
+				<li>You should track your time with the journaling feature.</li>
+				<li>You should upload your project to Printables once done.</li>
 			</ul>
 		</div>
 	</div>

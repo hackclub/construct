@@ -13,7 +13,7 @@ export async function sendSlackDM(userId: string, message: string) {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${token}`
+				Authorization: `Bearer ${token}`
 			},
 			body: JSON.stringify({
 				channel: userId,

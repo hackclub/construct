@@ -62,7 +62,7 @@ export async function load({ params }) {
 			editorUrl: queriedProject.project.editorUrl,
 			uploadedFileUrl: queriedProject.project.uploadedFileUrl,
 			modelFile: queriedProject.project.modelFile,
-			
+
 			createdAt: queriedProject.project.createdAt,
 			updatedAt: queriedProject.project.updatedAt,
 			timeSpent: queriedProject.timeSpent,

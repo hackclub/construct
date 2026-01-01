@@ -123,9 +123,7 @@
 				</div>
 			{/if}
 
-			<h2 class="mt-2 text-2xl font-bold">
-				YSWS Review
-			</h2>
+			<h2 class="mt-2 text-2xl font-bold">YSWS Review</h2>
 			<div class="themed-box flex flex-col gap-3 p-3">
 				<form
 					method="POST"

@@ -35,7 +35,7 @@
 			</div>
 		</div>
 	{:else}
-		<div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
+		<div class="grid grid-cols-1 gap-5 lg:grid-cols-2 2xl:grid-cols-3">
 			{#each data.projects as project}
 				<Project
 					id={project.id}

@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index.js';
-import { user, devlog, session } from '$lib/server/db/schema.js';
+import { user, devlog, session, impersonateAuditLog } from '$lib/server/db/schema.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
@@ -231,6 +231,12 @@ export const actions = {
 		if (!queriedUser) {
 			throw error(404, { message: 'user not found' });
 		}
+
+		// Log the impersonation
+		await db.insert(impersonateAuditLog).values({
+			adminUserId: locals.user.id,
+			targetUserId: id
+		});
 
 		const sessionToken = generateSessionToken();
 		await createSession(sessionToken, id);

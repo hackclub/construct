@@ -20,11 +20,7 @@
 			text="Cool rocket but there are better ones ∙ 15 hours"
 			imgsrc={prize02}
 		/>
-		<ImageCard
-			title="Saturn V"
-			text="The moon rocket™ ∙ 20 hours"
-			imgsrc={prize03}
-		/>
+		<ImageCard title="Saturn V" text="The moon rocket™ ∙ 20 hours" imgsrc={prize03} />
 	</div>
 	<p class="pt-5 text-sm">...and more!</p>
 </div>

@@ -43,7 +43,7 @@
 
 <h1 class="mt-5 mb-2 font-hero text-3xl font-medium">{data.project.name}</h1>
 
-<div class="flex flex-col xl:flex-row gap-3">
+<div class="flex flex-col gap-3 xl:flex-row">
 	<div class="mb-6 grow">
 		<p class="text-sm">
 			Created
@@ -109,7 +109,7 @@
 			<Spinny3DPreview
 				identifier="project-model"
 				modelUrl={data.s3PublicUrl + '/' + data.project.modelFile}
-				sizeCutoff={8*1024*1024}
+				sizeCutoff={8 * 1024 * 1024}
 			/>
 		</div>
 	{/if}
