@@ -123,22 +123,29 @@
 		</div>
 		<div class="themed-box grow p-3 lg:min-w-[30%]">
 			<h2 class="text-xl font-bold">Leaderboard</h2>
-			<div class="w-full overflow-scroll">
-				Coming soon!
-				<!-- <table class="w-full">
-					<thead>
-						<tr>
-							<th align="left">a</th>
-							<th align="right">a</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td align="left">a</td>
-							<td align="right">a</td>
-						</tr>
-					</tbody>
-				</table> -->
+			<div class="w-full overflow-x-auto">
+				{#if data.leaderboard?.length > 0}
+					<table class="w-full text-sm">
+						<thead>
+							<tr class="text-primary-300">
+								<th class="py-1" align="left">Printer</th>
+								<th class="py-1" align="right">Number of prints</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each data.leaderboard as row}
+								<tr>
+									<td class="py-1" align="left">
+										<a class="underline" href={`/dashboard/users/${row.id}`}>{row.name}</a>
+									</td>
+									<td class="py-1" align="right">{row.review_count}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				{:else}
+					<p class="text-sm text-primary-300">No printing actions yet.</p>
+				{/if}
 			</div>
 		</div>
 	</div>

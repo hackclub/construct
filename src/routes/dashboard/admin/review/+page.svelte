@@ -111,27 +111,34 @@
 		</div>
 		<div class="themed-box grow p-3 lg:min-w-[30%]">
 			<h2 class="text-xl font-bold">Leaderboard</h2>
-			<div class="w-full overflow-scroll">
-				Coming soon!
-				<!-- <table class="w-full">
-					<thead>
-						<tr>
-							<th align="left">a</th>
-							<th align="right">a</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td align="left">a</td>
-							<td align="right">a</td>
-						</tr>
-					</tbody>
-				</table> -->
+			<div class="w-full overflow-x-auto">
+				{#if data.leaderboard?.length > 0}
+					<table class="w-full text-sm">
+						<thead>
+							<tr class="text-primary-300">
+								<th class="py-1" align="left">Reviewer</th>
+								<th class="py-1" align="right">Reviews</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each data.leaderboard as row}
+								<tr>
+									<td class="py-1" align="left">
+										<a class="underline" href={`/dashboard/users/${row.id}`}>{row.name}</a>
+									</td>
+									<td class="py-1" align="right">{row.review_count}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				{:else}
+					<p class="text-sm text-primary-300">No reviews yet.</p>
+				{/if}
 			</div>
 		</div>
 	</div>
 
-	<h2 class="mt-4 mb-2 text-2xl font-bold">Projects</h2>
+	<h2 class="mt-4 mb-2 text-2xl font-bold">Projects <span class="ml-2 align-middle text-sm font-normal">({projects.length})</span></h2>
 
 	{#if projects.length == 0}
 		<div class="flex grow items-center justify-center">
