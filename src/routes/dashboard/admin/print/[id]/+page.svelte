@@ -163,6 +163,7 @@
 					<form
 						method="POST"
 						action="?/print"
+						enctype="multipart/form-data"
 						class="flex flex-col gap-3"
 						use:enhance={() => {
 							printFormPending = true;
@@ -175,15 +176,14 @@
 							return confirm('really submit?');
 						}}
 					>
+
 						<label class="flex flex-col gap-1">
-							<span class="font-medium">Filament used <span class="opacity-50">(grams)</span></span>
+							<span class="font-medium">G-code file <span class="opacity-50">(from slicer, required)</span></span>
 							<input
-								name="filament"
-								type="number"
+								name="gcode"
+								type="file"
 								class="themed-input-on-box"
-								placeholder="50"
-								step="0.1"
-								min="0"
+								accept=".gcode"
 								required
 							/>
 						</label>

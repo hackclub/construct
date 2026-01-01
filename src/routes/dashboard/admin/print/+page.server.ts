@@ -13,15 +13,23 @@ export async function load({ locals }) {
 		throw error(403, { message: 'oi get out' });
 	}
 
-	const projects = await getProjects(['t1_approved'], [], []);
+
+	const allowedStatuses: (typeof project.status._.data)[] = ['printing', 't1_approved'];
+	const projects = await getProjects(allowedStatuses, [], []);
 
 	const allProjects = await db
 		.select({
 			id: project.id,
-			name: project.name
+			name: project.name,
+			status: project.status,
+			userId: project.userId
 		})
 		.from(project)
-		.where(and(eq(project.deleted, false)));
+		.where(and(
+			eq(project.deleted, false),
+			inArray(project.status, ['printing', 't1_approved', 'printed']),
+			sql`(${project.status} != 'printed' OR ${project.userId} = ${locals.user.id})`
+		));
 
 	const users = await db
 		.select({
@@ -37,7 +45,8 @@ export async function load({ locals }) {
 		allProjects,
 		projects,
 		users,
-		currentlyPrinting
+		currentlyPrinting,
+		currentUserId: locals.user.id
 	};
 }
 
@@ -51,7 +60,10 @@ export const actions = {
 		}
 
 		const data = await request.formData();
-		const statusFilter = data.getAll('status') as (typeof project.status._.data)[];
+		const allowedStatuses: (typeof project.status._.data)[] = ['printing', 't1_approved', 'printed'];
+		const statusFilter = data.getAll('status')
+			.map((s) => s.toString())
+			.filter((s): s is typeof project.status._.data => allowedStatuses.includes(s as typeof project.status._.data)) as (typeof project.status._.data)[];
 
 		const projectFilter = data.getAll('project').map((projectId) => {
 			const parsedInt = parseInt(projectId.toString());
@@ -59,11 +71,15 @@ export const actions = {
 			return parseInt(projectId.toString());
 		});
 
-		const userFilter = data.getAll('user').map((userId) => {
+		let userFilter = data.getAll('user').map((userId) => {
 			const parsedInt = parseInt(userId.toString());
 			if (!parsedInt) throw error(400, { message: 'malformed user filter' });
 			return parseInt(userId.toString());
 		});
+
+		if (statusFilter.length === 1 && statusFilter[0] === 'printed') {
+			userFilter = [locals.user.id];
+		}
 
 		const projects = await getProjects(statusFilter, projectFilter, userFilter);
 
