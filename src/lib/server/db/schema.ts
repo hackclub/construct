@@ -181,6 +181,7 @@ export const t2Review = pgTable('t2_review', {
 		.references(() => project.id),
 
 	feedback: text(),
+	image: text(),
 	notes: text(),
 	shopScoreMultiplier: real().notNull().default(25.0),
 

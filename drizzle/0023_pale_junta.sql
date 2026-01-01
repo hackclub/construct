@@ -1,0 +1,1 @@
+ALTER TABLE "t2_review" ADD COLUMN "image" text;

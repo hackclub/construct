@@ -123,9 +123,7 @@
 				</div>
 			{/if}
 
-			<h2 class="mt-2 text-2xl font-bold">
-				YSWS Review
-			</h2>
+			<h2 class="mt-2 text-2xl font-bold">YSWS Review</h2>
 			<div class="themed-box flex flex-col gap-3 p-3">
 				<form
 					method="POST"
@@ -147,6 +145,22 @@
 							>Airtable notes <span class="opacity-50">(justification)</span></span
 						>
 						<textarea name="notes" class="themed-input-on-box"></textarea>
+					</label>
+
+					<label class="flex flex-col gap-1">
+						<span class="font-medium">
+							Printed image URL <span class="opacity-50">(will go on Airtable as the image)</span>
+						</span>
+						<input
+							type="text"
+							name="imageUrl"
+							class="themed-input-on-box"
+							placeholder="https://media.printables.com/media/prints/d5d795cb-ca3f-4382-a005-4bd6c2f2462d/images/9297795_75460779-320f-4001-841b-ff6f5f18db3c_a0bd6ebb-a672-49d9-a996-f8e2052c41a8/thumbs/inside/1920x1440/jpg/img_2399.webp"
+							required
+						/>
+						{#if form?.invalidImageUrl}
+							<span class="text-sm text-primary-400">Invalid image URL</span>
+						{/if}
 					</label>
 
 					<label class="flex flex-col gap-1">

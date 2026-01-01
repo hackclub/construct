@@ -10,6 +10,8 @@ import { decrypt } from '$lib/server/encryption';
 import { getUserData } from '$lib/server/idvUserData';
 import { getReviewHistory } from '../../getReviewHistory.server';
 import { calculatePayouts } from '$lib/currency';
+import { isValidUrl } from '$lib/utils';
+import { sanitizeUrl } from '@braintree/sanitize-url';
 
 export async function load({ locals, params }) {
 	if (!locals.user) {
@@ -170,6 +172,21 @@ export const actions = {
 		const notes = data.get('notes')?.toString();
 		const feedback = data.get('feedback')?.toString();
 		const shopScoreMultiplier = data.get('shopScoreMultiplier');
+		const imageUrl = data.get('imageUrl');
+
+		const imageUrlString =
+			imageUrl && imageUrl.toString() ? sanitizeUrl(imageUrl.toString().trim()) : null;
+		const imageUrlValid =
+			imageUrlString &&
+			imageUrlString.trim().length < 8000 &&
+			isValidUrl(imageUrlString.trim()) &&
+			imageUrlString !== 'about:blank';
+
+		if (!imageUrlValid) {
+			return fail(400, {
+				invalidImageUrl: true
+			});
+		}
 
 		if (notes === null || feedback === null) {
 			return error(400);
@@ -189,15 +206,6 @@ export const actions = {
 		const statusMessage = 'finalised! :woah-dino:';
 
 		if (airtableBase && !queriedProject.project.submittedToAirtable) {
-			const [latestDevlog] = await db
-				.select({
-					image: devlog.image
-				})
-				.from(devlog)
-				.where(and(eq(devlog.projectId, id), eq(devlog.deleted, false)))
-				.orderBy(desc(devlog.createdAt))
-				.limit(1);
-
 			if (!queriedProject.user?.idvToken) {
 				return fail(400, {
 					message: 'IDV token revoked/expired, ask them to reauthenticate'
@@ -251,7 +259,7 @@ export const actions = {
 					: justificationAppend,
 				Screenshot: [
 					{
-						url: env.S3_PUBLIC_URL + '/' + latestDevlog.image
+						url: imageUrlString
 					}
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				] as any,
@@ -266,6 +274,7 @@ export const actions = {
 			projectId: id,
 			userId: locals.user.id,
 			notes,
+			image: imageUrlString,
 			feedback,
 			shopScoreMultiplier: parsedShopScoreMultiplier
 		});
@@ -304,7 +313,7 @@ export const actions = {
 			);
 		}
 
-		return redirect(302, '/dashboard/admin/review');
+		return redirect(302, '/dashboard/admin/ysws-review');
 	},
 
 	override: async ({ locals, request, params }) => {
