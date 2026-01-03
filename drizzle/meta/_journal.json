@@ -169,6 +169,13 @@
       "when": 1767292777224,
       "tag": "0023_pale_junta",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1767390464394,
+      "tag": "0024_bored_valeria_richards",
+      "breakpoints": true
     }
   ]
 }

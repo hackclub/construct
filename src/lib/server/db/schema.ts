@@ -229,6 +229,16 @@ export const marketItem = pgTable('market_item', {
 	updatedAt: timestamp().notNull().defaultNow()
 });
 
+export const ovenpheusLog = pgTable('ovenpheus_log', {
+	id: serial().primaryKey(),
+	userId: integer().references(() => user.id),
+
+	clay: real().notNull(),
+	bricksReceived: real().notNull(),
+
+	timestamp: timestamp().notNull().defaultNow(),
+});
+
 export const marketOrderStatus = pgEnum('market_order_status', [
 	'awaiting_approval',
 	'fulfilled',

@@ -40,9 +40,9 @@
 					class={`button md primary ${disableBuy ? 'disabled' : ''}`}
 				>
 					{#if item.minRequiredShopScore > userShopScore}
-						{item.minRequiredShopScore - userShopScore} more market score needed
+						{Math.ceil(item.minRequiredShopScore - userShopScore)} more market score needed
 					{:else if item.computedPrice > userBricks}
-						{item.computedPrice - userBricks} more bricks needed
+						{item.computedPrice - Math.floor(userBricks)} more bricks needed
 					{:else}
 						Buy for {item.computedPrice} bricks
 					{/if}
