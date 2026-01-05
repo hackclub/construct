@@ -5,6 +5,7 @@ import { eq, and, asc, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
 import { getReviewHistory } from '../../getReviewHistory.server';
+import { getCurrentlyPrinting, calculateFilamentUsage } from '../utils.server';
 
 export async function load({ locals, params }) {
 	if (!locals.user) {
@@ -213,26 +214,24 @@ export const actions = {
 		}
 
 		const data = await request.formData();
-		const filamentUsed = data.get('filament');
+		const gcodeFile = data.get('gcode');
 		const notes = data.get('notes')?.toString();
 		const feedback = data.get('feedback')?.toString();
 
-		if (notes === null || feedback === null) {
+		if (!gcodeFile || typeof gcodeFile === 'string' || notes === null || feedback === null) {
 			return error(400);
 		}
 
-		if (
-			!filamentUsed ||
-			isNaN(parseFloat(filamentUsed.toString())) ||
-			parseFloat(filamentUsed.toString()) < 0
-		) {
-			return error(400, { message: 'invalid filament used' });
+		const gcodeText = await gcodeFile.text();
+		const filamentUsed = calculateFilamentUsage(gcodeText);
+		if (typeof filamentUsed !== 'number' || isNaN(filamentUsed) || filamentUsed <= 0) {
+			return error(400, { message: 'Could not calculate valid filament usage from G-code file' });
 		}
 
 		await db.insert(legionReview).values({
 			projectId: id,
 			userId: locals.user.id,
-			filamentUsed: parseFloat(filamentUsed.toString()),
+			filamentUsed: filamentUsed,
 			notes,
 			feedback,
 			action: 'print'

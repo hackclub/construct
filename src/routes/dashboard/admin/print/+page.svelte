@@ -7,15 +7,23 @@
 
 	let { data, form } = $props();
 
+	type AllProject = { id: number; name: string | null; status: string; userId: number };
+	const allProjects: AllProject[] = data.allProjects;
+	const currentUserId: number = data.currentUserId;
+
 	let projectSearch = $state('');
 	let userSearch = $state('');
 
 	let projects = $derived(form?.projects ?? data.projects);
 
 	let filteredProjects = $derived(
-		data.allProjects.filter((project) =>
-			project.name?.toLowerCase().includes(projectSearch.toLowerCase())
-		)
+		allProjects
+			.filter((project) => {
+				if (project.status === 'printing') return true;
+				if (project.status === 'printed' && project.userId === currentUserId) return true;
+				return false;
+			})
+			.filter((project) => project.name?.toLowerCase().includes(projectSearch.toLowerCase()))
 	);
 	let filteredUsers = $derived(
 		data.users.filter((user) => user.name.toLowerCase().includes(userSearch.toLowerCase()))
@@ -64,9 +72,9 @@
 							value={form?.fields.status ?? ['t1_approved']}
 							multiple
 						>
-							{#each Object.entries(projectStatuses) as [status, longStatus]}
-								<option value={status} class="truncate">{longStatus}</option>
-							{/each}
+						<option value="t1_approved" class="truncate">{projectStatuses['t1_approved'] ?? 'On Print Queue'}</option>
+						<option value="printing" class="truncate">{projectStatuses['printing'] ?? 'Being printed'}</option>
+							<option value="printed" class="truncate">{projectStatuses['printed'] ?? 'Printed'}</option>
 						</select>
 					</label>
 
