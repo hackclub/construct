@@ -204,6 +204,16 @@
 						</p>
 						<p class="text-sm">{projectStatuses[project.project.status]}</p>
 					</div>
+					{#if project.project.status === 'printing' && project.printer?.name}
+						<p class="mt-1 text-sm text-primary-400">
+							Claimed by <span class="font-medium">{project.printer.name}</span>
+							{#if project.project.claimedAt}
+								<abbr title={project.project.claimedAt.toUTCString()}>
+									{relativeDate(project.project.claimedAt)}
+								</abbr>
+							{/if}
+						</p>
+					{/if}
 				</div>
 			{/each}
 		</div>

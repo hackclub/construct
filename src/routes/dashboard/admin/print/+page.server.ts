@@ -2,6 +2,7 @@ import { db } from '$lib/server/db/index.js';
 import { project, user, devlog } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, and, sql, ne, inArray } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 import type { Actions } from './$types';
 import { getCurrentlyPrinting } from './utils.server';
 
@@ -83,6 +84,8 @@ async function getProjects(
 	projectFilter: number[],
 	userFilter: number[]
 ) {
+	const printer = alias(user, 'printer');
+
 	return await db
 		.select({
 			project: {
@@ -91,11 +94,16 @@ async function getProjects(
 				description: project.description,
 				url: project.url,
 				createdAt: project.createdAt,
-				status: project.status
+				status: project.status,
+				claimedAt: project.claimedAt
 			},
 			user: {
 				id: user.id,
 				name: user.name
+			},
+			printer: {
+				id: printer.id,
+				name: printer.name
 			},
 			timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
 			devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`
@@ -103,6 +111,7 @@ async function getProjects(
 		.from(project)
 		.leftJoin(devlog, and(eq(project.id, devlog.projectId), eq(devlog.deleted, false)))
 		.leftJoin(user, eq(user.id, project.userId))
+		.leftJoin(printer, eq(printer.id, project.printedBy))
 		.where(
 			and(
 				eq(project.deleted, false),
@@ -118,7 +127,10 @@ async function getProjects(
 			project.url,
 			project.createdAt,
 			project.status,
+			project.claimedAt,
 			user.id,
-			user.name
+			user.name,
+			printer.id,
+			printer.name
 		);
 }
