@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index.js';
-import { project, user, devlog, t2Review } from '$lib/server/db/schema.js';
+import { project, user, devlog, t2Review, legionReview } from '$lib/server/db/schema.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { eq, and, asc, sql, desc } from 'drizzle-orm';
 import type { Actions } from './$types';
@@ -9,6 +9,9 @@ import { env } from '$env/dynamic/private';
 import { decrypt } from '$lib/server/encryption';
 import { getUserData } from '$lib/server/idvUserData';
 import { getReviewHistory } from '../../getReviewHistory.server';
+import { calculatePayouts } from '$lib/currency';
+import { isValidUrl } from '$lib/utils';
+import { sanitizeUrl } from '@braintree/sanitize-url';
 
 export async function load({ locals, params }) {
 	if (!locals.user) {
@@ -64,6 +67,7 @@ export async function load({ locals, params }) {
 			project.modelFile,
 			project.submittedToAirtable,
 			project.createdAt,
+			project.updatedAt,
 			project.status,
 			user.id,
 			user.name,
@@ -86,7 +90,8 @@ export async function load({ locals, params }) {
 	return {
 		project: queriedProject,
 		devlogs,
-		reviews: await getReviewHistory(id)
+		reviews: await getReviewHistory(id),
+		filamentUsed: await getLatestPrintFilament(id)
 	};
 }
 
@@ -107,6 +112,7 @@ export const actions = {
 					id: project.id,
 					name: project.name,
 					description: project.description,
+					createdAt: project.createdAt,
 
 					url: project.url,
 					editorFileType: project.editorFileType,
@@ -121,7 +127,12 @@ export const actions = {
 					idvId: user.idvId,
 					idvToken: user.idvToken,
 					trust: user.trust,
-					hackatimeTrust: user.hackatimeTrust
+					hackatimeTrust: user.hackatimeTrust,
+					hasBasePrinter: user.hasBasePrinter,
+
+					clay: user.clay,
+					brick: user.brick,
+					shopScore: user.shopScore
 				},
 				timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
 				devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`
@@ -134,6 +145,7 @@ export const actions = {
 				project.id,
 				project.name,
 				project.description,
+				project.createdAt,
 				project.url,
 				project.editorFileType,
 				project.editorUrl,
@@ -144,7 +156,11 @@ export const actions = {
 				user.idvId,
 				user.idvToken,
 				user.trust,
-				user.hackatimeTrust
+				user.hackatimeTrust,
+				user.hasBasePrinter,
+				user.clay,
+				user.brick,
+				user.shopScore
 			)
 			.limit(1);
 
@@ -155,24 +171,41 @@ export const actions = {
 		const data = await request.formData();
 		const notes = data.get('notes')?.toString();
 		const feedback = data.get('feedback')?.toString();
+		const shopScoreMultiplier = data.get('shopScoreMultiplier');
+		const imageUrl = data.get('imageUrl');
+
+		const imageUrlString =
+			imageUrl && imageUrl.toString() ? sanitizeUrl(imageUrl.toString().trim()) : null;
+		const imageUrlValid =
+			imageUrlString &&
+			imageUrlString.trim().length < 8000 &&
+			isValidUrl(imageUrlString.trim()) &&
+			imageUrlString !== 'about:blank';
+
+		if (!imageUrlValid) {
+			return fail(400, {
+				invalidImageUrl: true
+			});
+		}
 
 		if (notes === null || feedback === null) {
 			return error(400);
 		}
 
+		if (
+			!shopScoreMultiplier ||
+			isNaN(parseFloat(shopScoreMultiplier.toString())) ||
+			parseFloat(shopScoreMultiplier.toString()) < 0
+		) {
+			return error(400, { message: 'invalid market score multiplier' });
+		}
+
+		const parsedShopScoreMultiplier = parseFloat(shopScoreMultiplier.toString());
+
 		const status: typeof project.status._.data | undefined = 'finalized';
 		const statusMessage = 'finalised! :woah-dino:';
 
 		if (airtableBase && !queriedProject.project.submittedToAirtable) {
-			const [latestDevlog] = await db
-				.select({
-					image: devlog.image
-				})
-				.from(devlog)
-				.where(and(eq(devlog.projectId, id), eq(devlog.deleted, false)))
-				.orderBy(desc(devlog.createdAt))
-				.limit(1);
-
 			if (!queriedProject.user?.idvToken) {
 				return fail(400, {
 					message: 'IDV token revoked/expired, ask them to reauthenticate'
@@ -226,7 +259,7 @@ export const actions = {
 					: justificationAppend,
 				Screenshot: [
 					{
-						url: env.S3_PUBLIC_URL + '/' + latestDevlog.image
+						url: imageUrlString
 					}
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				] as any,
@@ -240,9 +273,10 @@ export const actions = {
 		await db.insert(t2Review).values({
 			projectId: id,
 			userId: locals.user.id,
-			currencyMultiplier: 1.0, // TODO: implement
 			notes,
-			feedback
+			image: imageUrlString,
+			feedback,
+			shopScoreMultiplier: parsedShopScoreMultiplier
 		});
 
 		await db
@@ -254,6 +288,23 @@ export const actions = {
 			.where(eq(project.id, id));
 
 		if (queriedProject.user) {
+			const payouts = calculatePayouts(
+				queriedProject.timeSpent,
+				await getLatestPrintFilament(id),
+				parsedShopScoreMultiplier,
+				queriedProject.user.hasBasePrinter,
+				queriedProject.project.createdAt
+			);
+
+			await db
+				.update(user)
+				.set({
+					clay: sql`${user.clay} + ${payouts.clay ?? 0}`,
+					brick: sql`${user.brick} + ${payouts.bricks ?? 0}`,
+					shopScore: sql`${user.shopScore} + ${payouts.shopScore}`
+				})
+				.where(eq(user.id, queriedProject.user.id));
+
 			const feedbackText = feedback ? `\n\nHere's what they said:\n${feedback}` : '';
 
 			await sendSlackDM(
@@ -262,7 +313,7 @@ export const actions = {
 			);
 		}
 
-		return redirect(302, '/dashboard/admin/review');
+		return redirect(302, '/dashboard/admin/ysws-review');
 	},
 
 	override: async ({ locals, request, params }) => {
@@ -315,3 +366,16 @@ export const actions = {
 		return { success: true };
 	}
 } satisfies Actions;
+
+async function getLatestPrintFilament(id: number) {
+	const [queriedReview] = await db
+		.select({
+			filament: legionReview.filamentUsed
+		})
+		.from(legionReview)
+		.where(and(eq(legionReview.projectId, id), eq(legionReview.action, 'print')))
+		.orderBy(desc(legionReview.timestamp))
+		.limit(1);
+
+	return queriedReview?.filament ?? 0;
+}

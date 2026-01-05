@@ -84,6 +84,7 @@ export const project = pgTable('project', {
 
 	status: projectStatusEnum().notNull().default('building'),
 	printedBy: integer().references(() => user.id),
+	claimedAt: timestamp(), // When the project was claimed for printing
 
 	submittedToAirtable: boolean().default(false),
 
@@ -181,8 +182,9 @@ export const t2Review = pgTable('t2_review', {
 		.references(() => project.id),
 
 	feedback: text(),
+	image: text(),
 	notes: text(),
-	currencyMultiplier: real().notNull().default(1.0),
+	shopScoreMultiplier: real().notNull().default(25.0),
 
 	timestamp: timestamp().notNull().defaultNow()
 });
@@ -226,6 +228,16 @@ export const marketItem = pgTable('market_item', {
 	deleted: boolean().notNull().default(false),
 	createdAt: timestamp().notNull().defaultNow(),
 	updatedAt: timestamp().notNull().defaultNow()
+});
+
+export const ovenpheusLog = pgTable('ovenpheus_log', {
+	id: serial().primaryKey(),
+	userId: integer().references(() => user.id),
+
+	clay: real().notNull(),
+	bricksReceived: real().notNull(),
+
+	timestamp: timestamp().notNull().defaultNow(),
 });
 
 export const marketOrderStatus = pgEnum('market_order_status', [
@@ -288,9 +300,22 @@ export const marketItemOrder = pgTable('market_item_order', {
 // 	updatedAt: timestamp().notNull().defaultNow()
 // });
 
+// Impersonate audit logs
+export const impersonateAuditLog = pgTable('impersonate_audit_log', {
+	id: serial().primaryKey(),
+	adminUserId: integer()
+		.notNull()
+		.references(() => user.id), // Admin who performed the impersonation
+	targetUserId: integer()
+		.notNull()
+		.references(() => user.id), // User who was impersonated
+	timestamp: timestamp().notNull().defaultNow()
+});
+
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type Project = typeof project.$inferSelect;
+export type ImpersonateAuditLog = typeof impersonateAuditLog.$inferSelect;
 
 export type T1Review = typeof t1Review.$inferSelect;
 export type LegionReview = typeof legionReview.$inferSelect;

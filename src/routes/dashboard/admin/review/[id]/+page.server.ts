@@ -5,6 +5,7 @@ import { eq, and, asc, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
 import { getReviewHistory } from '../../getReviewHistory.server';
+import { T1_PAYOUT_BRICKS } from '$lib/defs';
 
 export async function load({ locals, params }) {
 	if (!locals.user) {
@@ -98,7 +99,8 @@ export const actions = {
 			.select({
 				id: project.id,
 				name: project.name,
-				userId: project.userId
+				userId: project.userId,
+				status: project.status
 			})
 			.from(project)
 			.where(and(eq(project.deleted, false), eq(project.id, id)));
@@ -123,6 +125,16 @@ export const actions = {
 			notes,
 			feedback
 		});
+
+		if (queriedProject.status === 'submitted' && action !== 'add_comment') {
+			// Bricks payout for reviewer
+			await db
+				.update(user)
+				.set({
+					brick: locals.user.brick + T1_PAYOUT_BRICKS
+				})
+				.where(eq(user.id, locals.user.id));
+		}
 
 		let status: typeof project.status._.data | undefined = undefined;
 		let statusMessage = '';

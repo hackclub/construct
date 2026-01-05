@@ -112,9 +112,9 @@
 
 			<h2 class="mt-2 text-2xl font-bold">Printering area</h2>
 
-			{#if (data.project.project.status === 't1_approved' && !data.currentlyPrinting) || (data.project.project.status === 'printing' && data.project.project.printedBy === data.user.id)}
+			{#if data.project.project.status === 't1_approved' || (data.project.project.status === 'printing' && data.project.project.printedBy === data.user.id)}
 				<div class="themed-box flex flex-col gap-3 p-3">
-					{#if data.project.project.status === 't1_approved' && !data.currentlyPrinting}
+					{#if data.project.project.status === 't1_approved'}
 						<form
 							method="POST"
 							action="?/markForPrint"

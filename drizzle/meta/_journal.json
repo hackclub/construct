@@ -148,6 +148,34 @@
       "when": 1766693140982,
       "tag": "0020_ambitious_sugar_man",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1767215125050,
+      "tag": "0021_perfect_meteorite",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1767271332880,
+      "tag": "0022_pale_maginty",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1767292777224,
+      "tag": "0023_pale_junta",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1767390464394,
+      "tag": "0024_bored_valeria_richards",
+      "breakpoints": true
     }
   ]
 }

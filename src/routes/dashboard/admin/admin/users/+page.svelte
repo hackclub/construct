@@ -89,7 +89,11 @@
 					</code>
 					<p>Hackatime: {user.hackatimeTrust}</p>
 					<p>Trust: {user.trust}</p>
-					<p>{user.clay} clay, {user.brick} brick, {user.shopScore} market</p>
+					<p>
+						{Math.round(user.clay * 10) / 10} clay, {Math.round(user.brick * 10) / 10} brick, {Math.round(
+							user.shopScore * 10
+						) / 10} market
+					</p>
 				</div>
 			{/each}
 		</div>

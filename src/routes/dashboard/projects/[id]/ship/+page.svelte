@@ -3,6 +3,7 @@
 	import ChecklistItem from '$lib/components/ChecklistItem.svelte';
 	import Head from '$lib/components/Head.svelte';
 	import Project from '$lib/components/Project.svelte';
+	import { calculateCurrencyPayout, calculateMinutes } from '$lib/currency';
 	import { MAX_UPLOAD_SIZE } from '../config';
 	import type { PageProps } from './$types';
 	import { Ship, SquarePen } from '@lucide/svelte';
@@ -17,6 +18,15 @@
 	let modelFile = $state(null);
 
 	let hasEditorFile = $derived((editorUrl || editorUploadFile) && !(editorUrl && editorUploadFile));
+
+	let filamentUse = $state(50);
+	let payoutEstimate = $derived.by(() =>
+		calculateCurrencyPayout(
+			calculateMinutes(data.project.timeSpent, filamentUse),
+			data.user.hasBasePrinter,
+			data.project.createdAt
+		)
+	);
 </script>
 
 <Head title="Ship project" />
@@ -177,21 +187,21 @@
 			and <span class="font-bold">meets the open definition</span> or Orpheus will come after you with
 			a stick. I'd recommend using CC-BY-SA!
 		</p>
-		<div class="mt-2 mb-1">
-			{#if data.project.timeSpent >= 120 && data.project.description != '' && data.project.url != ''}
-				<p class="text-primary-300">
-					Are you sure you want to ship "{data.project.name}"?
-					<span class="font-bold">You won't be able to edit it or journal again</span> unless it gets
-					rejected.
-				</p>
-			{/if}
-		</div>
+	</div>
+	<div class="mb-1">
+		{#if data.project.timeSpent >= 120 && data.project.description != '' && data.project.url != ''}
+			<p class="text-primary-300">
+				Are you sure you want to ship "{data.project.name}"?
+				<span class="font-bold">You won't be able to edit it or journal again</span> unless it gets rejected.
+			</p>
+		{/if}
 	</div>
 	<div class="flex flex-row gap-2">
 		<div>
 			<a href="./" class="button sm primary">Cancel</a>
 		</div>
 		<button
+			type="submit"
 			class="button sm orange"
 			disabled={formPending ||
 				data.project.timeSpent < 120 ||
@@ -206,3 +216,39 @@
 		</button>
 	</div>
 </form>
+
+{#if data.project.timeSpent >= 120}
+	<div class="mt-3 mb-5">
+		<h2 class="mb-2 text-xl font-bold">Estimate payout</h2>
+		<div class="themed-box p-3">
+			<label class="flex flex-col gap-1">
+				<span
+					>Filament usage <span class="opacity-50"
+						>(grams, enter 0 if you're printing this yourself)</span
+					></span
+				>
+				<input
+					type="number"
+					min="0"
+					step="0.1"
+					placeholder="50"
+					bind:value={filamentUse}
+					class="themed-input-on-box"
+				/>
+			</label>
+			<p class="mt-2">
+				You'll get <span class="font-bold"
+					>{payoutEstimate.clay
+						? Math.round(payoutEstimate.clay * 10) / 10 + ' clay'
+						: Math.round((payoutEstimate.bricks ?? 0) * 10) / 10 + ' bricks'}</span
+				>
+			</p>
+			<p>
+				This is just an estimate, not a guarantee - your journal time might be adjusted after
+				review.
+			</p>
+		</div>
+	</div>
+{:else}
+	<div class="h-5"></div>
+{/if}
