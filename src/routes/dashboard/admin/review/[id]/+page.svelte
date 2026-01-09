@@ -119,9 +119,6 @@
 							formPending = false;
 						};
 					}}
-					onsubmit={() => {
-						return confirm('really submit?');
-					}}
 				>
 					<label class="flex flex-col gap-1">
 						<span class="font-medium">Action</span>

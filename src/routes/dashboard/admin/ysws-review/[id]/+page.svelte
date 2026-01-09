@@ -136,9 +136,6 @@
 							formPending = false;
 						};
 					}}
-					onsubmit={() => {
-						return confirm('really submit to airtable?');
-					}}
 				>
 					<label class="flex flex-col gap-1">
 						<span class="font-medium"
