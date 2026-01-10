@@ -28,7 +28,7 @@ export const actions = {
 		}
 
 		await db.delete(session);
-		
+
 		return {};
 	}
 } satisfies Actions;

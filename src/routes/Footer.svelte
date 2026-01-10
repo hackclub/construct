@@ -8,7 +8,10 @@
 			A <a href="https://hackclub.com" class="underline">Hack Club</a> program. Made by teens, for
 			teens!
 			{#if env.PUBLIC_COMMIT}
-				· Build <a href={`https://github.com/hackclub/construct/commit/${env.PUBLIC_COMMIT}`} class="underline">{env.PUBLIC_COMMIT.slice(0, 7)}</a>
+				· Build <a
+					href={`https://github.com/hackclub/construct/commit/${env.PUBLIC_COMMIT}`}
+					class="underline">{env.PUBLIC_COMMIT.slice(0, 7)}</a
+				>
 			{/if}
 		</p>
 	</div>

@@ -67,9 +67,7 @@
 		<li>The number and quality of your devlogs</li>
 		<li>How polished your project is</li>
 	</ul>
-	<p class="my-1">
-		A higher market score:
-	</p>
+	<p class="my-1">A higher market score:</p>
 	<ul class="my-1 list-inside list-disc">
 		<li>Reduces the price of market items</li>
 		<li>Lets you unlock more items in the market</li>
@@ -83,7 +81,7 @@
 
 <form
 	method="POST"
-	class="flex flex-col gap-3 mb-5"
+	class="mb-5 flex flex-col gap-3"
 	use:enhance={() => {
 		formPending = true;
 		return async ({ update }) => {

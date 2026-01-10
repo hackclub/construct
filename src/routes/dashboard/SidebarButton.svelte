@@ -13,9 +13,10 @@
 
 <a
 	href={isExactMatch ? null : href}
-	class={`flex h-12 items-center rounded-lg justify-center gap-1.5 shadow-xl/3 transition-colors hover:outline-primary-100 2xl:h-13 ${
+	class={`flex h-12 items-center justify-center gap-1.5 rounded-lg shadow-xl/3 transition-colors hover:outline-primary-100 2xl:h-13 ${
 		admin
-			? (isCurrentPage ? 'bg-primary-700' : 'bg-primary-800') + ' hover:bg-primary-700 border-2 border-dotted border-yellow-600'
+			? (isCurrentPage ? 'bg-primary-700' : 'bg-primary-800') +
+				' border-2 border-dotted border-yellow-600 hover:bg-primary-700'
 			: (isCurrentPage ? 'bg-primary-700' : 'bg-primary-800') + ' hover:bg-primary-700'
 	} ${isExactMatch ? '' : 'hover:outline-2'}`}
 >

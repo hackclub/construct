@@ -76,7 +76,6 @@
 
 <h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Explore</h1>
 
-
 <div class="mt-3 mb-5 flex flex-col gap-3">
 	{#if devlogs.length == 0}
 		<div>
@@ -107,9 +106,7 @@
 		{#if loadError}
 			<div class="flex items-center gap-2 text-sm text-red-300">
 				<span>{loadError}</span>
-				<button class="button xs primary" type="button" onclick={loadMoreDevlogs}>
-					Retry
-				</button>
+				<button class="button xs primary" type="button" onclick={loadMoreDevlogs}> Retry </button>
 			</div>
 		{/if}
 

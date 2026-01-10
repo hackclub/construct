@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Sidebar from './Sidebar.svelte';
-	import { ProgressBar } from "@prgm/sveltekit-progress-bar";
+	import { ProgressBar } from '@prgm/sveltekit-progress-bar';
 
 	let { children, data } = $props();
 </script>

@@ -31,15 +31,13 @@ export async function load({ locals }) {
 		.from(user)
 		.where(and(ne(user.trust, 'red'), ne(user.hackatimeTrust, 'red'))); // hide banned users
 
-	const t1Agg = db
-		.$with('t1Agg')
-		.as(
-			db
-				.select({ userId: t1Review.userId, t1Cnt: sql<number>`COUNT(*)`.as('t1Cnt') })
-				.from(t1Review)
-				.where(ne(t1Review.action, 'add_comment'))
-				.groupBy(t1Review.userId)
-		);
+	const t1Agg = db.$with('t1Agg').as(
+		db
+			.select({ userId: t1Review.userId, t1Cnt: sql<number>`COUNT(*)`.as('t1Cnt') })
+			.from(t1Review)
+			.where(ne(t1Review.action, 'add_comment'))
+			.groupBy(t1Review.userId)
+	);
 
 	const totalExpr = sql<number>`COALESCE(${t1Agg.t1Cnt}, 0)`;
 

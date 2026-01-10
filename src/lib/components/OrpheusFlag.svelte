@@ -14,4 +14,3 @@
 		alt="Hack Club"
 	/>
 </a>
-

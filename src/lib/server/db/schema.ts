@@ -236,7 +236,7 @@ export const ovenpheusLog = pgTable('ovenpheus_log', {
 	clay: real().notNull(),
 	bricksReceived: real().notNull(),
 
-	timestamp: timestamp().notNull().defaultNow(),
+	timestamp: timestamp().notNull().defaultNow()
 });
 
 export const marketOrderStatus = pgEnum('market_order_status', [
@@ -248,14 +248,16 @@ export const marketOrderStatus = pgEnum('market_order_status', [
 
 export const marketItemOrder = pgTable('market_item_order', {
 	id: serial().primaryKey(),
-	userId: integer().references(() => user.id).notNull(),
+	userId: integer()
+		.references(() => user.id)
+		.notNull(),
 
 	addressId: text().notNull(),
 	bricksPaid: integer().notNull(),
 
 	status: marketOrderStatus().notNull().default('awaiting_approval'),
 	userNotes: text().notNull(),
-	notes: text(),	// stuff like tracking code, shown to user
+	notes: text(), // stuff like tracking code, shown to user
 
 	deleted: boolean().notNull().default(false),
 	createdAt: timestamp().notNull().defaultNow()

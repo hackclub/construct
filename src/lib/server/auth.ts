@@ -49,7 +49,8 @@ export async function validateSessionToken(token: string) {
 		return { session: null, user: null };
 	}
 
-	const renewSession = Date.now() >= session.expiresAt.getTime() - DAY_IN_MS * (SESSION_EXPIRY_DAYS / 2);
+	const renewSession =
+		Date.now() >= session.expiresAt.getTime() - DAY_IN_MS * (SESSION_EXPIRY_DAYS / 2);
 	if (renewSession) {
 		session.expiresAt = new Date(Date.now() + DAY_IN_MS * SESSION_EXPIRY_DAYS);
 		await db
