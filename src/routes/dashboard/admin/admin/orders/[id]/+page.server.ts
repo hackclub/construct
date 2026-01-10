@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/index.js';
 import { marketItemOrder, marketItem, user } from '$lib/server/db/schema.js';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
@@ -131,7 +131,7 @@ export const actions = {
 		return { success: true, message: 'Order marked as shipped' };
 	},
 
-	refund: async ({ locals, params, request }) => {
+	refund: async ({ locals, params }) => {
 		if (!locals.user) {
 			throw error(500);
 		}

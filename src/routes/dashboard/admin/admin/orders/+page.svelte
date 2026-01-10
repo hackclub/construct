@@ -57,7 +57,7 @@
 							value={form?.fields.status ?? ['awaiting_approval']}
 							multiple
 						>
-							{#each Object.entries(marketOrderStatuses) as [status, longStatus]}
+							{#each Object.entries(marketOrderStatuses) as [status, longStatus] (status)}
 								<option value={status} class="truncate">{longStatus}</option>
 							{/each}
 						</select>
@@ -79,7 +79,7 @@
 								value={form?.fields.marketItem ?? []}
 								multiple
 							>
-								{#each filteredMarketItems as item}
+								{#each filteredMarketItems as item (item.id)}
 									<option value={item.id} class="truncate">{item.name}</option>
 								{/each}
 							</select>
@@ -102,7 +102,7 @@
 								value={form?.fields.user ?? []}
 								multiple
 							>
-								{#each filteredUsers as user}
+								{#each filteredUsers as user (user?.id)}
 									<option value={user?.id} class="truncate">{user?.name}</option>
 								{/each}
 							</select>
@@ -118,7 +118,7 @@
 							value={form?.fields.country ?? []}
 							multiple
 						>
-							{#each data.countries as country}
+							{#each data.countries as country (country)}
 								<option value={country} class="truncate">{country}</option>
 							{/each}
 						</select>
@@ -147,7 +147,7 @@
 		</div>
 	{:else}
 		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-			{#each orders as order}
+			{#each orders as order (order.order.id)}
 				<div
 					class="themed-box relative flex flex-col p-3 shadow-lg/20 transition-all hover:scale-102"
 				>

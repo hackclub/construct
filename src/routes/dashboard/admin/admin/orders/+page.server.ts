@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
 import { marketItemOrder, marketItem, user } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
-import { eq, and, ne, inArray, sql, desc } from 'drizzle-orm';
+import { eq, and, ne, inArray, desc } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { decrypt } from '$lib/server/encryption';
 import { getUserData } from '$lib/server/idvUserData';
