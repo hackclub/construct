@@ -20,10 +20,10 @@ export async function load({ locals, params }) {
 	let addresses = null;
 
 	if (locals.user.idvToken) {
-		const token = decrypt(locals.user.idvToken);
 		let userData = null;
 
 		try {
+			const token = decrypt(locals.user.idvToken);
 			userData = await getUserData(token);
 		} catch {
 			userDataError = true;
@@ -63,10 +63,10 @@ export const actions = {
 
 		const itemWithPrice = await getItemWithPrice(id, locals);
 
-		const token = decrypt(locals.user.idvToken!);
 		let userData = null;
 
 		try {
+			const token = decrypt(locals.user.idvToken!);
 			userData = await getUserData(token);
 		} catch {
 			throw error(403, { message: 'failed to fetch address, try logging out and back in' });

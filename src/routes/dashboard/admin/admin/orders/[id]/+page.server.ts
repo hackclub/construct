@@ -62,7 +62,9 @@ export async function load({ locals, params }) {
 		try {
 			const token = decrypt(orderData.user.idvToken);
 			const userData = await getUserData(token);
-			address = userData?.addresses?.find((a: { id: string }) => a.id === orderData.order.addressId);
+			address = userData?.addresses?.find(
+				(a: { id: string }) => a.id === orderData.order.addressId
+			);
 		} catch {
 			userDataError = true;
 		}
@@ -124,7 +126,7 @@ export const actions = {
 			const notesText = orderData.order.notes ? `\n\nNotes: ${orderData.order.notes}` : '';
 			await sendSlackDM(
 				orderData.user.slackId,
-				`Your order for ${orderData.marketItem?.name || 'a market item'} has been shipped! :package:${notesText}`
+				`Your order for ${orderData.marketItem?.name || 'a market item'} just got shipped! :package: :package: :package:\n\n${notesText}`
 			);
 		}
 
@@ -186,14 +188,14 @@ export const actions = {
 		if (orderData.user?.slackId) {
 			await sendSlackDM(
 				orderData.user.slackId,
-				`Your order for ${orderData.marketItem?.name || 'a market item'} has been refunded. You received ${orderData.order.bricksPaid} bricks back.`
+				`Your order for ${orderData.marketItem?.name || 'a market item'} has been refunded! :oop:\nYou got your ${orderData.order.bricksPaid} bricks back`
 			);
 		}
 
 		return { success: true, message: 'Order refunded' };
 	},
 
-	delete: async ({ locals, params }) => {
+	deny: async ({ locals, params }) => {
 		if (!locals.user) {
 			throw error(500);
 		}
@@ -225,19 +227,18 @@ export const actions = {
 			throw error(404, { message: 'order not found' });
 		}
 
-		// Mark order as denied (deleted without refund)
+		// Mark order as denied
 		await db
 			.update(marketItemOrder)
 			.set({
-				status: 'denied',
-				deleted: true
+				status: 'denied'
 			})
 			.where(eq(marketItemOrder.id, id));
 
 		if (orderData.user?.slackId) {
 			await sendSlackDM(
 				orderData.user.slackId,
-				`Your order for ${orderData.marketItem?.name || 'a market item'} has been denied.`
+				`Your order for ${orderData.marketItem?.name || 'a market item'} has been denied :dcolon:\nYou didn't get any of your bricks back :hmmm:`
 			);
 		}
 

@@ -212,10 +212,10 @@ export const actions = {
 				});
 			}
 
-			const token = decrypt(queriedProject.user.idvToken);
 			let userData;
 
 			try {
+				const token = decrypt(queriedProject.user.idvToken);
 				userData = await getUserData(token);
 			} catch {
 				return fail(400, {

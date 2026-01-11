@@ -73,7 +73,9 @@
 						max={Math.floor(data.user.clay)}
 					/>
 				</div>
-				<p class="mt-1 text-sm opacity-50">You'll get {bricks} bricks</p>
+				<p class="mt-1 text-sm opacity-50">
+					You'll get {bricks} bricks and have {Math.floor(data.user.clay - clay)} left
+				</p>
 			</label>
 
 			<div class="grow"></div>

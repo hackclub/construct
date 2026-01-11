@@ -249,7 +249,7 @@ export const marketOrderStatus = pgEnum('market_order_status', [
 export const marketItemOrder = pgTable('market_item_order', {
 	id: serial().primaryKey(),
 	userId: integer().references(() => user.id).notNull(),
-	marketItemId: integer().references(() => marketItem.id).notNull(),
+	marketItemId: integer().references(() => marketItem.id),
 
 	addressId: text().notNull(),
 	bricksPaid: integer().notNull(),

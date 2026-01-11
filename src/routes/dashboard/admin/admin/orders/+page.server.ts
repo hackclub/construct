@@ -3,8 +3,6 @@ import { marketItemOrder, marketItem, user } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, and, ne, inArray, desc } from 'drizzle-orm';
 import type { Actions } from './$types';
-import { decrypt } from '$lib/server/encryption';
-import { getUserData } from '$lib/server/idvUserData';
 
 export async function load({ locals }) {
 	if (!locals.user) {
@@ -14,7 +12,7 @@ export async function load({ locals }) {
 		throw error(403, { message: 'oi get out' });
 	}
 
-	const orders = await getOrders([], [], [], []);
+	const orders = await getOrders(['awaiting_approval'], [], []);
 
 	const allMarketItems = await db
 		.select({
@@ -32,44 +30,10 @@ export async function load({ locals }) {
 		.from(user)
 		.where(and(ne(user.trust, 'red'), ne(user.hackatimeTrust, 'red'))); // hide banned users
 
-	// Get unique countries from orders
-	const ordersWithAddresses = await db
-		.select({
-			userId: marketItemOrder.userId,
-			addressId: marketItemOrder.addressId
-		})
-		.from(marketItemOrder)
-		.where(eq(marketItemOrder.deleted, false));
-
-	const countries: string[] = [];
-	for (const order of ordersWithAddresses) {
-		try {
-			const orderUser = await db
-				.select({
-					idvToken: user.idvToken
-				})
-				.from(user)
-				.where(eq(user.id, order.userId))
-				.limit(1);
-
-			if (orderUser[0]?.idvToken) {
-				const token = decrypt(orderUser[0].idvToken);
-				const userData = await getUserData(token);
-				const address = userData?.addresses?.find((a: { id: string }) => a.id === order.addressId);
-				if (address?.country && !countries.includes(address.country)) {
-					countries.push(address.country);
-				}
-			}
-		} catch {
-			// Skip if we can't fetch address
-		}
-	}
-
 	return {
 		allMarketItems,
 		orders,
-		users,
-		countries: countries.sort()
+		users
 	};
 }
 
@@ -97,17 +61,14 @@ export const actions = {
 			return parsedInt;
 		});
 
-		const countryFilter = data.getAll('country') as string[];
-
-		const orders = await getOrders(statusFilter, marketItemFilter, userFilter, countryFilter);
+		const orders = await getOrders(statusFilter, marketItemFilter, userFilter);
 
 		return {
 			orders,
 			fields: {
 				status: statusFilter,
 				marketItem: marketItemFilter,
-				user: userFilter,
-				country: countryFilter
+				user: userFilter
 			}
 		};
 	}
@@ -116,10 +77,9 @@ export const actions = {
 async function getOrders(
 	statusFilter: (typeof marketItemOrder.status._.data)[],
 	marketItemFilter: number[],
-	userFilter: number[],
-	countryFilter: string[]
+	userFilter: number[]
 ) {
-	const baseOrders = await db
+	return await db
 		.select({
 			order: {
 				id: marketItemOrder.id,
@@ -150,31 +110,11 @@ async function getOrders(
 			and(
 				eq(marketItemOrder.deleted, false),
 				statusFilter.length > 0 ? inArray(marketItemOrder.status, statusFilter) : undefined,
-				marketItemFilter.length > 0 ? inArray(marketItemOrder.marketItemId, marketItemFilter) : undefined,
+				marketItemFilter.length > 0
+					? inArray(marketItemOrder.marketItemId, marketItemFilter)
+					: undefined,
 				userFilter.length > 0 ? inArray(marketItemOrder.userId, userFilter) : undefined
 			)
 		)
 		.orderBy(desc(marketItemOrder.createdAt));
-
-	// Filter by country if needed
-	if (countryFilter.length > 0) {
-		const filteredOrders = [];
-		for (const orderData of baseOrders) {
-			try {
-				if (orderData.user?.idvToken) {
-					const token = decrypt(orderData.user.idvToken);
-					const userData = await getUserData(token);
-					const address = userData?.addresses?.find((a: { id: string }) => a.id === orderData.order.addressId);
-					if (address?.country && countryFilter.includes(address.country)) {
-						filteredOrders.push(orderData);
-					}
-				}
-			} catch {
-				// Skip if we can't fetch address
-			}
-		}
-		return filteredOrders;
-	}
-
-	return baseOrders;
 }

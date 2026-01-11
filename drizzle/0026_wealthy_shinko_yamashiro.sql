@@ -1,0 +1,1 @@
+-- ALTER TABLE "market_item_order" ALTER COLUMN "marketItemId" DROP NOT NULL;

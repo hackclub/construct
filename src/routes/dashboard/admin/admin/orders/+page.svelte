@@ -11,7 +11,7 @@
 	let orders = $derived(form?.orders ?? data.orders);
 
 	const marketOrderStatuses = {
-		awaiting_approval: 'Awaiting Approval',
+		awaiting_approval: 'Pending',
 		fulfilled: 'Fulfilled',
 		denied: 'Denied',
 		refunded: 'Refunded'
@@ -31,7 +31,7 @@
 
 <Head title="Market orders" />
 
-<div class="flex h-full flex-col">
+<div class="mb-5 flex flex-col">
 	<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Market item orders</h1>
 
 	<div class="flex flex-col-reverse gap-5 lg:flex-row">
@@ -47,7 +47,7 @@
 					};
 				}}
 			>
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
+				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
 					<!-- Status -->
 					<label class="flex flex-col gap-1">
 						<span class="font-medium">Status</span>
@@ -63,9 +63,9 @@
 						</select>
 					</label>
 
-					<!-- Market Item -->
+					<!-- Market item -->
 					<label class="flex flex-col">
-						<span class="mb-1 font-medium">Market Item</span>
+						<span class="mb-1 font-medium">Market item</span>
 						<div class="flex h-40 flex-col">
 							<input
 								type="text"
@@ -108,21 +108,6 @@
 							</select>
 						</div>
 					</label>
-
-					<!-- Country -->
-					<label class="flex flex-col gap-1">
-						<span class="font-medium">Country</span>
-						<select
-							class="h-40 grow border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 placeholder:text-primary-900 active:ring-3"
-							name="country"
-							value={form?.fields.country ?? []}
-							multiple
-						>
-							{#each data.countries as country (country)}
-								<option value={country} class="truncate">{country}</option>
-							{/each}
-						</select>
-					</label>
 				</div>
 				<button type="submit" class="button md primary mt-3 w-full" disabled={formPending}
 					>Apply!</button
@@ -131,7 +116,9 @@
 		</div>
 	</div>
 
-	<h2 class="mt-4 mb-2 text-2xl font-bold">Orders <span class="ml-2 align-middle text-sm font-normal">({orders.length})</span></h2>
+	<h2 class="mt-4 mb-2 text-2xl font-bold">
+		Orders <span class="ml-2 align-middle text-sm font-normal">({orders.length})</span>
+	</h2>
 
 	{#if orders.length == 0}
 		<div class="flex grow items-center justify-center">
@@ -158,10 +145,10 @@
 					>
 					</a>
 					{#if order.marketItem?.image}
-						<img 
-							src={order.marketItem.image} 
-							alt={order.marketItem?.name || 'Market item'} 
-							class="mb-2 h-40 w-full rounded object-cover"
+						<img
+							src={order.marketItem.image}
+							alt={order.marketItem?.name || 'Market item'}
+							class="mb-2 aspect-[5/3] w-full overflow-hidden rounded-lg bg-primary-800/10 object-contain"
 						/>
 					{/if}
 					<h1 class="flex flex-row gap-1 text-xl font-semibold">
@@ -172,15 +159,12 @@
 							>{order.user?.name}</a
 						>
 					</p>
-					<p class="text-sm mt-2">
+					<p class="mt-1 text-sm">
 						Bricks paid: {order.order.bricksPaid}
 					</p>
-					<div class="flex flex-row gap-4 mt-2">
+					<div class="flex flex-row gap-4">
 						<p class="grow text-sm">
-							Ordered <abbr
-								title={`${order.order.createdAt.toUTCString()}`}
-								class="relative z-2"
-							>
+							Ordered <abbr title={`${order.order.createdAt.toUTCString()}`} class="relative z-2">
 								{relativeDate(order.order.createdAt)}
 							</abbr>
 						</p>

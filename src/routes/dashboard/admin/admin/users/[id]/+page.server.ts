@@ -289,10 +289,10 @@ export const actions = {
 			});
 		}
 
-		const token = decrypt(queriedUser.idvToken);
 		let userData;
 
 		try {
+			const token = decrypt(queriedUser.idvToken);
 			userData = await getUserData(token);
 		} catch {
 			return fail(400, {
