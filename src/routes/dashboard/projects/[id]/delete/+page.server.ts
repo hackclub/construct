@@ -3,6 +3,7 @@ import { devlog, project } from '$lib/server/db/schema.js';
 import { error, redirect } from '@sveltejs/kit';
 import { eq, and, or, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
+import { airtableBase } from '$lib/server/airtable';
 
 export async function load({ params, locals }) {
 	const id: number = parseInt(params.id);
@@ -36,7 +37,14 @@ export async function load({ params, locals }) {
 				or(eq(project.status, 'building'), eq(project.status, 'rejected'))
 			)
 		)
-		.groupBy(project.id, project.name, project.description, project.url, project.createdAt, project.status)
+		.groupBy(
+			project.id,
+			project.name,
+			project.description,
+			project.url,
+			project.createdAt,
+			project.status
+		)
 		.limit(1);
 
 	if (!queriedProject) {
@@ -73,6 +81,30 @@ export const actions = {
 			throw error(404);
 		}
 
+		if (airtableBase) {
+			const records = await airtableBase('tblwUPbRqbRBnQl7G')
+				.select({
+					maxRecords: 1,
+					view: 'Grid view',
+					filterByFormula: '{fldXbtQyDOFpWwGBQ} = ' + locals.user.id
+				})
+				.firstPage();
+
+			if (records.length > 0) {
+				const record = records[0];
+				const projectCount = (record.get('Project Count') ?? 0) as number;
+
+				await airtableBase('tblwUPbRqbRBnQl7G').update([
+					{
+						id: record.id,
+						fields: {
+							fldeNiHX4OhZEDWM5: projectCount - 1
+						}
+					}
+				]);
+			}
+		}
+
 		// Delete project
 		await db
 			.update(project)
@@ -87,7 +119,7 @@ export const actions = {
 					eq(project.deleted, false)
 				)
 			);
-		
+
 		// Mark all associated devlogs as deleted
 		await db
 			.update(devlog)
@@ -95,12 +127,7 @@ export const actions = {
 				deleted: true,
 				updatedAt: new Date(Date.now())
 			})
-			.where(
-				and(
-					eq(devlog.projectId, queriedProject.id),
-					eq(devlog.userId, locals.user.id),
-				)
-			);
+			.where(and(eq(devlog.projectId, queriedProject.id), eq(devlog.userId, locals.user.id)));
 
 		return redirect(303, '/dashboard/projects');
 	}

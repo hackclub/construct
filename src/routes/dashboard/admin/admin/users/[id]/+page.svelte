@@ -131,6 +131,9 @@
 				<DataCard title="Devlog count">
 					{data.devlogCount}
 				</DataCard>
+				<DataCard title="Referred by ID">
+					{user.referralId ?? 'None'}
+				</DataCard>
 			</div>
 
 			<h2 class="mt-2 text-2xl font-bold">Currency stuff</h2>

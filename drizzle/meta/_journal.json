@@ -190,6 +190,13 @@
       "when": 1768171539001,
       "tag": "0026_wealthy_shinko_yamashiro",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1768175514843,
+      "tag": "0027_motionless_colossus",
+      "breakpoints": true
     }
   ]
 }

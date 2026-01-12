@@ -12,6 +12,7 @@ import {
 } from '$lib/server/auth.js';
 import { encrypt } from '$lib/server/encryption.js';
 import { getUserData } from '$lib/server/idvUserData';
+import { airtableBase } from '$lib/server/airtable';
 
 export async function GET(event) {
 	const url = event.url;
@@ -52,7 +53,7 @@ export async function GET(event) {
 		return redirect(302, '/auth/failed');
 	}
 
-	const { id, slack_id, ysws_eligible } = userData;
+	const { id, slack_id, first_name, last_name, primary_email, ysws_eligible } = userData;
 
 	if (!ysws_eligible) {
 		return redirect(302, '/auth/ineligible');
@@ -156,6 +157,8 @@ export async function GET(event) {
 		env.SUPER_ADMIN_SLACK_ID.length > 0 &&
 		slack_id === env.SUPER_ADMIN_SLACK_ID;
 
+	const ref = event.cookies.get('ref');
+
 	if (databaseUser) {
 		// Update user (update name and profile picture and lastLoginAt on login)
 		await db
@@ -180,6 +183,7 @@ export async function GET(event) {
 			createdAt: new Date(Date.now()),
 			lastLoginAt: new Date(Date.now()),
 			hackatimeTrust,
+			referralId: ref,
 
 			hasT1Review: isSuperAdmin,
 			hasT2Review: isSuperAdmin,
@@ -191,6 +195,17 @@ export async function GET(event) {
 		if (!databaseUser) {
 			// Something went _really_ wrong
 			return error(500);
+		}
+
+		if (ref && airtableBase) {
+			await airtableBase('tblwUPbRqbRBnQl7G').create({
+				fldMYF9BuxKbRuSJt: first_name + ' ' + last_name, // Name
+				fldXbtQyDOFpWwGBQ: databaseUser.id, // User ID
+				fldkTgzCj0sz01QQM: primary_email, // Email
+				fldeNiHX4OhZEDWM5: 0, // Project count
+				fld1Sssrs7K69cN0i: 0, // Verified ship count
+				fldaPDWM3wrIYOAEf: ref // Referral code
+			});
 		}
 	}
 

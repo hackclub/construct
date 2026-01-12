@@ -237,37 +237,58 @@ export const actions = {
 				queriedProject.timeSpent / 60
 			)}h ${queriedProject.timeSpent % 60}min, each one with a 3d model file to show progress.\nAll journals can be found here: https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}`;
 
-			await airtableBase('YSWS Project Submission').create({
-				'Code URL': repoUrl ?? '',
-				'Playable URL': queriedProject.project.url ?? '',
-				Description: queriedProject.project.description ?? '',
+			await airtableBase('tblBQ2aKCQanXJSaa').create({
+				fld9BIrlDRnjVL6Ui: repoUrl ?? '',
+				fldPrLiLa12h50Pfy: queriedProject.project.url ?? '',
+				fldIFFkfSli8AFMbD: queriedProject.project.description ?? '',
 
-				'First Name': first_name ?? '',
-				'Last Name': last_name ?? '',
-				Email: primary_email ?? '',
-				Birthday: birthday ?? '',
-				'Address (Line 1)': address?.line_1 ?? '',
-				City: address?.city ?? '',
-				'State / Province': address?.state ?? '',
-				Country: address?.country ?? '',
-				'ZIP / Postal Code': address?.postal_code ?? '',
+				fldaQ63WIIhwzJkzv: first_name ?? '',
+				fldrz5U1lHDLNgsIH: last_name ?? '',
+				fldYCGOtjaGdTkmzR: primary_email ?? '',
+				fldKVDqNLSfo4rI6z: birthday ?? '',
+				fldDtPb8zPM4CZS2s: address?.line_1 ?? '',
+				fldgduLK4ImVTE4Ro: address?.line_2 ?? '',
+				fldQoWAVX33mOdLrz: address?.city ?? '',
+				fldYeXjXlNueOhoLw: address?.state ?? '',
+				fldSDMKS7YLgmAs07: address?.country ?? '',
+				fld00PyO4JOklsDxj: address?.postal_code ?? '',
 
-				'Hours estimate': queriedProject.timeSpent / 60,
-				'Optional - Override Hours Spent': queriedProject.timeSpent / 60,
-				'Optional - Override Hours Spent Justification': notes
-					? notes + '\n' + justificationAppend
-					: justificationAppend,
-				Screenshot: [
+				fldoOwpxxFpwu49lF: queriedProject.timeSpent / 60,
+				fldvLn9Rh9X9To51y: queriedProject.timeSpent / 60,
+				fldkai7CLWixkJlc2: notes ? notes + '\n' + justificationAppend : justificationAppend,
+				fldCUW9JyeauwmyLZ: [
 					{
 						url: imageUrlString
 					}
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				] as any,
-				'Slack Username': queriedProject.user?.name,
-				idv_rec: queriedProject.user?.idvId,
-				'Identity Verified': true,
-				'Temp hold': false
+				fld9TiRu0JTKaqCbA: queriedProject.user?.name,
+				fld1xMv37PLYw0MbZ: queriedProject.user?.idvId,
+				fldoe0vNhq3NDzEUo: true,
+				fldADmpBlSo84dNNM: false
 			});
+
+			const records = await airtableBase('tblwUPbRqbRBnQl7G')
+				.select({
+					maxRecords: 1,
+					view: 'Grid view',
+					filterByFormula: '{fldXbtQyDOFpWwGBQ} = ' + locals.user.id
+				})
+				.firstPage();
+
+			if (records.length > 0) {
+				const record = records[0];
+				const verifiedShipCount = (record.get('Verified Ship Count') ?? 0) as number;
+
+				await airtableBase('tblwUPbRqbRBnQl7G').update([
+					{
+						id: record.id,
+						fields: {
+							fld1Sssrs7K69cN0i: verifiedShipCount + 1
+						}
+					}
+				]);
+			}
 		}
 
 		await db.insert(t2Review).values({
