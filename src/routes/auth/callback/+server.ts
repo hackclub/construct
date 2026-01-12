@@ -156,6 +156,8 @@ export async function GET(event) {
 		env.SUPER_ADMIN_SLACK_ID.length > 0 &&
 		slack_id === env.SUPER_ADMIN_SLACK_ID;
 
+	const ref = event.cookies.get('ref');
+
 	if (databaseUser) {
 		// Update user (update name and profile picture and lastLoginAt on login)
 		await db
@@ -180,6 +182,7 @@ export async function GET(event) {
 			createdAt: new Date(Date.now()),
 			lastLoginAt: new Date(Date.now()),
 			hackatimeTrust,
+			referralId: ref,
 
 			hasT1Review: isSuperAdmin,
 			hasT2Review: isSuperAdmin,
