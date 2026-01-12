@@ -108,7 +108,13 @@ export const actions = {
 			.from(marketItemOrder)
 			.leftJoin(marketItem, eq(marketItem.id, marketItemOrder.marketItemId))
 			.leftJoin(user, eq(user.id, marketItemOrder.userId))
-			.where(and(eq(marketItemOrder.id, id), eq(marketItemOrder.deleted, false)))
+			.where(
+				and(
+					eq(marketItemOrder.id, id),
+					eq(marketItemOrder.deleted, false),
+					eq(marketItemOrder.status, 'awaiting_approval')
+				)
+			)
 			.limit(1);
 
 		if (!orderData) {
@@ -162,7 +168,13 @@ export const actions = {
 			.from(marketItemOrder)
 			.leftJoin(marketItem, eq(marketItem.id, marketItemOrder.marketItemId))
 			.leftJoin(user, eq(user.id, marketItemOrder.userId))
-			.where(and(eq(marketItemOrder.id, id), eq(marketItemOrder.deleted, false)))
+			.where(
+				and(
+					eq(marketItemOrder.id, id),
+					eq(marketItemOrder.deleted, false),
+					eq(marketItemOrder.status, 'awaiting_approval')
+				)
+			)
 			.limit(1);
 
 		if (!orderData) {
@@ -220,7 +232,13 @@ export const actions = {
 			.from(marketItemOrder)
 			.leftJoin(marketItem, eq(marketItem.id, marketItemOrder.marketItemId))
 			.leftJoin(user, eq(user.id, marketItemOrder.userId))
-			.where(and(eq(marketItemOrder.id, id), eq(marketItemOrder.deleted, false)))
+			.where(
+				and(
+					eq(marketItemOrder.id, id),
+					eq(marketItemOrder.deleted, false),
+					eq(marketItemOrder.status, 'awaiting_approval')
+				)
+			)
 			.limit(1);
 
 		if (!orderData) {
