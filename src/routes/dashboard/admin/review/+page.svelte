@@ -116,6 +116,9 @@
 							<option value="onshape" class="truncate">Onshape</option>
 							<option value="fusion-link" class="truncate">Fusion Link</option>
 							<option value="fusion-file" class="truncate">Fusion File</option>
+							<option value="blender" class="truncate">Blender</option>
+							<option value="freecad" class="truncate">FreeCAD</option>
+							<option value="solvespace" class="truncate">SolveSpace</option>
 							<option value="unknown" class="truncate">Other</option>
 						</select>
 					</label>
