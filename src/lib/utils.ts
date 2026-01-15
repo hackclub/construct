@@ -89,7 +89,7 @@ export function getProjectLinkType(
 	if (editorFileType === 'upload' && uploadedFileUrl?.endsWith('.f3d')) return 'fusion-file';
 	if (editorFileType === 'upload' && uploadedFileUrl?.endsWith('.f3z')) return 'fusion-file';
 	if (editorFileType === 'upload' && (uploadedFileUrl?.endsWith('.blend') || uploadedFileUrl?.endsWith('.blend1'))) return 'blender';
-	if (editorFileType === 'upload' && uploadedFileUrl?.endsWith('.FCStd')) return 'freecad';
+	if (editorFileType === 'upload' && uploadedFileUrl?.toLowerCase().endsWith('.fcstd')) return 'freecad';
 	if (editorFileType === 'upload' && uploadedFileUrl?.endsWith('.slvs')) return 'solvespace';
 	return 'unknown';
 }
