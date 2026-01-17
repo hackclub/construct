@@ -10,7 +10,7 @@
 
 <Head title="Market" />
 
-<h1 class="mt-5 mb-2 font-hero text-3xl font-medium">Market</h1>
+<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Market</h1>
 
 {#if data.marketItems.length === 0}
 	<MarketTimer />
@@ -40,6 +40,14 @@
 			<div class="grow"></div>
 			<a href="market/ovenpheus" class="button md primary">Go get your bricks</a>
 		</div>
+	</div>
+
+	<h2 class="mb-2 text-2xl font-bold">Printers</h2>
+
+	<div class="mb-5">
+		<a href="/dashboard/market/printer" class="button md primary">
+			Go to Printer Market
+		</a>
 	</div>
 
 	<h2 class="mb-2 text-2xl font-bold">Market items</h2>

@@ -8,7 +8,6 @@
 		ClipboardPen,
 		ClipboardPenLine,
 		Store,
-
 		ShieldUser,
 
 		Box

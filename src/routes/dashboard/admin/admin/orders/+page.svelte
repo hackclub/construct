@@ -5,7 +5,7 @@
 
 	let { data, form } = $props();
 
-	let marketItemSearch = $state('');
+	let itemSearch = $state('');
 	let userSearch = $state('');
 
 	let orders = $derived(form?.orders ?? data.orders);
@@ -17,9 +17,12 @@
 		refunded: 'Refunded'
 	};
 
-	let filteredMarketItems = $derived(
-		data.allMarketItems.filter((item) =>
-			item.name?.toLowerCase().includes(marketItemSearch.toLowerCase())
+	let filteredItems = $derived(
+		[
+			...data.allMarketItems.map(item => ({ ...item, type: 'marketItem' as const })),
+			...data.allPrinters.map(item => ({ ...item, type: 'printer' as const }))
+		].filter((item) =>
+			item.name?.toLowerCase().includes(itemSearch.toLowerCase())
 		)
 	);
 	let filteredUsers = $derived(
@@ -47,7 +50,7 @@
 					};
 				}}
 			>
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 					<!-- Status -->
 					<label class="flex flex-col gap-1">
 						<span class="font-medium">Status</span>
@@ -63,24 +66,26 @@
 						</select>
 					</label>
 
-					<!-- Market item -->
+					<!-- Items (Market items + Printers) -->
 					<label class="flex flex-col">
-						<span class="mb-1 font-medium">Market item</span>
+						<span class="mb-1 font-medium">Items</span>
 						<div class="flex h-40 flex-col">
 							<input
 								type="text"
 								placeholder="search"
-								bind:value={marketItemSearch}
+								bind:value={itemSearch}
 								class="themed-input-light border-b-0 py-1.5"
 							/>
 							<select
 								class="themed-input-light grow"
-								name="marketItem"
-								value={form?.fields.marketItem ?? []}
+								name="{itemSearch}" 
+								value={[]}
 								multiple
 							>
-								{#each filteredMarketItems as item (item.id)}
-									<option value={item.id} class="truncate">{item.name}</option>
+								{#each filteredItems as item (item.type + '-' + item.id)}
+									<option value={item.type === 'printer' ? `printer-${item.id}` : `marketItem-${item.id}`} class="truncate">
+										{item.name}{item.type === 'printer' ? ' ' : ''}
+									</option>
 								{/each}
 							</select>
 						</div>
@@ -144,15 +149,15 @@
 						aria-label="order"
 					>
 					</a>
-					{#if order.marketItem?.image}
+					{#if order.item?.image}
 						<img
-							src={order.marketItem.image}
-							alt={order.marketItem?.name || 'Market item'}
+							src={order.item.image}
+							alt={order.item?.name || (order.order.type === 'printer' ? 'Printer' : 'Market item')}
 							class="mb-2 aspect-[5/3] w-full overflow-hidden rounded-lg bg-primary-800/10 object-contain"
 						/>
 					{/if}
 					<h1 class="flex flex-row gap-1 text-xl font-semibold">
-						<span class="grow truncate">{order.marketItem?.name || 'Unknown item'}</span>
+						<span class="grow truncate">{order.item?.name || 'Unknown item'}</span>
 					</h1>
 					<p class="text-sm">
 						by <a class="relative z-2 underline" href={`/dashboard/users/${order.user?.id}`}

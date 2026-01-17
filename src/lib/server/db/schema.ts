@@ -6,7 +6,8 @@ import {
 	boolean,
 	serial,
 	timestamp,
-	real
+	real,
+	json
 } from 'drizzle-orm/pg-core';
 
 export const hackatimeTrustEnum = pgEnum('hackatime_trust', ['green', 'blue', 'yellow', 'red']);
@@ -261,6 +262,60 @@ export const marketItemOrder = pgTable('market_item_order', {
 	status: marketOrderStatus().notNull().default('awaiting_approval'),
 	userNotes: text().notNull(),
 	notes: text(), // stuff like tracking code, shown to user
+
+	deleted: boolean().notNull().default(false),
+	createdAt: timestamp().notNull().defaultNow()
+});
+
+export const printer = pgTable('printer', {
+	id: serial().primaryKey(),
+	editedBy: json().$type<number[]>(),
+	createdBy: integer().references(() => user.id),
+
+	name: text().notNull(),
+	description: text().notNull(),
+	image: text().notNull(),
+
+	minRequiredShopScore: integer().notNull().default(0),
+
+	clayPrice: integer().notNull(),
+
+	minShopScore: integer().notNull(),
+	maxShopScore: integer().notNull(),
+	maxPrice: integer().notNull(),
+	minPrice: integer().notNull(),
+
+	requiresId: integer().references(() => printer.id),
+
+	isPublic: boolean().notNull().default(false),
+
+	deleted: boolean().notNull().default(false),
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp().notNull().defaultNow()
+});
+
+export const printerOrderStatus = pgEnum('printer_order_status', [
+	'awaiting_approval',
+	'fulfilled',
+	'denied',
+	'refunded'
+]);
+
+export const printerOrder = pgTable('printer_order', {
+	id: serial().primaryKey(),
+	userId: integer()
+		.references(() => user.id)
+		.notNull(),
+	printerId: integer()
+		.references(() => printer.id)
+		.notNull(),
+
+	addressId: text(),
+	bricksPaid: integer().notNull(),
+
+	status: printerOrderStatus().notNull().default('awaiting_approval'),
+	userNotes: text().notNull(),
+	notes: text(),
 
 	deleted: boolean().notNull().default(false),
 	createdAt: timestamp().notNull().defaultNow()

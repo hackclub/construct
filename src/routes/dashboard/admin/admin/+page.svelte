@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Head from '$lib/components/Head.svelte';
-	import { ChartLine, Package2, ScrollText, Store, Users } from '@lucide/svelte';
+	import { ChartLine, Package2, ScrollText, Store, Users, Printer } from '@lucide/svelte';
 
 	let { data } = $props();
 </script>
@@ -36,7 +36,16 @@
 			<div>
 				<Store size={40} />
 			</div>
-			<p class="text-2xl font-bold">Market</p>
+			<p class="text-2xl font-bold">Brick Market</p>
+		</a>
+		<a
+			class="themed-box flex flex-col items-center justify-center gap-2 p-3 shadow-xl transition-transform hover:scale-105"
+			href="admin/market/printer"
+		>
+			<div>
+				<Printer size={40} />
+			</div>
+			<p class="text-2xl font-bold">Printer market</p>
 		</a>
 		<a
 			class="themed-box flex flex-col items-center justify-center gap-2 p-3 shadow-xl transition-transform hover:scale-105"
