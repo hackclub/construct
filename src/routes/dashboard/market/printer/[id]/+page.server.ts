@@ -224,32 +224,32 @@ export const actions = {
 				throw error(404, { message: 'printer upgrade not found' });
 			}
 
-		const validOrderedBasePrinter = await db
-			.select()
-			.from(printerOrder)
-			.where(
-				and(
-					eq(printerOrder.userId, locals.user.id),
-					isNotNull(printerOrder.printerId),
-					or(
-						eq(printerOrder.status, 'awaiting_approval'),
-						eq(printerOrder.status, 'fulfilled')
+			const validOrderedBasePrinter = await db
+				.select()
+				.from(printerOrder)
+				.where(
+					and(
+						eq(printerOrder.userId, locals.user.id),
+						isNotNull(printerOrder.printerId),
+						or(
+							eq(printerOrder.status, 'awaiting_approval'),
+							eq(printerOrder.status, 'fulfilled')
+						)
 					)
 				)
-			)
-			.limit(1);
+				.limit(1);
 
-		if (!validOrderedBasePrinter || validOrderedBasePrinter.length === 0) {
-			throw error(403, { message: 'you need to buy a base printer first' });
-		}
+			if (!validOrderedBasePrinter || validOrderedBasePrinter.length === 0) {
+				throw error(403, { message: 'you need to buy a base printer first' });
+			}
 
-		const computedPrice = calculateMarketPrice(
-			upgrade.minPrice,
-			upgrade.maxPrice,
-			upgrade.minShopScore,
-			upgrade.maxShopScore,
-			locals.user.shopScore
-		);
+			const computedPrice = calculateMarketPrice(
+				upgrade.minPrice,
+				upgrade.maxPrice,
+				upgrade.minShopScore,
+				upgrade.maxShopScore,
+				locals.user.shopScore
+			);
 
 			if (computedPrice > locals.user.brick) {
 				throw error(403, { message: "you can't afford this" });
