@@ -58,17 +58,24 @@ export const actions = {
 		const data = await request.formData();
 		const statusFilter = data.getAll('status') as (typeof marketItemOrder.status._.data)[];
 
-		const marketItemFilter = data.getAll('marketItem').map((itemId) => {
-			const parsedInt = parseInt(itemId.toString());
-			if (!parsedInt) throw error(400, { message: 'malformed market item filter' });
-			return parsedInt;
-		});
+		const selectedItems = data.getAll('marketItem').map((item) => item.toString());
 
-		const printerFilter = data.getAll('printer').map((itemId) => {
-			const parsedInt = parseInt(itemId.toString());
-			if (!parsedInt) throw error(400, { message: 'malformed printer filter' });
-			return parsedInt;
-		});
+		const marketItemFilter: number[] = [];
+		const printerFilter: number[] = [];
+
+		for (const item of selectedItems) {
+			if (item.startsWith('marketItem-')) {
+				const id = parseInt(item.slice('marketItem-'.length));
+				if (!id) throw error(400, { message: 'malformed market item filter' });
+				marketItemFilter.push(id);
+			} else if (item.startsWith('printer-')) {
+				const id = parseInt(item.slice('printer-'.length));
+				if (!id) throw error(400, { message: 'malformed printer filter' });
+				printerFilter.push(id);
+			} else {
+				throw error(400, { message: 'invalid item format' });
+			}
+		}
 
 		const userFilter = data.getAll('user').map((userId) => {
 			const parsedInt = parseInt(userId.toString());
@@ -82,8 +89,7 @@ export const actions = {
 			orders,
 			fields: {
 				status: statusFilter,
-				marketItem: marketItemFilter,
-				printer: printerFilter,
+				marketItem: selectedItems,
 				user: userFilter
 			}
 		};

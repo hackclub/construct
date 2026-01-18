@@ -106,7 +106,8 @@
 						<PrinterCard
 							printer={upgrade}
 							userShopScore={data.user.shopScore}
-							userClay={data.user.brick}
+							userClay={data.user.clay}
+							userBrick={data.user.brick}
 							isBasePrinter={false}
 							userHasBasePrinter={data.user.hasBasePrinter}
 						/>

@@ -214,7 +214,7 @@ export const actions = {
 
 		const printerId = parseInt(printerIdStr);
 
-		if (!printerId) {
+		if (isNaN(printerId)) {
 			throw error(400, { message: 'Invalid printer ID' });
 		}
 

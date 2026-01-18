@@ -1,9 +1,9 @@
 <script lang="ts">
-	let { printer, userShopScore, userClay, isBasePrinter, userHasBasePrinter } = $props();
+	let { printer, userShopScore, userClay, userBrick, isBasePrinter, userHasBasePrinter } = $props();
 
 	let disableBuy = $derived(
 		printer.minRequiredShopScore > userShopScore ||
-			(isBasePrinter ? printer.clayPrice > userClay : printer.computedPrice > userClay)
+			(isBasePrinter ? printer.clayPrice > userClay : printer.computedPrice > userBrick)
 	);
 
 	const price = isBasePrinter ? printer.clayPrice : printer.computedPrice;
@@ -45,8 +45,8 @@
 			>
 				{#if printer.minRequiredShopScore > userShopScore}
 					{Math.ceil(printer.minRequiredShopScore - userShopScore)} more market score needed
-				{:else if price > userClay}
-					{Math.ceil(price - userClay)} more {currency} needed
+				{:else if price > (isBasePrinter ? userClay : userBrick)}
+					{Math.ceil(price - (isBasePrinter ? userClay : userBrick))} more {currency} needed
 				{:else}
 					Buy for {price} {currency}
 				{/if}
