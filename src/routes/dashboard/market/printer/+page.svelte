@@ -12,9 +12,9 @@
 
 {#if !data.preferredPrinter}
 	<div class="mb-6">
-		<h2 class="mb-3 text-2xl font-bold">Select Your Printer</h2>
+		<h2 class="mb-3 text-2xl font-bold">Choose a printer</h2>
 		<p class="mb-4 text-primary-300">
-			Choose which printer you'd like to get. You can always change your preferred printer later.
+			Choose which printer you'd like to get. You can always change your preferred printer later
 		</p>
 
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -22,7 +22,7 @@
 				<form method="POST" action="?/selectPrinter" use:enhance>
 					<input type="hidden" name="printerId" value={printer.id} />
 					<button type="submit" class="w-full text-left">
-						<div class="themed-box flex flex-col gap-3 p-3 transition-all hover:scale-[1.02]">
+						<div class="themed-box flex flex-col gap-3 p-3 transition-all">
 							<div class="aspect-square overflow-hidden rounded-lg bg-primary-800/10">
 								<img
 									src={printer.image}
@@ -36,7 +36,7 @@
 									{printer.description}
 								</p>
 								<div class="text-center text-lg font-bold">Base: 40 clay</div>
-								<div class="button md primary">Select This Printer</div>
+								<div class="button md primary">Select this printer</div>
 							</div>
 						</div>
 					</button>
@@ -47,11 +47,11 @@
 {:else}
 	<div class="mb-6">
 		<div class="mb-4 flex items-center justify-between">
-			<h2 class="text-2xl font-bold">Your Selected Printer: {data.preferredPrinter.name}</h2>
+			<h2 class="text-2xl font-bold">Chosen printer: {data.preferredPrinter.name}</h2>
 			{#if !data.hasOrderedBasePrinter}
 				<form method="POST" action="?/selectPrinter" use:enhance>
 					<input type="hidden" name="printerId" value="" />
-					<button type="submit" class="button sm secondary">Change Printer</button>
+					<button type="submit" class="button sm primary">Change Printer</button>
 				</form>
 			{/if}
 		</div>
