@@ -147,6 +147,7 @@ async function getOrders(
 			itemId: printer.id,
 			itemName: printer.name,
 			itemImage: printer.image,
+			clayPrice: printer.clayPrice,
 			userName: user.name,
 			userIdvToken: user.idvToken
 		})
@@ -206,7 +207,7 @@ async function getOrders(
 			},
 			item: {
 				id: o.itemId,
-				name: o.itemName,
+				name: o.notes ? `${o.itemName} (${o.notes}) - Clay: ${o.clayPrice || 40}, Bricks: ${o.bricksPaid}` : `${o.itemName} - Clay: ${o.clayPrice || 40}, Bricks: ${o.bricksPaid}`,
 				image: o.itemImage
 			},
 			user: {

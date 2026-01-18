@@ -25,11 +25,13 @@
 	<h2 class="mt-2 text-2xl font-bold">Order details</h2>
 
 	<div class="themed-box flex flex-row gap-3 p-3 shadow-lg">
-		<div class="flex grow flex-col gap-3">
-			<div>
-				<p class="text-xl font-bold">{data.orderData.marketItem?.name}</p>
-				<p>{data.orderData.marketItem?.description}</p>
-			</div>
+	       <div class="flex grow flex-col gap-3">
+		       <div>
+			       <p class="text-xl font-bold">
+				       {data.orderData.marketItem?.name || data.orderData.printer?.name || 'Printer Order'}
+			       </p>
+			       <p>{data.orderData.marketItem?.description || data.orderData.printer?.description}</p>
+		       </div>
 
 			<div>
 				<h3 class="text-lg font-bold">User</h3>
@@ -51,7 +53,12 @@
 
 			<div>
 				<h3 class="text-lg font-bold">Payment</h3>
-				<p>Bricks paid: {data.orderData.order.bricksPaid}</p>
+				{#if data.orderData.type === 'printer'}
+					<p>Clay paid: {data.orderData.printer?.clayPrice || 40}</p>
+					<p>Bricks paid: {data.orderData.order.bricksPaid}</p>
+				{:else}
+					<p>Bricks paid: {data.orderData.order.bricksPaid}</p>
+				{/if}
 			</div>
 
 			<div>
@@ -91,18 +98,41 @@
 					</abbr>
 				</p>
 			</div>
-		</div>
-		<div>
-			{#if data.orderData.marketItem?.image}
-				<div>
-					<img
-						src={data.orderData.marketItem.image}
-						alt={data.orderData.marketItem.name}
-						class="w-80 rounded"
-					/>
-				</div>
-			{/if}
-		</div>
+			       {#if data.orderData.order.type === 'printer' && data.orderData.selectedUpgrades?.length}
+				       <div>
+					       <h3 class="text-lg font-bold">Selected Upgrades</h3>
+					       <ul class="list-disc ml-5">
+						       {#each data.orderData.selectedUpgrades as upgrade}
+							       <li>
+								       <span class="font-semibold">{upgrade.name}</span>
+								       <span class="ml-2 text-primary-300">{upgrade.description}</span>
+								       <span class="ml-2 text-primary-500">+{upgrade.computedPrice ?? upgrade.maxPrice} bricks</span>
+							       </li>
+						       {/each}
+					       </ul>
+				       </div>
+			       {/if}
+		       </div>
+		       <div>
+			       {#if data.orderData.marketItem?.image}
+				       <div>
+					       <img
+						       src={data.orderData.marketItem.image}
+						       alt={data.orderData.marketItem.name}
+						       class="w-80 rounded"
+					       />
+				       </div>
+			       {/if}
+			       {#if data.orderData.printer?.image}
+				       <div>
+					       <img
+						       src={data.orderData.printer.image}
+						       alt={data.orderData.printer.name}
+						       class="w-80 rounded"
+					       />
+				       </div>
+			       {/if}
+		       </div>
 	</div>
 
 	<h2 class="mt-2 text-2xl font-bold">Admin notes</h2>
