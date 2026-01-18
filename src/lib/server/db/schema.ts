@@ -30,6 +30,7 @@ export const user = pgTable('user', {
 	shopScore: real().notNull().default(0),
 
 	hasBasePrinter: boolean().notNull().default(false),
+	preferredBasePrinterId: integer().references(() => printer.id),
 	// bricksSpentOnUpgrades: integer().notNull().default(0),
 
 	hasT1Review: boolean().notNull().default(false), // Has access to t1 review

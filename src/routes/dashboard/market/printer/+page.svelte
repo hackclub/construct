@@ -15,7 +15,6 @@
 		<h2 class="mb-3 text-2xl font-bold">Select Your Printer</h2>
 		<p class="mb-4 text-primary-300">
 			Choose which printer you'd like to get. You can always change your preferred printer later.
-			selecting.
 		</p>
 
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">

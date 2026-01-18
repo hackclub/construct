@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
 import { marketItemOrder, marketItem, printerOrder, printer, user } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
-import { eq, and, ne, inArray, desc, sql } from 'drizzle-orm';
+import { eq, and, ne, inArray } from 'drizzle-orm';
 import type { Actions } from './$types';
 
 export async function load({ locals }) {

@@ -8,11 +8,7 @@
 	let disableBuy = $derived(
 		data.printerData.minRequiredShopScore > data.user.shopScore ||
 			(data.isBase
-				? data.printerData.clayPrice > data.user.clay ||
-					data.userDataError ||
-					!data.addresses ||
-					!data.addresses?.length ||
-					data.addresses.length <= 0
+				? data.printerData.clayPrice > data.user.clay || data.userDataError || !data.addresses?.length
 				: (data.printerData.computedPrice ?? data.printerData.maxPrice) > data.user.brick)
 	);
 </script>
@@ -126,7 +122,7 @@
 						<option disabled selected
 							>Failed to fetch addresses, try logging out and back in</option
 						>
-					{:else if !data.addresses || !data.addresses?.length || data.addresses.length <= 0}
+					{:else if !data.addresses?.length}
 						<option disabled selected>Go to auth.hackclub.com and add an address</option>
 					{:else}
 						{#each data.addresses.sort((a, b) => {

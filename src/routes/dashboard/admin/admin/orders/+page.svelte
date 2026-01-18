@@ -78,8 +78,8 @@
 							/>
 							<select
 								class="themed-input-light grow"
-								name="{itemSearch}" 
-								value={[]}
+								name="marketItem"
+								value={form?.fields.marketItem ?? []}
 								multiple
 							>
 								{#each filteredItems as item (item.type + '-' + item.id)}

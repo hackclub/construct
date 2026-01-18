@@ -129,13 +129,13 @@ export const actions = {
 
 		if (type === 'base') {
 			const addressId = data.get('address')?.toString();
-			const notes = data.get('notes')?.toString();
+			const notes = data.get('notes')?.toString() || '';
 
 			if (!addressId) {
 				throw error(400, { message: 'invalid address id' });
 			}
 
-			if (notes === null || notes === undefined || notes.length > 10000) {
+			if (notes.length > 10000) {
 				throw error(400, { message: 'stop writing so much in notes' });
 			}
 
@@ -200,10 +200,10 @@ export const actions = {
 
 			return redirect(302, '/dashboard/market/printer');
 		} else {
-			const notes = data.get('notes')?.toString();
+			const notes = data.get('notes')?.toString() || '';
 			const addressId = data.get('address')?.toString();
 
-			if (notes === null || notes === undefined || notes.length > 10000) {
+			if (notes.length > 10000) {
 				throw error(400, { message: 'stop writing so much in notes' });
 			}
 
@@ -215,14 +215,14 @@ export const actions = {
 						eq(printer.deleted, false),
 						eq(printer.isPublic, true),
 						eq(printer.id, id),
-					isNotNull(printer.requiresId)
+						isNotNull(printer.requiresId)
+					)
 				)
-			)
-			.limit(1);
+				.limit(1);
 
-		if (!upgrade) {
-			throw error(404, { message: 'printer upgrade not found' });
-		}
+			if (!upgrade) {
+				throw error(404, { message: 'printer upgrade not found' });
+			}
 
 		const validOrderedBasePrinter = await db
 			.select()
