@@ -7,7 +7,7 @@ import {
 	serial,
 	timestamp,
 	real,
-	json
+	type AnyPgColumn
 } from 'drizzle-orm/pg-core';
 
 export const hackatimeTrustEnum = pgEnum('hackatime_trust', ['green', 'blue', 'yellow', 'red']);
@@ -30,7 +30,7 @@ export const user = pgTable('user', {
 	shopScore: real().notNull().default(0),
 
 	hasBasePrinter: boolean().notNull().default(false),
-	preferredBasePrinterId: integer().references(() => printer.id),
+	preferredBasePrinterId: integer().references((): AnyPgColumn => printer.id),
 	// bricksSpentOnUpgrades: integer().notNull().default(0),
 
 	hasT1Review: boolean().notNull().default(false), // Has access to t1 review
@@ -270,7 +270,6 @@ export const marketItemOrder = pgTable('market_item_order', {
 
 export const printer = pgTable('printer', {
 	id: serial().primaryKey(),
-	editedBy: json().$type<number[]>(),
 	createdBy: integer().references(() => user.id),
 
 	name: text().notNull(),
@@ -286,7 +285,7 @@ export const printer = pgTable('printer', {
 	maxPrice: integer().notNull(),
 	minPrice: integer().notNull(),
 
-	requiresId: integer().references(() => printer.id),
+	requiresId: integer().references((): AnyPgColumn => printer.id),
 
 	isPublic: boolean().notNull().default(false),
 

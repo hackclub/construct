@@ -1,0 +1,1 @@
+ALTER TABLE "printer" DROP COLUMN "editedBy";
