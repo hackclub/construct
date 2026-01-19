@@ -38,6 +38,8 @@ export const user = pgTable('user', {
 
 	isPrinter: boolean().notNull().default(false), // Is a printer
 
+	referralId: text(),
+
 	createdAt: timestamp().notNull().defaultNow(), // Account creation timestamp
 	lastLoginAt: timestamp().notNull().defaultNow() // Last login timestamp
 });
@@ -181,8 +183,9 @@ export const t2Review = pgTable('t2_review', {
 		.references(() => project.id),
 
 	feedback: text(),
+	image: text(),
 	notes: text(),
-	currencyMultiplier: real().notNull().default(1.0),
+	shopScoreMultiplier: real().notNull().default(25.0),
 
 	timestamp: timestamp().notNull().defaultNow()
 });
@@ -213,24 +216,33 @@ export const marketItem = pgTable('market_item', {
 	name: text().notNull(),
 	description: text().notNull(),
 	image: text().notNull(),
-	
+
 	minRequiredShopScore: integer().notNull().default(0),
-	
+
 	minShopScore: integer().notNull(),
 	maxShopScore: integer().notNull(), // Score after which price becomes constant
 	maxPrice: integer().notNull(),
 	minPrice: integer().notNull(),
-	
+
 	isPublic: boolean().notNull().default(false),
-	
+
 	deleted: boolean().notNull().default(false),
 	createdAt: timestamp().notNull().defaultNow(),
 	updatedAt: timestamp().notNull().defaultNow()
 });
 
+export const ovenpheusLog = pgTable('ovenpheus_log', {
+	id: serial().primaryKey(),
+	userId: integer().references(() => user.id),
+
+	clay: real().notNull(),
+	bricksReceived: real().notNull(),
+
+	timestamp: timestamp().notNull().defaultNow()
+});
+
 export const marketOrderStatus = pgEnum('market_order_status', [
 	'awaiting_approval',
-	'approved',
 	'fulfilled',
 	'denied',
 	'refunded'
@@ -238,14 +250,17 @@ export const marketOrderStatus = pgEnum('market_order_status', [
 
 export const marketItemOrder = pgTable('market_item_order', {
 	id: serial().primaryKey(),
-	userId: integer().references(() => user.id),
+	userId: integer()
+		.references(() => user.id)
+		.notNull(),
+	marketItemId: integer().references(() => marketItem.id),
 
 	addressId: text().notNull(),
 	bricksPaid: integer().notNull(),
-	
+
 	status: marketOrderStatus().notNull().default('awaiting_approval'),
 	userNotes: text().notNull(),
-	notes: text().notNull(),
+	notes: text(), // stuff like tracking code, shown to user
 
 	deleted: boolean().notNull().default(false),
 	createdAt: timestamp().notNull().defaultNow()
@@ -289,9 +304,22 @@ export const marketItemOrder = pgTable('market_item_order', {
 // 	updatedAt: timestamp().notNull().defaultNow()
 // });
 
+// Impersonate audit logs
+export const impersonateAuditLog = pgTable('impersonate_audit_log', {
+	id: serial().primaryKey(),
+	adminUserId: integer()
+		.notNull()
+		.references(() => user.id), // Admin who performed the impersonation
+	targetUserId: integer()
+		.notNull()
+		.references(() => user.id), // User who was impersonated
+	timestamp: timestamp().notNull().defaultNow()
+});
+
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type Project = typeof project.$inferSelect;
+export type ImpersonateAuditLog = typeof impersonateAuditLog.$inferSelect;
 
 export type T1Review = typeof t1Review.$inferSelect;
 export type LegionReview = typeof legionReview.$inferSelect;

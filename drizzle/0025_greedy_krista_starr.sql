@@ -1,0 +1,2 @@
+ALTER TABLE "market_item_order" ADD COLUMN "marketItemId" integer;--> statement-breakpoint
+ALTER TABLE "market_item_order" ADD CONSTRAINT "market_item_order_marketItemId_market_item_id_fk" FOREIGN KEY ("marketItemId") REFERENCES "public"."market_item"("id") ON DELETE no action ON UPDATE no action;

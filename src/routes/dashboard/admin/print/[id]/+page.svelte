@@ -171,9 +171,6 @@
 								printFormPending = false;
 							};
 						}}
-						onsubmit={() => {
-							return confirm('really submit?');
-						}}
 					>
 						<label class="flex flex-col gap-1">
 							<span class="font-medium">Filament used <span class="opacity-50">(grams)</span></span>
@@ -222,9 +219,6 @@
 								await update({ reset: false });
 								actionsFormPending = false;
 							};
-						}}
-						onsubmit={() => {
-							return confirm('really submit?');
 						}}
 					>
 						<label class="flex flex-col gap-1">

@@ -14,6 +14,7 @@
 	let impersonatePending = $state(false);
 	let logoutPending = $state(false);
 	let fetchPIIPending = $state(false);
+	let changeTrustPending = $state(false);
 </script>
 
 <Head title={'User: ' + user.name} />
@@ -130,6 +131,9 @@
 				<DataCard title="Devlog count">
 					{data.devlogCount}
 				</DataCard>
+				<DataCard title="Referred by ID">
+					{user.referralId ?? 'None'}
+				</DataCard>
 			</div>
 
 			<h2 class="mt-2 text-2xl font-bold">Currency stuff</h2>
@@ -234,6 +238,37 @@
 						</label>
 					</div>
 					<button type="submit" class="button md primary mt-3 w-full" disabled={privilegesPending}
+						>Apply!</button
+					>
+				</form>
+			</div>
+
+			<h2 class="mt-2 text-2xl font-bold">Trust Level</h2>
+			<div class="themed-box flex flex-col gap-3 p-3 shadow-lg">
+				<form
+					action="?/changeTrust"
+					method="POST"
+					use:enhance={() => {
+						changeTrustPending = true;
+						return async ({ update }) => {
+							await update({ reset: false });
+							changeTrustPending = false;
+						};
+					}}
+				>
+					<label class="flex flex-col gap-1">
+						<span class="text-sm font-medium">User Trust Level</span>
+						<select name="trust" value={user.trust} class="themed-input-on-box text-sm" required>
+							<option value="green">Green</option>
+							<option value="blue">Blue</option>
+							<option value="yellow">Yellow</option>
+							<option value="red">Red</option>
+						</select>
+					</label>
+					{#if form?.changeTrust?.invalidTrust}
+						<p class="w-full text-center text-sm">Invalid trust level</p>
+					{/if}
+					<button type="submit" class="button md primary mt-3 w-full" disabled={changeTrustPending}
 						>Apply!</button
 					>
 				</form>

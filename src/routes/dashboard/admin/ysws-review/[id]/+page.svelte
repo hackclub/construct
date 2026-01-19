@@ -8,10 +8,24 @@
 	import Spinny3DPreview from '$lib/components/Spinny3DPreview.svelte';
 	import { Download } from '@lucide/svelte';
 	import ReviewHistory from '../../ReviewHistory.svelte';
+	import { calculatePayouts, minutesToClay } from '$lib/currency';
+	import { BASE_SHOP_SCORE_PER_HOUR } from '$lib/defs';
 
 	let { data, form } = $props();
 
 	let formPending = $state(false);
+	let overridePending = $state(false);
+
+	let shopScoreMultiplier = $state(BASE_SHOP_SCORE_PER_HOUR);
+	let payouts = $derived.by(() =>
+		calculatePayouts(
+			data.project.timeSpent,
+			data.filamentUsed,
+			shopScoreMultiplier,
+			data.user.hasBasePrinter,
+			data.project.project.createdAt
+		)
+	);
 </script>
 
 <Head title={'YSWS Review: ' + data.project.project.name} />
@@ -41,6 +55,7 @@
 							.project.timeSpent % 60}min
 					</p>
 					<p>Status: {projectStatuses[data.project.project.status]}</p>
+					<p>Filament spent printing: {data.filamentUsed}g</p>
 					<p>Submitted to Airtable: {data.project.project.submittedToAirtable ?? 'null (false)'}</p>
 					<div class="mt-1">
 						<ProjectLinks
@@ -108,12 +123,11 @@
 				</div>
 			{/if}
 
-			<h2 class="mt-2 text-2xl font-bold">
-				YSWS Review (currently you need to add currency/market score manually)
-			</h2>
+			<h2 class="mt-2 text-2xl font-bold">YSWS Review</h2>
 			<div class="themed-box flex flex-col gap-3 p-3">
 				<form
 					method="POST"
+					action="?/review"
 					class="flex flex-col gap-3"
 					use:enhance={() => {
 						formPending = true;
@@ -121,9 +135,6 @@
 							await update({ reset: false });
 							formPending = false;
 						};
-					}}
-					onsubmit={() => {
-						return confirm('really submit to airtable?');
 					}}
 				>
 					<label class="flex flex-col gap-1">
@@ -134,9 +145,46 @@
 					</label>
 
 					<label class="flex flex-col gap-1">
+						<span class="font-medium">
+							Printed image URL <span class="opacity-50">(will go on Airtable as the image)</span>
+						</span>
+						<input
+							type="text"
+							name="imageUrl"
+							class="themed-input-on-box"
+							placeholder="https://media.printables.com/media/prints/d5d795cb-ca3f-4382-a005-4bd6c2f2462d/images/9297795_75460779-320f-4001-841b-ff6f5f18db3c_a0bd6ebb-a672-49d9-a996-f8e2052c41a8/thumbs/inside/1920x1440/jpg/img_2399.webp"
+							required
+						/>
+						{#if form?.invalidImageUrl}
+							<span class="text-sm text-primary-400">Invalid image URL</span>
+						{/if}
+					</label>
+
+					<label class="flex flex-col gap-1">
 						<span class="font-medium">Feedback <span class="opacity-50">(public)</span></span>
 						<textarea name="feedback" class="themed-input-on-box"></textarea>
 					</label>
+
+					<label class="flex flex-col gap-1">
+						<span class="font-medium">Market score per hour</span>
+						<input
+							type="number"
+							name="shopScoreMultiplier"
+							bind:value={shopScoreMultiplier}
+							class="themed-input-on-box"
+							placeholder="Market score per hour"
+							step="0.1"
+							min="0"
+							required
+						/>
+					</label>
+
+					<p>
+						Payouts: {Math.round((payouts.clay ?? 0) * 10) / 10} clay, {Math.round(
+							(payouts.bricks ?? 0) * 10
+						) / 10} bricks,
+						{Math.round(payouts.shopScore * 10) / 10} market score
+					</p>
 
 					{#if form?.message}
 						<p>{form?.message}</p>
@@ -151,7 +199,43 @@
 			<h2 class="mt-2 text-2xl font-bold">Journal logs</h2>
 			<div class="mb-5 flex flex-col gap-5">
 				{#each data.devlogs as devlog}
-					<Devlog {devlog} projectId={devlog.projectId} showModifyButtons={false} />
+					<div class="flex flex-col gap-2">
+						<Devlog {devlog} projectId={devlog.projectId} showModifyButtons={false} />
+						<div class="themed-box flex flex-col gap-3 p-3">
+							<form
+								method="POST"
+								class="flex flex-row gap-3"
+								action="?/override"
+								use:enhance={() => {
+									overridePending = true;
+									return async ({ update }) => {
+										await update({ reset: false });
+										overridePending = false;
+									};
+								}}
+							>
+								<input
+									name="minutes"
+									type="number"
+									class="themed-input-on-box grow"
+									placeholder="50"
+									value={devlog.timeSpent}
+									min="0"
+									required
+								/>
+
+								<input type="hidden" name="devlogId" value={devlog.id} />
+
+								<button
+									type="submit"
+									class="button md primary items-center"
+									disabled={overridePending}
+								>
+									Override
+								</button>
+							</form>
+						</div>
+					</div>
 				{/each}
 			</div>
 		</div>

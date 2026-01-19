@@ -34,6 +34,12 @@
 				{/if}
 			</p>
 
+			<p>
+				Market score: <span class="rounded-xl bg-primary-800 px-1"
+					>{data.requestedUser.shopScore}</span
+				>
+			</p>
+
 			<Calendar />
 			<div class="items-center text-center">
 				<p>

@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
-import { project, user, devlog } from '$lib/server/db/schema.js';
+import { project, user, devlog, t2Review } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
-import { eq, and, sql, ne, inArray } from 'drizzle-orm';
+import { eq, and, sql, ne, inArray, desc, gt } from 'drizzle-orm';
 import type { Actions } from './$types';
 
 export async function load({ locals }) {
@@ -30,10 +30,30 @@ export async function load({ locals }) {
 		.from(user)
 		.where(and(ne(user.trust, 'red'), ne(user.hackatimeTrust, 'red'))); // hide banned users
 
+	const t2Agg = db
+		.$with('t2Agg')
+		.as(
+			db
+				.select({ userId: t2Review.userId, t2Cnt: sql<number>`COUNT(*)`.as('t2Cnt') })
+				.from(t2Review)
+				.groupBy(t2Review.userId)
+		);
+
+	const totalExpr = sql<number>`COALESCE(${t2Agg.t2Cnt}, 0)`;
+
+	const leaderboard = await db
+		.with(t2Agg)
+		.select({ id: user.id, name: user.name, review_count: totalExpr })
+		.from(user)
+		.leftJoin(t2Agg, eq(t2Agg.userId, user.id))
+		.where(and(ne(user.trust, 'red'), ne(user.hackatimeTrust, 'red'), gt(totalExpr, 0)))
+		.orderBy(desc(totalExpr));
+
 	return {
 		allProjects,
 		projects,
-		users
+		users,
+		leaderboard
 	};
 }
 

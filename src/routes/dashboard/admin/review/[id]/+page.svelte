@@ -3,7 +3,7 @@
 	import Devlog from '$lib/components/Devlog.svelte';
 	import Head from '$lib/components/Head.svelte';
 	import { enhance } from '$app/forms';
-	import { projectStatuses } from '$lib/utils.js';
+	import { projectStatuses, getProjectLinkType} from '$lib/utils.js';
 	import ProjectLinks from '$lib/components/ProjectLinks.svelte';
 	import Spinny3DPreview from '$lib/components/Spinny3DPreview.svelte';
 	import { Download } from '@lucide/svelte';
@@ -49,6 +49,7 @@
 							uploadedFileUrl={data.project.project.uploadedFileUrl}
 						/>
 					</div>
+					<p class="text-sm">Type: {getProjectLinkType(data.project.project.editorFileType, data.project.project.editorUrl, data.project.project.uploadedFileUrl)}</p>
 				</div>
 
 				<div>
@@ -118,9 +119,6 @@
 							await update();
 							formPending = false;
 						};
-					}}
-					onsubmit={() => {
-						return confirm('really submit?');
 					}}
 				>
 					<label class="flex flex-col gap-1">

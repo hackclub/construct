@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index.js';
-import { user, devlog, session } from '$lib/server/db/schema.js';
+import { user, devlog, session, impersonateAuditLog } from '$lib/server/db/schema.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
@@ -214,6 +214,50 @@ export const actions = {
 		};
 	},
 
+	changeTrust: async ({ locals, request, params }) => {
+		if (!locals.user) {
+			throw error(500);
+		}
+		if (!locals.user.hasAdmin) {
+			throw error(403, { message: 'oi get out' });
+		}
+
+		const id: number = parseInt(params.id);
+
+		const data = await request.formData();
+		const trust = data.get('trust');
+
+		if (!trust || !['green', 'blue', 'yellow', 'red'].includes(trust.toString())) {
+			return fail(400, {
+				changeTrust: {
+					invalidTrust: true
+				}
+			});
+		}
+
+		// Log out user if trust is set to red
+		if (trust === 'red') {
+			await db.delete(session).where(eq(session.userId, id));
+		}
+
+		await db
+			.update(user)
+			.set({
+				trust: trust.toString() as 'green' | 'blue' | 'yellow' | 'red'
+			})
+			.where(eq(user.id, id));
+
+		const [queriedUser] = await db.select().from(user).where(eq(user.id, id));
+
+		if (!queriedUser) {
+			throw error(404, { message: 'user not found' });
+		}
+
+		return {
+			queriedUser
+		};
+	},
+
 	impersonate: async (event) => {
 		const { locals, params } = event;
 
@@ -231,6 +275,12 @@ export const actions = {
 		if (!queriedUser) {
 			throw error(404, { message: 'user not found' });
 		}
+
+		// Log the impersonation
+		await db.insert(impersonateAuditLog).values({
+			adminUserId: locals.user.id,
+			targetUserId: id
+		});
 
 		const sessionToken = generateSessionToken();
 		await createSession(sessionToken, id);
@@ -283,10 +333,10 @@ export const actions = {
 			});
 		}
 
-		const token = decrypt(queriedUser.idvToken);
 		let userData;
 
 		try {
+			const token = decrypt(queriedUser.idvToken);
 			userData = await getUserData(token);
 		} catch {
 			return fail(400, {
