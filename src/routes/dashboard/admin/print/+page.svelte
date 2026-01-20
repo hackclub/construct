@@ -29,14 +29,16 @@
 <div class="flex h-full flex-col">
 	<h1 class="mt-5 mb-3 font-hero text-3xl font-medium">Print</h1>
 
-	{#if data.currentlyPrinting}
+	{#if data.currentlyPrinting.length > 0}
 		<div class="mb-3 flex flex-row gap-2 rounded-lg border-3 border-primary-700 bg-primary-900 p-3">
 			<Info />
 			<p>
-				You've already marked a project as printing:
-				<a href={`print/${data.currentlyPrinting.id}`} class="text-primary-400 underline"
-					>{data.currentlyPrinting.name}</a
-				>
+				You've already marked {data.currentlyPrinting.length === 1 ? "a project" : "the following projects"} as currently printing:
+				{#each data.currentlyPrinting as printing}
+					<a href={`print/${printing.id}`} class="text-primary-400 underline"
+						>{printing.name}</a
+					>&ThickSpace;
+				{/each}
 			</p>
 		</div>
 	{/if}

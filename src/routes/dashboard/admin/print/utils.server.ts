@@ -3,7 +3,7 @@ import { project } from '$lib/server/db/schema';
 import { and, eq, type SQLWrapper } from 'drizzle-orm';
 
 export async function getCurrentlyPrinting(user: { id: number | SQLWrapper }) {
-	const [currentlyPrinting] = await db
+	const currentlyPrinting = await db
 		.select({
 			id: project.id,
 			name: project.name
@@ -15,8 +15,7 @@ export async function getCurrentlyPrinting(user: { id: number | SQLWrapper }) {
 				eq(project.status, 'printing'),
 				eq(project.deleted, false)
 			)
-		)
-		.limit(1);
+		);
 
 	return currentlyPrinting;
 }

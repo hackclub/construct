@@ -3,7 +3,7 @@ import { project, user, devlog, legionReview } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, and, asc, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
-import { sendSlackDM } from '$lib/server/slack.js';
+// import { sendSlackDM } from '$lib/server/slack.js';
 import { getReviewHistory } from '../../getReviewHistory.server';
 import { getCurrentlyPrinting } from '../utils.server';
 
@@ -99,15 +99,7 @@ export const actions = {
 			throw error(403, { message: 'oi get out' });
 		}
 
-		const currentlyPrinting = await getCurrentlyPrinting(locals.user);
-
 		const id: number = parseInt(params.id);
-
-		if (currentlyPrinting && currentlyPrinting.id !== id) {
-			return error(400, {
-				message: 'you are already printing something else right now'
-			});
-		}
 
 		const [queriedProject] = await db
 			.select({
@@ -200,7 +192,7 @@ export const actions = {
 
 		const id: number = parseInt(params.id);
 
-		if (!currentlyPrinting || currentlyPrinting.id !== id) {
+		if (!currentlyPrinting.find((item) => item.id === id)) {
 			return error(400, {
 				message: "you can only print a project if you've marked it as you're printing it"
 			});
