@@ -292,6 +292,16 @@ export const actions = {
 					}
 				]);
 			}
+
+			if (env.PXL_API_KEY)
+				await fetch('https://pxl.hackclub.com/api/pixels/give', {
+					method: 'POST',
+					headers: {
+						Authorization: `Bearer ${env.PXL_API_KEY}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ email: primary_email, number_to_add: 200 })
+				});
 		}
 
 		await db.insert(t2Review).values({
@@ -338,16 +348,6 @@ export const actions = {
 					shopScore: sql`${user.shopScore} + ${payouts.shopScore}`
 				})
 				.where(eq(user.id, queriedProject.user.id));
-
-			if (env.PXL_API_KEY)
-				await fetch('https://pxl.hackclub.com/api/pixels/give', {
-					method: 'POST',
-					headers: {
-						Authorization: `Bearer ${env.PXL_API_KEY}`,
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({ slack_id: queriedProject.user.slackId, number_to_add: 200 })
-				});
 
 			const feedbackText = feedback ? `\n\nHere's what they said:\n${feedback}` : '';
 
