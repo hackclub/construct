@@ -339,6 +339,16 @@ export const actions = {
 				})
 				.where(eq(user.id, queriedProject.user.id));
 
+			if (env.PXL_API_KEY)
+				await fetch('https://pxl.hackclub.com/api/pixels/give', {
+					method: 'POST',
+					headers: {
+						Authorization: `Bearer ${env.PXL_API_KEY}`,
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ slack_id: queriedProject.user.slackId, number_to_add: 200 })
+				});
+
 			const feedbackText = feedback ? `\n\nHere's what they said:\n${feedback}` : '';
 
 			await sendSlackDM(
