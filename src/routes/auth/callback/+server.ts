@@ -55,7 +55,11 @@ export async function GET(event) {
 
 	const { id, slack_id, first_name, last_name, primary_email, ysws_eligible } = userData;
 
-	if (!ysws_eligible) {
+	if (
+		!ysws_eligible &&
+		(!env.LOGIN_IDV_BYPASS_SLACK_IDS ||
+			!env.LOGIN_IDV_BYPASS_SLACK_IDS.split(',').includes(slack_id))
+	) {
 		return redirect(302, '/auth/ineligible');
 	}
 
