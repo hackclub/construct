@@ -11,6 +11,11 @@ import {
 
 export const hackatimeTrustEnum = pgEnum('hackatime_trust', ['green', 'blue', 'yellow', 'red']);
 export const trustEnum = pgEnum('trust', ['green', 'blue', 'yellow', 'red']);
+export const stickerFulfilmentStatusEnum = pgEnum('sticker_fulfilment_status', [
+	'not_ordered',
+	'ordered',
+	'fulfilled'
+]);
 
 export const user = pgTable('user', {
 	id: serial().primaryKey(), // User ID
@@ -37,6 +42,8 @@ export const user = pgTable('user', {
 	hasAdmin: boolean().notNull().default(false), // Has access to admin section
 
 	isPrinter: boolean().notNull().default(false), // Is a printer
+
+	stickerFulfilmentStatus: stickerFulfilmentStatusEnum().notNull().default('not_ordered'), // Sticker fulfillment status
 
 	referralId: text(),
 

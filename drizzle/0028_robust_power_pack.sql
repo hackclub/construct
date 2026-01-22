@@ -1,0 +1,2 @@
+CREATE TYPE "public"."sticker_fulfilment_status" AS ENUM('not_ordered', 'ordered', 'fulfilled');--> statement-breakpoint
+ALTER TABLE "user" ADD COLUMN "stickerFulfilmentStatus" "sticker_fulfilment_status" DEFAULT 'not_ordered' NOT NULL;
