@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/index.js';
 import { user } from '$lib/server/db/schema.js';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { decrypt } from '$lib/server/encryption';
