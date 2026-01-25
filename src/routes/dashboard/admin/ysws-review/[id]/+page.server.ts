@@ -334,7 +334,7 @@ export const actions = {
 				.where(eq(user.id, locals.user.id));
 		}
 
-		if (queriedProject.user) {
+		if (queriedProject.user && queriedProject.project.status === 'printed') {
 			const payouts = calculatePayouts(
 				queriedProject.timeSpent,
 				await getLatestPrintFilament(id),
