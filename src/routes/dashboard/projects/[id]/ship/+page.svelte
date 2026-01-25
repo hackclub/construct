@@ -16,6 +16,7 @@
 	let editorUrl = $state(data.project.editorUrl);
 	let editorUploadFile = $state(null);
 	let modelFile = $state(null);
+	let submitAsClub = $state(false);
 
 	let hasEditorFile = $derived((editorUrl || editorUploadFile) && !(editorUrl && editorUploadFile));
 
@@ -164,6 +165,42 @@
 		{/if}
 	</label>
 
+	{#if data.clubMembership}
+		<div class="mt-1">
+			<p class="mb-1 font-bold">Submit as</p>
+			<div class="themed-box flex flex-col gap-2 p-3">
+				<label class="flex cursor-pointer items-center gap-2">
+					<input
+						type="radio"
+						name="submission_type"
+						value="individual"
+						checked={!submitAsClub}
+						onchange={() => (submitAsClub = false)}
+						class="radio"
+					/>
+					<span>Individual submission</span>
+				</label>
+				<label class="flex cursor-pointer items-center gap-2">
+					<input
+						type="radio"
+						name="submission_type"
+						value="club"
+						checked={submitAsClub}
+						onchange={() => (submitAsClub = true)}
+						class="radio"
+					/>
+					<span>Submit as {data.clubMembership.clubName}</span>
+				</label>
+				{#if submitAsClub}
+					<p class="text-sm opacity-80">
+						This project's hours will count toward your club's total.
+					</p>
+				{/if}
+			</div>
+		</div>
+		<input type="hidden" name="submit_as_club" value={submitAsClub ? 'true' : 'false'} />
+	{/if}
+
 	<div class="mt-3">
 		<h2 class="mb-1 text-xl font-bold">Requirements</h2>
 		<ChecklistItem completed={data.project.timeSpent >= 120}
@@ -219,7 +256,7 @@
 
 {#if data.project.timeSpent >= 120}
 	<div class="mt-3 mb-5">
-		<h2 class="mb-2 text-xl font-bold">Estimate payout</h2>
+		<h2 class="mb-2 text-xl font-bold">{submitAsClub ? 'Filament usage' : 'Estimate payout'}</h2>
 		<div class="themed-box p-3">
 			<label class="flex flex-col gap-1">
 				<span
@@ -236,17 +273,23 @@
 					class="themed-input-on-box"
 				/>
 			</label>
-			<p class="mt-2">
-				You'll get <span class="font-bold"
-					>{payoutEstimate.clay
-						? Math.round(payoutEstimate.clay * 10) / 10 + ' clay'
-						: Math.round((payoutEstimate.bricks ?? 0) * 10) / 10 + ' bricks'}</span
-				>
-			</p>
-			<p>
-				This is just an estimate, not a guarantee - your journal time might be adjusted after
-				review.
-			</p>
+			{#if submitAsClub}
+				<p class="mt-2 opacity-80">
+					Club submissions do not receive personal currency rewards.
+				</p>
+			{:else}
+				<p class="mt-2">
+					You'll get <span class="font-bold"
+						>{payoutEstimate.clay
+							? Math.round(payoutEstimate.clay * 10) / 10 + ' clay'
+							: Math.round((payoutEstimate.bricks ?? 0) * 10) / 10 + ' bricks'}</span
+					>
+				</p>
+				<p>
+					This is just an estimate, not a guarantee - your journal time might be adjusted after
+					review.
+				</p>
+			{/if}
 		</div>
 	</div>
 {:else}

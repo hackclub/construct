@@ -11,6 +11,7 @@ import {
 
 export const hackatimeTrustEnum = pgEnum('hackatime_trust', ['green', 'blue', 'yellow', 'red']);
 export const trustEnum = pgEnum('trust', ['green', 'blue', 'yellow', 'red']);
+export const clubRoleEnum = pgEnum('club_role', ['leader', 'member']);
 
 export const user = pgTable('user', {
 	id: serial().primaryKey(), // User ID
@@ -51,6 +52,26 @@ export const session = pgTable('session', {
 		.notNull()
 		.references(() => user.id),
 	expiresAt: timestamp().notNull()
+});
+
+export const club = pgTable('club', {
+	id: serial().primaryKey(),
+	name: text().notNull().unique(),
+	joinCode: text(),
+	createdAt: timestamp().defaultNow()
+});
+
+export const clubMembership = pgTable('club_membership', {
+	id: serial().primaryKey(),
+	clubId: integer()
+		.notNull()
+		.references(() => club.id),
+	userId: integer()
+		.notNull()
+		.unique()
+		.references(() => user.id),
+	role: clubRoleEnum().notNull(),
+	createdAt: timestamp().defaultNow()
 });
 
 export const projectStatusEnum = pgEnum('status', [
@@ -109,6 +130,7 @@ export const ship = pgTable('ship', {
 	projectId: integer()
 		.notNull()
 		.references(() => project.id),
+	clubId: integer().references(() => club.id),
 
 	url: text().notNull(),
 
@@ -326,3 +348,5 @@ export type LegionReview = typeof legionReview.$inferSelect;
 export type T2Review = typeof t2Review.$inferSelect;
 
 export type MarketItem = typeof marketItem.$inferSelect;
+export type Club = typeof club.$inferSelect;
+export type ClubMembership = typeof clubMembership.$inferSelect;

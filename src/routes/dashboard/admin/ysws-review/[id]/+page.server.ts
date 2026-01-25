@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index.js';
-import { project, user, devlog, t2Review, legionReview } from '$lib/server/db/schema.js';
+import { project, user, devlog, t2Review, legionReview, ship } from '$lib/server/db/schema.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { eq, and, asc, sql, desc } from 'drizzle-orm';
 import type { Actions } from './$types';
@@ -334,33 +334,62 @@ export const actions = {
 				.where(eq(user.id, locals.user.id));
 		}
 
-		if (queriedProject.user && queriedProject.project.status === 'printed') {
-			const payouts = calculatePayouts(
-				queriedProject.timeSpent,
-				await getLatestPrintFilament(id),
-				parsedShopScoreMultiplier,
-				queriedProject.user.hasBasePrinter,
-				queriedProject.project.createdAt
-			);
+		if (queriedProject.user) {
+			const [latestShip] = await db
+				.select({ clubId: ship.clubId })
+				.from(ship)
+				.where(eq(ship.projectId, id))
+				.orderBy(desc(ship.timestamp))
+				.limit(1);
 
-			await db
-				.update(user)
-				.set({
-					clay: sql`${user.clay} + ${payouts.clay ?? 0}`,
-					brick: sql`${user.brick} + ${payouts.bricks ?? 0}`,
-					shopScore: sql`${user.shopScore} + ${payouts.shopScore}`
-				})
-				.where(eq(user.id, queriedProject.user.id));
+			const isClubShip = latestShip?.clubId !== null && latestShip?.clubId !== undefined;
 
-			const feedbackText = feedback ? `\n\nHere's what they said:\n${feedback}` : '';
+			if (!isClubShip) {
+				const payouts = calculatePayouts(
+					queriedProject.timeSpent,
+					await getLatestPrintFilament(id),
+					parsedShopScoreMultiplier,
+					queriedProject.user.hasBasePrinter,
+					queriedProject.project.createdAt
+				);
 
-			await sendSlackDM(
-				queriedProject.user.slackId,
-				`Your project <https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}|${queriedProject.project.name}> has been ${statusMessage}${feedbackText}`
-			);
+				await db
+					.update(user)
+					.set({
+						clay: sql`${user.clay} + ${payouts.clay ?? 0}`,
+						brick: sql`${user.brick} + ${payouts.bricks ?? 0}`,
+						shopScore: sql`${user.shopScore} + ${payouts.shopScore}`
+					})
+					.where(eq(user.id, queriedProject.user.id));
+			}
+			if (queriedProject.user && queriedProject.project.status === 'printed') {
+				const payouts = calculatePayouts(
+					queriedProject.timeSpent,
+					await getLatestPrintFilament(id),
+					parsedShopScoreMultiplier,
+					queriedProject.user.hasBasePrinter,
+					queriedProject.project.createdAt
+				);
+
+				await db
+					.update(user)
+					.set({
+						clay: sql`${user.clay} + ${payouts.clay ?? 0}`,
+						brick: sql`${user.brick} + ${payouts.bricks ?? 0}`,
+						shopScore: sql`${user.shopScore} + ${payouts.shopScore}`
+					})
+					.where(eq(user.id, queriedProject.user.id));
+
+				const feedbackText = feedback ? `\n\nHere's what they said:\n${feedback}` : '';
+
+				await sendSlackDM(
+					queriedProject.user.slackId,
+					`Your project <https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}|${queriedProject.project.name}> has been ${statusMessage}${feedbackText}`
+				);
+			}
+
+			return redirect(302, '/dashboard/admin/ysws-review');
 		}
-
-		return redirect(302, '/dashboard/admin/ysws-review');
 	},
 
 	override: async ({ locals, request, params }) => {

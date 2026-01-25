@@ -8,12 +8,9 @@
 		ClipboardPen,
 		ClipboardPenLine,
 		Store,
-
 		ShieldUser,
-
-		Box
-
-
+		Box,
+		Users
 	} from '@lucide/svelte';
 	import { page } from '$app/state';
 	import logo from '$lib/assets/logo.png';
@@ -36,6 +33,7 @@
 	<SidebarButton icon={PencilRuler} href="/dashboard/projects">Projects</SidebarButton>
 	<SidebarButton icon={Compass} href="/dashboard/explore">Explore</SidebarButton>
 	<SidebarButton icon={Store} href="/dashboard/market">Market</SidebarButton>
+	<SidebarButton icon={Users} href="/dashboard/clubs">Club</SidebarButton>
 	{#if user.isPrinter}
 		<SidebarButton icon={Box} href="/dashboard/admin/print" admin={true}>
 			Print
