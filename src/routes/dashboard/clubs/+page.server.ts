@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index.js';
-import { club, clubMembership, user, devlog, ship } from '$lib/server/db/schema.js';
+import { club, clubMembership, user, devlog, ship, project } from '$lib/server/db/schema.js';
 import { error, fail } from '@sveltejs/kit';
 import { eq, and, sql, inArray } from 'drizzle-orm';
 import { getLeaderClub } from '$lib/server/clubs-api.js';
@@ -61,9 +61,10 @@ export async function load({ locals }) {
 	// Calculate club hours from devlogs on shipped club projects
 	// Get project IDs that were shipped as this club
 	const clubShips = await db
-		.selectDistinct({ projectId: ship.projectId })
-		.from(ship)
-		.where(eq(ship.clubId, userMembership.clubId));
+		.selectDistinct({ projectId: project.id })
+		.from(project)
+		.innerJoin(ship, eq(ship.projectId, project.id))
+		.where(and(eq(project.status, 'finalized'), eq(ship.clubId, userMembership.clubId)));
 
 	let totalMinutes = 0;
 	if (clubShips.length > 0) {
