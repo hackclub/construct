@@ -293,7 +293,11 @@ export const actions = {
 				]);
 			}
 
-			if (env.PXL_API_KEY)
+			if (env.PXL_API_KEY) {
+				// typescript can't do basic maths and concatenates two items of
+				// type number together so we multiply by 1
+				const number_to_add = queriedProject.timeSpent * 1 + 200 * 1;
+
 				await fetch('https://pxl.hackclub.com/api/pixels/give', {
 					method: 'POST',
 					headers: {
@@ -302,9 +306,10 @@ export const actions = {
 					},
 					body: JSON.stringify({
 						email: primary_email,
-						number_to_add: 200 + queriedProject.timeSpent
+						number_to_add
 					})
 				});
+			}
 		}
 
 		await db.insert(t2Review).values({
