@@ -1,6 +1,6 @@
 # Construct
 
-A [Hack Club](https://hackclub.com) YSWS event
+A [Hack Club](https://hackclub.com) YSWS event about CAD modelling and 3D printers
 
 Built with SvelteKit, deployed with Docker (auto-builds container image and publishes to GitHub packages!)
 
