@@ -14,6 +14,16 @@
 
 	const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
+	const PROJECT_STATUSES = ['submitted', 't1_approved', 'printing', 'printed', 'finalized'] as const;
+
+	const PROGRESS_STEPS = [
+		{ key: 'submitted', label: 'Submitted' },
+		{ key: 't1_approved', label: 'On print queue' },
+		{ key: 'printing', label: 'Being printed' },
+		{ key: 'printed', label: 'Printed' },
+		{ key: 'finalized', label: 'Payout' }
+	] as const;
+
 	let { data, form }: PageProps = $props();
 	let sortDropdownValue = $state('descending');
 	let sortDevlogsAscending = $derived.by(() => sortDropdownValue == 'ascending');
@@ -36,28 +46,83 @@
 		);
 	}
 
+	function getStatusIndex(status: string): number {
+		const index = PROJECT_STATUSES.indexOf(status as never);
+		return index >= 0 ? index : 0;
+	}
+
 	let formPending = $state(false);
 </script>
 
 <Head title={data.project.name} />
 
+
+
 <h1 class="mt-5 mb-2 font-hero text-3xl font-medium">{data.project.name}</h1>
+<div class="mb-2">
+	<p class="text-sm">
+		Created
+		<abbr title={`${data.project.createdAt.toUTCString()}`}>
+			{relativeDate(data.project.createdAt)}
+		</abbr>
+		∙ Updated
+		<abbr title={`${new Date(data.project.updatedAt).toUTCString()}`}>
+			{relativeDate(data.project.updatedAt)}
+		</abbr>
+		∙ {Math.floor(data.project.timeSpent / 60)}h {data.project.timeSpent % 60}min
+	</p>
+	<p class="mt-0.5">Status: {projectStatuses[data.project.status]}</p>
+</div>
+
+<div class="mb-8 w-full px-0 sm:px-2 md:px-4 lg:px-8 xl:px-16 py-6">
+	{#if data.project.status !== 'rejected' && data.project.status !== 'rejected_locked'}
+	<div class="w-full flex flex-col items-stretch">
+		<div class="relative w-full flex items-center" style="height: 44px;">
+			<div 
+				class="absolute z-0 top-1/2 -translate-y-1/2 left-[5%] right-[5%] h-2 bg-gray-200 rounded-full overflow-hidden"
+				role="progressbar"
+				aria-label="Project progress"
+				aria-valuenow={getStatusIndex(data.project.status)}
+				aria-valuemin={0}
+				aria-valuemax={PROJECT_STATUSES.length - 1}
+			>
+				<div 
+					class="h-2 bg-gradient-to-r from-primary-400 to-primary-600 transition-all duration-300" 
+					style="width: calc((({getStatusIndex(data.project.status)}) / {PROJECT_STATUSES.length - 1}) * 100%)"
+				></div>
+			</div>
+			{#each PROGRESS_STEPS as step, i (step.key)}
+				<div class="flex-1 flex flex-col items-center min-w-0 relative z-10" style="position: absolute; left: calc(5% + (90% * {i} / {PROJECT_STATUSES.length - 1})); top: 50%; transform: translate(-50%, -50%);">
+					<div
+						class="w-7 h-7 rounded-full border-4 shadow-md transition-all duration-300"
+						class:bg-primary-500={getStatusIndex(data.project.status) >= i}
+						class:bg-gray-200={getStatusIndex(data.project.status) < i}
+						class:border-primary-500={getStatusIndex(data.project.status) >= i}
+						class:border-gray-300={getStatusIndex(data.project.status) < i}
+						style="box-shadow: 0 2px 8px 0 rgba(0,0,0,0.07);"
+					></div>
+				</div>
+			{/each}
+		</div>
+		<div class="relative w-full mt-3" style="height: 22px;">
+			{#each PROGRESS_STEPS as step, i (step.key)}
+				<div class="absolute w-max max-w-[20%] text-center left-0" style="left: calc(5% + (90% * {i} / {PROJECT_STATUSES.length - 1})); transform: translate(-50%, 0);">
+					<span 
+						class="text-xs font-semibold whitespace-nowrap"
+						class:text-primary-700={getStatusIndex(data.project.status) >= i}
+						class:text-gray-400={getStatusIndex(data.project.status) < i}
+					>
+						{step.label}
+					</span>
+				</div>
+			{/each}
+		</div>
+	</div>
+{/if}
+</div>
 
 <div class="flex flex-col xl:flex-row gap-3">
 	<div class="mb-6 grow">
-		<p class="text-sm">
-			Created
-			<abbr title={`${data.project.createdAt.toUTCString()}`}>
-				{relativeDate(data.project.createdAt)}
-			</abbr>
-			∙ Updated
-			<abbr title={`${new Date(data.project.updatedAt).toUTCString()}`}>
-				{relativeDate(data.project.updatedAt)}
-			</abbr>
-			∙ {Math.floor(data.project.timeSpent / 60)}h {data.project.timeSpent % 60}min
-		</p>
-		<p class="mt-0.5">Status: {projectStatuses[data.project.status]}</p>
-
 		<div class="my-2">
 			<ProjectLinks
 				url={data.project.url}
