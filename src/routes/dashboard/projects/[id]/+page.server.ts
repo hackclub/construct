@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index.js';
-import { devlog, project } from '$lib/server/db/schema.js';
+import { devlog, project, user } from '$lib/server/db/schema.js';
 import { error, fail } from '@sveltejs/kit';
 import { eq, and, desc, sql, or } from 'drizzle-orm';
 import type { Actions } from './$types';
@@ -21,7 +21,7 @@ import { S3 } from '$lib/server/s3';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { env } from '$env/dynamic/private';
 
-export async function load({ params }) {
+export async function load({ params, locals }) {
 	const id: number = parseInt(params.id);
 
 	// TODO: add this to the other endpoints
@@ -44,6 +44,18 @@ export async function load({ params }) {
 		throw error(404);
 	}
 
+	let projectUser = null;
+
+	if (queriedProject.project.userId !== locals.user?.id) {
+		[projectUser] = await db
+			.select({
+				name: user.name
+			})
+			.from(user)
+			.where(eq(user.id, queriedProject.project.userId))
+			.limit(1);
+	}
+
 	const devlogs = await db
 		.select()
 		.from(devlog)
@@ -62,12 +74,13 @@ export async function load({ params }) {
 			editorUrl: queriedProject.project.editorUrl,
 			uploadedFileUrl: queriedProject.project.uploadedFileUrl,
 			modelFile: queriedProject.project.modelFile,
-			
+
 			createdAt: queriedProject.project.createdAt,
 			updatedAt: queriedProject.project.updatedAt,
 			timeSpent: queriedProject.timeSpent,
 			status: queriedProject.project.status
 		},
+		projectUser,
 		devlogs: devlogs.map((devlog) => {
 			return {
 				id: devlog.id,
