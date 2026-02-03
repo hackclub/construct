@@ -37,6 +37,36 @@
 	}
 
 	let formPending = $state(false);
+
+
+	document.addEventListener('DOMContentLoaded', () => {
+	    const pasteArea = document.querySelector('#description');
+	    const fileInput = document.querySelector('#imagefield');
+	
+	    pasteArea.addEventListener('paste', (event) => {
+	        // Prevent the default paste behavior (e.g., pasting into the contenteditable div as text/html)
+	        // Access the clipboard data items
+	        const items = event.clipboardData.items;
+	
+	        // Iterate over the items to find a file
+	        for (const item of items) {
+	            if (item.kind === 'file') {
+	                const blob = item.getAsFile();
+	                
+	                // Create a DataTransfer object to manage files
+	                const dataTransfer = new DataTransfer();
+	                dataTransfer.items.add(blob);
+	
+	                // Assign the DataTransfer's file list to the input element
+	                fileInput.files = dataTransfer.files;
+	
+	                // Optional: Provide a visual cue that the file was accepted
+	                break; // Stop after finding the first file
+	            }
+	        }
+	    });
+	});
+
 </script>
 
 <Head title={data.project.name} />
@@ -180,6 +210,7 @@
 				<label class="flex flex-col gap-1">
 					Description
 					<CharCountedTextarea
+						id="description"
 						name="description"
 						placeholder="Describe what you changed"
 						bind:value={description}
@@ -197,6 +228,7 @@
 					<label class="flex grow flex-col gap-1">
 						Image
 						<input
+							id="imagefield"
 							type="file"
 							name="image"
 							accept={ALLOWED_IMAGE_TYPES.join(', ')}
