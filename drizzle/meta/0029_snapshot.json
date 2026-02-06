@@ -1,6 +1,6 @@
 {
-  "id": "fabc3135-7dc2-4e68-bd11-f63e1d94b5dc",
-  "prevId": "1843b2fe-285f-4ca2-9169-6869508c379d",
+  "id": "5d7455a2-db70-4de0-a934-811b906c31c2",
+  "prevId": "fabc3135-7dc2-4e68-bd11-f63e1d94b5dc",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1254,6 +1254,14 @@
           "notNull": true,
           "default": false
         },
+        "stickerFulfilmentStatus": {
+          "name": "stickerFulfilmentStatus",
+          "type": "sticker_fulfilment_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'not_ordered'"
+        },
         "referralId": {
           "name": "referralId",
           "type": "text",
@@ -1370,6 +1378,15 @@
         "finalized",
         "rejected",
         "rejected_locked"
+      ]
+    },
+    "public.sticker_fulfilment_status": {
+      "name": "sticker_fulfilment_status",
+      "schema": "public",
+      "values": [
+        "not_ordered",
+        "ordered",
+        "fulfilled"
       ]
     },
     "public.t1_review_action": {

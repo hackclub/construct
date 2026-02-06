@@ -11,6 +11,7 @@ import {
 
 export const hackatimeTrustEnum = pgEnum('hackatime_trust', ['green', 'blue', 'yellow', 'red']);
 export const trustEnum = pgEnum('trust', ['green', 'blue', 'yellow', 'red']);
+export const clubRoleEnum = pgEnum('club_role', ['leader', 'member']);
 export const stickerFulfilmentStatusEnum = pgEnum('sticker_fulfilment_status', [
 	'not_ordered',
 	'ordered',
@@ -58,6 +59,26 @@ export const session = pgTable('session', {
 		.notNull()
 		.references(() => user.id),
 	expiresAt: timestamp().notNull()
+});
+
+export const club = pgTable('club', {
+	id: serial().primaryKey(),
+	name: text().notNull().unique(),
+	joinCode: text(),
+	createdAt: timestamp().defaultNow()
+});
+
+export const clubMembership = pgTable('club_membership', {
+	id: serial().primaryKey(),
+	clubId: integer()
+		.notNull()
+		.references(() => club.id),
+	userId: integer()
+		.notNull()
+		.unique()
+		.references(() => user.id),
+	role: clubRoleEnum().notNull(),
+	createdAt: timestamp().defaultNow()
 });
 
 export const projectStatusEnum = pgEnum('status', [
@@ -116,6 +137,7 @@ export const ship = pgTable('ship', {
 	projectId: integer()
 		.notNull()
 		.references(() => project.id),
+	clubId: integer().references(() => club.id),
 
 	url: text().notNull(),
 
