@@ -138,8 +138,8 @@ export async function GET(event) {
 	)['trust_level'];
 
 	if (!hackatimeTrust) {
-		console.error();
-		return redirect(302, '/auth/create-hackatime-account');
+		// console.error();
+		// return redirect(302, '/auth/create-hackatime-account');
 		// return error(503, {
 		// 	message: 'failed to fetch hackatime trust factor, please try again later'
 		// });

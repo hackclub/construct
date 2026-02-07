@@ -1,0 +1,65 @@
+<script lang="ts">
+	import Head from '$lib/components/Head.svelte';
+	import relativeDate from 'tiny-relative-date';
+
+	let { data } = $props();
+
+	let userSearch = $state('');
+
+	let filteredUsers = $derived(
+		data.users.filter((user) => user.name?.toLowerCase().includes(userSearch.toLowerCase()))
+	);
+</script>
+
+<Head title="Stickers/keyrings" />
+
+<div class="flex h-full flex-col">
+	<div class="mt-5 flex flex-row">
+		<h1 class="mb-3 grow font-hero text-3xl font-medium">Stickers/keyrings</h1>
+	</div>
+
+	<p class="mb-3 text-lg">Showing {filteredUsers.length} users</p>
+
+	<input class="themed-box mb-3 w-full p-2" placeholder="Search users..." bind:value={userSearch} />
+
+	{#if filteredUsers.length == 0}
+		<div class="flex grow items-center justify-center">
+			<div>
+				<p class="themed-box p-3 shadow-lg/20">
+					No users found matching the filter <img
+						src="https://emoji.slack-edge.com/T0266FRGM/heavysob/55bf09f6c9d93d08.png"
+						alt="heavysob"
+						class="inline h-5.5"
+					/>
+				</p>
+			</div>
+		</div>
+	{:else}
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+			{#each filteredUsers as user}
+				<div
+					class="themed-box relative flex flex-col p-3 shadow-lg/20 transition-all hover:scale-102"
+				>
+					<a class="absolute inset-0 z-1" href={`stickers/${user.id}`} aria-label="user"> </a>
+					<h1 class="flex flex-row gap-1 text-xl font-semibold">
+						<span class="grow truncate">{user.name}</span>
+					</h1>
+					<code>
+						{user.slackId}
+					</code>
+					<div class="flex flex-row gap-1">
+						<p>Project created </p>
+						<abbr title={`${user.projectCreatedAt.toUTCString()}`} class="relative z-2">
+							{relativeDate(user.projectCreatedAt)}
+						</abbr>
+					</div>
+					<p>
+						{Math.round(user.clay * 10) / 10} clay, {Math.round(user.brick * 10) / 10} brick, {Math.round(
+							user.shopScore * 10
+						) / 10} market
+					</p>
+				</div>
+			{/each}
+		</div>
+	{/if}
+</div>

@@ -34,6 +34,7 @@
 
 			<div class="flex flex-row flex-wrap gap-3">
 				<a href={`/dashboard/users/${user.id}`} class="button md primary">Public profile page</a>
+				<a href={`../stickers/${user.id}`} class="button md primary">Sticker fulfilment page</a>
 
 				<div>
 					<form
@@ -117,6 +118,9 @@
 				</DataCard>
 				<DataCard title="Has base printer">
 					{user.hasBasePrinter ? 'Yes' : 'No'}
+				</DataCard>
+				<DataCard title="Stickers fulfilled">
+					{user.stickersShipped ? 'Yes' : 'No'}
 				</DataCard>
 				<DataCard title="Account created">
 					<abbr title={`${user.createdAt.toUTCString()}`} class="relative z-2">

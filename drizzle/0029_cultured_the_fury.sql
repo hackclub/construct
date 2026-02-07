@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "stickersShipped" boolean DEFAULT false NOT NULL;

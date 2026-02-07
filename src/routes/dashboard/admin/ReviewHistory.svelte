@@ -34,4 +34,24 @@
 			</p>
 		</div>
 	{/each}
+	<h1 class="text-2xl font-bold">T2 reviews</h1>
+	{#each reviews.t2Reviews as review}
+		<div class="themed-box flex flex-col p-3 shadow-lg">
+			{#if review.notes}
+				<p class="text-sm"><span class="font-bold">Notes:</span> {review.notes}</p>
+			{/if}
+			{#if review.feedback}
+				<p class="text-sm"><span class="font-bold">Feedback:</span> {review.feedback}</p>
+			{/if}
+			{#if review.image}
+				<p class="text-sm"><span class="font-bold">Image:</span> {review.image}</p>
+			{/if}
+			<p class="text-sm">
+				<span class="font-bold">Market score per hour:</span> {review.shopScoreMultiplier}
+			</p>
+			<p class="text-xs">
+				by <a href={`../../users/${review.user.id}`} class="underline">{review.user.name}</a>
+			</p>
+		</div>
+	{/each}
 </div>

@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { legionReview, t1Review, user } from '$lib/server/db/schema';
+import { legionReview, t1Review, t2Review, user } from '$lib/server/db/schema';
 import { eq, asc } from 'drizzle-orm';
 
 export async function getReviewHistory(id: number) {
@@ -36,8 +36,26 @@ export async function getReviewHistory(id: number) {
 		.where(eq(legionReview.projectId, id))
 		.orderBy(asc(legionReview.timestamp));
 
+	const t2Reviews = await db
+		.select({
+			user: {
+				id: user.id,
+				name: user.name
+			},
+			notes: t2Review.notes,
+			feedback: t2Review.feedback,
+			image: t2Review.image,
+			shopScoreMultiplier: t2Review.shopScoreMultiplier,
+			timestamp: t2Review.timestamp
+		})
+		.from(t2Review)
+		.innerJoin(user, eq(user.id, t2Review.userId))
+		.where(eq(t2Review.projectId, id))
+		.orderBy(asc(t2Review.timestamp));
+
 	return {
 		t1Reviews,
-		legionReviews
+		legionReviews,
+		t2Reviews
 	};
 }

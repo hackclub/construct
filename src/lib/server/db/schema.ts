@@ -34,12 +34,12 @@ export const user = pgTable('user', {
 
 	hasT1Review: boolean().notNull().default(false), // Has access to t1 review
 	hasT2Review: boolean().notNull().default(false), // Has access to t2 review
-
+	isPrinter: boolean().notNull().default(false), // Is a printer
 	hasAdmin: boolean().notNull().default(false), // Has access to admin section
 
-	isPrinter: boolean().notNull().default(false), // Is a printer
-
 	referralId: text(),
+
+	stickersShipped: boolean().notNull().default(false), // Stickers/keyring fulfilled
 
 	createdAt: timestamp().notNull().defaultNow(), // Account creation timestamp
 	lastLoginAt: timestamp().notNull().defaultNow() // Last login timestamp
