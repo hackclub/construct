@@ -1,14 +1,17 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
 	import relativeDate from 'tiny-relative-date';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
 	let userSearch = $state('');
 
 	let filteredUsers = $derived(
 		data.users.filter((user) => user.name?.toLowerCase().includes(userSearch.toLowerCase()))
 	);
+
+	let formPending = $state(false);
 </script>
 
 <Head title="Stickers/keyrings" />
@@ -18,7 +21,48 @@
 		<h1 class="mb-3 grow font-hero text-3xl font-medium">Stickers/keyrings</h1>
 	</div>
 
-	<p class="mb-3 text-lg">Showing {filteredUsers.length} users</p>
+	<form
+		action="?/fulfil"
+		method="POST"
+		class="mb-3"
+		use:enhance={() => {
+			formPending = true;
+			return async ({ update }) => {
+				await update();
+				formPending = false;
+				document.getElementById("id-input")!.focus();
+			};
+		}}
+	>
+		<div class="flex flex-row gap-3">
+			<label class="flex flex-col grow">
+				<input
+					type="number"
+					name="id"
+					id="id-input"
+					class="themed-input"
+					placeholder="User ID"
+					required
+				/>
+			</label>
+			<div class="flex flex-col justify-center">
+				<button type="submit" class="button md primary" disabled={formPending}
+					>Mark fulfilled</button
+				>
+			</div>
+		</div>
+		{#if form?.alreadyFulfilled}
+			<p class="text-sm mt-1.5">Already fulfilled, go to <a href={`stickers/${form.id}`} class="underline">fulfillment page</a></p>
+		{/if}
+		{#if form?.userNotFound}
+			<p class="text-sm mt-1.5">User not found</p>
+		{/if}
+		{#if form?.fulfilled}
+			<p class="text-sm mt-1.5">Fulfilled <a href={`stickers/${form.id}`} class="underline">user</a></p>
+		{/if}
+	</form>
+
+	<p class="mb-2 text-lg">Showing {filteredUsers.length} users</p>
 
 	<input class="themed-box mb-3 w-full p-2" placeholder="Search users..." bind:value={userSearch} />
 
@@ -48,7 +92,7 @@
 						{user.slackId}
 					</code>
 					<div class="flex flex-row gap-1">
-						<p>Project created </p>
+						<p>Project created</p>
 						<abbr title={`${user.projectCreatedAt.toUTCString()}`} class="relative z-2">
 							{relativeDate(user.projectCreatedAt)}
 						</abbr>
