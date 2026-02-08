@@ -275,13 +275,16 @@ export const actions = {
 				.select({
 					maxRecords: 1,
 					view: 'Grid view',
-					filterByFormula: '{fldXbtQyDOFpWwGBQ} = ' + locals.user.id
+					filterByFormula: `{fldXbtQyDOFpWwGBQ} = ${queriedProject.user.id}`
 				})
 				.firstPage();
+			console.log(`{fldXbtQyDOFpWwGBQ} = ${queriedProject.user.id}`, records)
 
 			if (records.length > 0) {
 				const record = records[0];
 				const verifiedShipCount = (record.get('Verified Ship Count') ?? 0) as number;
+
+				console.log(verifiedShipCount)
 
 				await airtableBase('tblwUPbRqbRBnQl7G').update([
 					{
