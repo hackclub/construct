@@ -138,7 +138,7 @@
 		</div>
 	</div>
 
-	<h2 class="mt-4 mb-2 text-2xl font-bold">Projects</h2>
+	<h2 class="mt-4 mb-2 text-2xl font-bold">Projects <span class="ml-2 align-middle text-sm font-normal">({projects.length})</span></h2>
 
 	{#if projects.length == 0}
 		<div class="flex grow items-center justify-center">
