@@ -38,6 +38,7 @@
 
 	let formPending = $state(false);
 
+onMount(() => {
 
 	document.addEventListener('DOMContentLoaded', () => {
 	    const pasteArea = document.querySelector('#description');
@@ -66,6 +67,7 @@
 	        }
 	    });
 	});
+});
 
 </script>
 
