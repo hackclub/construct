@@ -38,9 +38,8 @@
 
 	let formPending = $state(false);
 
-onMount(() => {
+	onMount(() => {
 
-	document.addEventListener('DOMContentLoaded', () => {
 	    const pasteArea = document.querySelector('#description');
 	    const fileInput = document.querySelector('#imagefield');
 	
@@ -67,7 +66,6 @@ onMount(() => {
 	        }
 	    });
 	});
-});
 
 </script>
 
