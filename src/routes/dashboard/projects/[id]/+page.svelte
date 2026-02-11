@@ -204,11 +204,11 @@
 						/>
 						{#if form?.invalid_image_file}
 							<p class="mt-1 text-sm">
-								Invalid file, must be a PNG or JPEG file under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB
+								Invalid file, must be a PNG, JPEG or GIF file under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB
 							</p>
 						{:else}
 							<p class="mt-1 text-sm opacity-50">
-								Must be a PNG or JPEG file under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB
+								PNG, JPEG or GIF (up to {MAX_UPLOAD_SIZE / 1024 / 1024} MiB)
 							</p>
 						{/if}
 					</label>
