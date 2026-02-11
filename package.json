@@ -15,7 +15,9 @@
 		"db:push": "drizzle-kit push",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate --config ./drizzle.config.ts",
-		"db:studio": "drizzle-kit studio"
+		"db:studio": "drizzle-kit studio",
+		"test": "vitest run",
+		"test:watch": "vitest"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
@@ -44,7 +46,8 @@
 		"tailwindcss": "^4.1.13",
 		"typescript": "^5.9.2",
 		"typescript-eslint": "^8.44.1",
-		"vite": "^7.1.7"
+		"vite": "^7.1.7",
+		"vitest": "^4.0.18"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.940.0",
