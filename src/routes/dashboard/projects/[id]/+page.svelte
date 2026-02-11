@@ -177,6 +177,7 @@
 			method="POST"
 			class="flex flex-col gap-3"
 			enctype="multipart/form-data"
+			onpaste={handlePaste}
 			use:enhance={() => {
 				formPending = true;
 				return async ({ update }) => {
@@ -238,24 +239,28 @@
 						</p>
 					{/if}
 				</label>
-				<div class="mt-1 flex flex-row gap-2" onpaste={handlePaste}>
+				<div class="mt-1 flex flex-row gap-2">
 					<label class="flex grow flex-col gap-1">
 						Image
-						<input
-							bind:this={imageInput}
-							type="file"
-							name="image"
-							accept={ALLOWED_IMAGE_TYPES.join(', ')}
-							class="themed-box p-1 outline-primary-900 focus:outline-1"
-							onchange={updateImagePreview}
-						/>
-						{#if imagePreviewUrl}
-							<img
-								src={imagePreviewUrl}
-								alt="Preview"
-								class="mt-2 max-h-32 max-w-full rounded object-contain"
+						<div
+							class="themed-box flex flex-col items-center p-1 outline-primary-900 focus-within:outline-1"
+						>
+							<input
+								bind:this={imageInput}
+								type="file"
+								name="image"
+								accept={ALLOWED_IMAGE_TYPES.join(', ')}
+								class="w-full outline-0"
+								onchange={updateImagePreview}
 							/>
-						{/if}
+							{#if imagePreviewUrl}
+								<img
+									src={imagePreviewUrl}
+									alt="Preview"
+									class="mt-2 max-h-32 max-w-full rounded object-contain"
+								/>
+							{/if}
+						</div>
 						{#if form?.invalid_image_file}
 							<p class="mt-1 text-sm">
 								Invalid file, must be a PNG or JPEG file under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB
