@@ -38,6 +38,19 @@
 
 	let formPending = $state(false);
 	let imageInput: HTMLInputElement | undefined = $state();
+	let imagePreviewUrl = $state<string | null>(null);
+
+	function updateImagePreview() {
+		if (imagePreviewUrl) {
+			URL.revokeObjectURL(imagePreviewUrl);
+			imagePreviewUrl = null;
+		}
+
+		if (imageInput?.files && imageInput.files.length > 0) {
+			const file = imageInput.files[0];
+			imagePreviewUrl = URL.createObjectURL(file);
+		}
+	}
 
 	function handlePaste(e: ClipboardEvent) {
 		if (!imageInput) return;
@@ -53,6 +66,7 @@
 					const dataTransfer = new DataTransfer();
 					dataTransfer.items.add(blob);
 					imageInput.files = dataTransfer.files;
+					updateImagePreview();
 					e.preventDefault();
 					break;
 				}
@@ -224,7 +238,15 @@
 							name="image"
 							accept={ALLOWED_IMAGE_TYPES.join(', ')}
 							class="themed-box p-1 outline-primary-900 focus:outline-1"
+							onchange={updateImagePreview}
 						/>
+						{#if imagePreviewUrl}
+							<img
+								src={imagePreviewUrl}
+								alt="Preview"
+								class="mt-2 max-h-32 max-w-full rounded object-contain"
+							/>
+						{/if}
 						{#if form?.invalid_image_file}
 							<p class="mt-1 text-sm">
 								Invalid file, must be a PNG or JPEG file under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB
