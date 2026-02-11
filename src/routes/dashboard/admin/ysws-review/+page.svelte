@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
-	import { projectStatuses } from '$lib/utils.js';
+	import { projectStatuses, getProjectLinkType } from '$lib/utils.js';
 	import { ExternalLink } from '@lucide/svelte';
 	import relativeDate from 'tiny-relative-date';
 
@@ -42,7 +42,7 @@
 					};
 				}}
 			>
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
 					<!-- Project status -->
 					<label class="flex flex-col gap-1">
 						<span class="font-medium">Status</span>
@@ -102,6 +102,25 @@
 								{/each}
 							</select>
 						</div>
+					</label>
+
+					<!-- Type -->
+					<label class="flex flex-col gap-1">
+						<span class="font-medium">Type</span>
+						<select
+							class="h-40 grow border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 placeholder:text-primary-900 active:ring-3"
+							name="type"
+							value={form?.fields.type ?? []}
+							multiple
+						>
+							<option value="onshape" class="truncate">Onshape</option>
+							<option value="fusion-link" class="truncate">Fusion Link</option>
+							<option value="fusion-file" class="truncate">Fusion File</option>
+							<option value="blender" class="truncate">Blender</option>
+							<option value="freecad" class="truncate">FreeCAD</option>
+							<option value="solvespace" class="truncate">SolveSpace</option>
+							<option value="unknown" class="truncate">Other</option>
+						</select>
 					</label>
 				</div>
 				<button type="submit" class="button md primary mt-3 w-full" disabled={formPending}
@@ -183,6 +202,13 @@
 					{:else}
 						<div class="mb-2"></div>
 					{/if}
+					<p class="text-sm">
+						Type: {getProjectLinkType(
+							project.project.editorFileType,
+							project.project.editorUrl,
+							project.project.uploadedFileUrl
+						)}
+					</p>
 					<p class="text-sm">
 						{project.devlogCount} journal{project.devlogCount !== 1 ? 's' : ''} ∙ {Math.floor(
 							project.timeSpent / 60
