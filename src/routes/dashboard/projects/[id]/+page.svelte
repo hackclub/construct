@@ -37,6 +37,51 @@
 	}
 
 	let formPending = $state(false);
+	let imageInput: HTMLInputElement | undefined = $state();
+	let imagePreviewUrl = $state<string | null>(null);
+
+	// Cleanup preview URL on component unmount
+	$effect(() => {
+		return () => {
+			if (imagePreviewUrl) {
+				URL.revokeObjectURL(imagePreviewUrl);
+			}
+		};
+	});
+
+	function updateImagePreview() {
+		if (imagePreviewUrl) {
+			URL.revokeObjectURL(imagePreviewUrl);
+			imagePreviewUrl = null;
+		}
+
+		if (imageInput?.files && imageInput.files.length > 0) {
+			const file = imageInput.files[0];
+			imagePreviewUrl = URL.createObjectURL(file);
+		}
+	}
+
+	function handlePaste(e: ClipboardEvent) {
+		if (!imageInput) return;
+
+		const items = e.clipboardData?.items;
+		if (!items) return;
+
+		for (let index = 0; index < items.length; index++) {
+			const item = items[index];
+			if (item.type.startsWith('image/')) {
+				const blob = item.getAsFile();
+				if (blob && ALLOWED_IMAGE_TYPES.includes(blob.type)) {
+					const dataTransfer = new DataTransfer();
+					dataTransfer.items.add(blob);
+					imageInput.files = dataTransfer.files;
+					updateImagePreview();
+					e.preventDefault();
+					break;
+				}
+			}
+		}
+	}
 </script>
 
 <Head title={data.project.name} />
@@ -132,6 +177,7 @@
 			method="POST"
 			class="flex flex-col gap-3"
 			enctype="multipart/form-data"
+			onpaste={handlePaste}
 			use:enhance={() => {
 				formPending = true;
 				return async ({ update }) => {
@@ -196,12 +242,25 @@
 				<div class="mt-1 flex flex-row gap-2">
 					<label class="flex grow flex-col gap-1">
 						Image
-						<input
-							type="file"
-							name="image"
-							accept={ALLOWED_IMAGE_TYPES.join(', ')}
-							class="themed-box p-1 outline-primary-900 focus:outline-1"
-						/>
+						<div
+							class="themed-box flex flex-col items-center p-1 outline-primary-900 focus-within:outline-1"
+						>
+							<input
+								bind:this={imageInput}
+								type="file"
+								name="image"
+								accept={ALLOWED_IMAGE_TYPES.join(', ')}
+								class="w-full outline-0"
+								onchange={updateImagePreview}
+							/>
+							{#if imagePreviewUrl}
+								<img
+									src={imagePreviewUrl}
+									alt="Preview"
+									class="mt-2 max-h-32 max-w-full rounded object-contain"
+								/>
+							{/if}
+						</div>
 						{#if form?.invalid_image_file}
 							<p class="mt-1 text-sm">
 								Invalid file, must be a PNG or JPEG file under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB

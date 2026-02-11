@@ -3,7 +3,7 @@ import { project, user, devlog, legionReview } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, and, asc, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
-// import { sendSlackDM } from '$lib/server/slack.js';
+import { sendSlackDM } from '$lib/server/slack.js';
 import { getReviewHistory } from '../../getReviewHistory.server';
 import { getCurrentlyPrinting } from '../utils.server';
 
@@ -200,10 +200,18 @@ export const actions = {
 
 		const [queriedProject] = await db
 			.select({
-				id: project.id,
-				status: project.status
+				project: {
+					id: project.id,
+					name: project.name,
+					status: project.status
+				},
+				user: {
+					id: user.id,
+					slackId: user.slackId
+				}
 			})
 			.from(project)
+			.leftJoin(user, eq(user.id, project.userId))
 			.where(and(eq(project.id, id), eq(project.deleted, false)))
 			.limit(1);
 
@@ -211,7 +219,7 @@ export const actions = {
 			return error(404, { message: 'project not found' });
 		}
 
-		if (queriedProject.status !== 'printing') {
+		if (queriedProject.project.status !== 'printing') {
 			return error(403, { message: 'project is not marked as currently printing' });
 		}
 
@@ -248,14 +256,14 @@ export const actions = {
 			})
 			.where(eq(project.id, id));
 
-		// if (queriedProject.user) {
-		// 	const feedbackText = feedback ? `\n\nHere's what they said:\n${feedback}` : '';
+		if (queriedProject.user?.slackId) {
+			const feedbackText = feedback ? `\n\nHere's what they said:\n${feedback}` : '';
 
-		// 	await sendSlackDM(
-		// 		queriedProject.user.slackId,
-		// 		`Your project <https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}|${queriedProject.project.name}> has been ${statusMessage}${feedbackText}`
-		// 	);
-		// }
+			await sendSlackDM(
+				queriedProject.user.slackId,
+				`Your project <https://construct.hackclub.com/dashboard/projects/${queriedProject.project.id}|${queriedProject.project.name}> has been printed! :tada:${feedbackText}`
+			);
+		}
 
 		return {};
 	},
