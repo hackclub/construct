@@ -3,6 +3,7 @@ import { project, user, devlog, t2Review } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, and, sql, ne, inArray, desc, gt } from 'drizzle-orm';
 import type { Actions } from './$types';
+import { getProjectLinkType } from '$lib/utils';
 
 export async function load({ locals }) {
 	if (!locals.user) {
@@ -12,7 +13,7 @@ export async function load({ locals }) {
 		throw error(403, { message: 'oi get out' });
 	}
 
-	const projects = await getProjects(['printed'], [], []);
+	const projects = await getProjects(['printed'], [], [], []);
 
 	const allProjects = await db
 		.select({
@@ -81,14 +82,17 @@ export const actions = {
 			return parseInt(userId.toString());
 		});
 
-		const projects = await getProjects(statusFilter, projectFilter, userFilter);
+		const typeFilter = data.getAll('type') as string[];
+
+		const projects = await getProjects(statusFilter, projectFilter, userFilter, typeFilter);
 
 		return {
 			projects,
 			fields: {
 				status: statusFilter,
 				project: projectFilter,
-				user: userFilter
+				user: userFilter,
+				type: typeFilter
 			}
 		};
 	}
@@ -97,44 +101,63 @@ export const actions = {
 async function getProjects(
 	statusFilter: (typeof project.status._.data)[],
 	projectFilter: number[],
-	userFilter: number[]
+	userFilter: number[],
+	typeFilter: string[]
 ) {
-	return await db
-		.select({
-			project: {
-				id: project.id,
-				name: project.name,
-				description: project.description,
-				url: project.url,
-				createdAt: project.createdAt,
-				status: project.status
-			},
-			user: {
-				id: user.id,
-				name: user.name
-			},
-			timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
-			devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`
-		})
-		.from(project)
-		.leftJoin(devlog, and(eq(project.id, devlog.projectId), eq(devlog.deleted, false)))
-		.leftJoin(user, eq(user.id, project.userId))
-		.where(
-			and(
-				eq(project.deleted, false),
-				statusFilter.length > 0 ? inArray(project.status, statusFilter) : undefined,
-				projectFilter.length > 0 ? inArray(project.id, projectFilter) : undefined,
-				userFilter.length > 0 ? inArray(project.userId, userFilter) : undefined
+	return (
+		await db
+			.select({
+				project: {
+					id: project.id,
+					name: project.name,
+					description: project.description,
+					url: project.url,
+					createdAt: project.createdAt,
+					status: project.status,
+					editorFileType: project.editorFileType,
+					editorUrl: project.editorUrl,
+					uploadedFileUrl: project.uploadedFileUrl
+				},
+				user: {
+					id: user.id,
+					name: user.name
+				},
+				timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
+				devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`
+			})
+			.from(project)
+			.leftJoin(devlog, and(eq(project.id, devlog.projectId), eq(devlog.deleted, false)))
+			.leftJoin(user, eq(user.id, project.userId))
+			.where(
+				and(
+					eq(project.deleted, false),
+					statusFilter.length > 0 ? inArray(project.status, statusFilter) : undefined,
+					projectFilter.length > 0 ? inArray(project.id, projectFilter) : undefined,
+					userFilter.length > 0 ? inArray(project.userId, userFilter) : undefined
+				)
 			)
-		)
-		.groupBy(
-			project.id,
-			project.name,
-			project.description,
-			project.url,
-			project.createdAt,
-			project.status,
-			user.id,
-			user.name
-		);
+			.groupBy(
+				project.id,
+				project.name,
+				project.description,
+				project.url,
+				project.createdAt,
+				project.status,
+				project.editorFileType,
+				project.editorUrl,
+				project.uploadedFileUrl,
+				user.id,
+				user.name
+			)
+	).filter((item) =>
+		typeFilter.length > 0
+			? typeFilter.includes(
+					getProjectLinkType(
+						item.project.editorFileType,
+						item.project.editorUrl,
+						item.project.uploadedFileUrl
+					)
+				)
+			: true
+	);
 }
