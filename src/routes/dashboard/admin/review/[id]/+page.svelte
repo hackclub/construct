@@ -70,7 +70,7 @@
 					<p>
 						Hackatime trust: <a
 							class="underline"
-							href={`https://dash.fraud.land/profile/${data.project.user?.slackID}`}
+							href={`https://joe.fraud.hackclub.com/profile/${data.project.user?.slackID}`}
 							target="_blank">{data.project.user?.hackatimeTrust}</a
 						>
 					</p>
