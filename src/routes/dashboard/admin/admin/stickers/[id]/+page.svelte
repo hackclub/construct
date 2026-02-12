@@ -73,7 +73,7 @@
 				<DataCard title="Hackatime trust">
 					<a
 						class="underline"
-						href={`https://dash.fraud.land/profile/${user.slackId}`}
+						href={`https://joe.fraud.hackclub.com/profile/${user.slackId}`}
 						target="_blank">{user.hackatimeTrust}</a
 					>
 				</DataCard>
