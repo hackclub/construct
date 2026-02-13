@@ -30,3 +30,7 @@ uploads/models/*-*.*
 
 # no leaky
 *.NOLEAKY.*
+
+# Playwright
+/test-results/
+/playwright-report/

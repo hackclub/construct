@@ -16,6 +16,9 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit()
 	],
+	test: {
+		exclude: ['e2e/**', 'node_modules/**']
+	},
 	ssr: {
 		// leave pg to be required at runtime by Node
 		external: ['pg']
