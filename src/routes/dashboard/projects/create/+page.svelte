@@ -110,10 +110,11 @@
 	</div>
 	<div>
 		<label class="flex flex-col gap-1">
-			<span>Description <span class="inline opacity-50">(optional)</span></span>
+			<span>Description <span class="inline opacity-50">(required)</span></span>
 			<textarea
 				name="description"
 				placeholder="A couple sentences to describe your project"
+				required
 				class="themed-box ring-primary-900 placeholder:text-primary-900 active:ring-3"
 				>{form?.fields?.description ?? ''}</textarea
 			>
