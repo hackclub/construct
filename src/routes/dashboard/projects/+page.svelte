@@ -9,21 +9,18 @@
 <Head title="Projects" />
 
 <div class="flex h-full flex-col">
-	<div class="flex">
-		<h1 class="mt-5 mb-2 grow font-hero text-3xl font-medium">Projects</h1>
-    <h2 class="absolute ml-0 mt-16  text-lg  text-[#72685e] font-medium">{data.totalHours}h total ∙ {data.finalHours}h finalized</h2>
-        <h1 class="absolute ml-0 mt-22 font-hero text-sm  text-[#72685e] font-medium"></h1>
-
-		<div class="flex flex-row">
-			<div>
-				<Button
-					text="Create project"
-					bgcolor="bg-primary-800"
-					bgcolor_hover="bg-primary-700"
-					href="/dashboard/projects/create"
-				/>
-			</div>
+	<div class="flex justify-between items-center">
+		<div>
+			<h1 class="mt-5 mb-2 font-hero text-3xl font-medium">Projects</h1>
+			<h2 class="text-lg text-[#72685e] font-medium">{data.totalHours}h total ∙ {data.finalHours}h finalized</h2>
 		</div>
+		<Button
+			text="Create project"
+			bgcolor="bg-primary-800"
+			bgcolor_hover="bg-primary-700"
+			href="/dashboard/projects/create"
+			class="-mt-14"
+		/>
 	</div>
 	{#if data.projects.length == 0}
 		<div class="flex grow items-center justify-center">
@@ -38,7 +35,7 @@
 			</div>
 		</div>
 	{:else}
-		<div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-5 mt-9">
+		<div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-5 mt-2">
 			{#each data.projects as project}
 				<Project
 					id={project.id}
