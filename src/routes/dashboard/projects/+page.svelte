@@ -10,7 +10,10 @@
 
 <div class="flex h-full flex-col">
 	<div class="flex">
-		<h1 class="mt-5 mb-3 grow font-hero text-3xl font-medium">Projects</h1>
+		<h1 class="mt-5 mb-2 grow font-hero text-3xl font-medium">Projects</h1>
+    <h2 class="absolute ml-0 mt-16  text-lg  text-[#72685e] font-medium">{data.totalHours}h total ∙ {data.finalHours}h finalized</h2>
+        <h1 class="absolute ml-0 mt-22 font-hero text-sm  text-[#72685e] font-medium"></h1>
+
 		<div class="flex flex-row">
 			<div>
 				<Button
@@ -35,7 +38,7 @@
 			</div>
 		</div>
 	{:else}
-		<div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
+		<div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-5 mt-9">
 			{#each data.projects as project}
 				<Project
 					id={project.id}
