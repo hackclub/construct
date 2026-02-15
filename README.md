@@ -1,6 +1,6 @@
 # Construct
 
-A [Hack Club](https://hackclub.com) YSWS event about CAD modelling and 3D printers
+Work on CAD projects for 40 hours, get a 3D printer!
 
 Built with SvelteKit, deployed with Docker (auto-builds container image and publishes to GitHub packages!)
 
@@ -10,6 +10,9 @@ Stack:
 - Drizzle ORM
 - PostgreSQL
 - Cloudflare R2 (make sure you've configured CORS to allow GET and HEAD requests)
+
+> [!NOTE]  
+> When contributing, fork from/PR into the `staging` branch
 
 ## Slack Bot
 
