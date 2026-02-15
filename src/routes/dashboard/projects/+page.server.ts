@@ -36,7 +36,15 @@ export async function load({ locals }) {
 			project.status
 		);
 
-	return {
+	const totalHours = projects.reduce((sum, p) => sum + (Number(p.timeSpent) || 0), 0) / 60;
+	const finalHours =
 		projects
+			.filter((p) => p.status == 'finalized')
+			.reduce((sum, p) => sum + (Number(p.timeSpent) || 0), 0) / 60;
+
+	return {
+		projects,
+		totalHours: Math.round(totalHours * 10) / 10,
+		finalHours: Math.round(finalHours * 10) / 10
 	};
 }
