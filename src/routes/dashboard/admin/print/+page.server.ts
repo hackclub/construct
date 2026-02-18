@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
 import { project, user, devlog, legionReview } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
-import { eq, and, sql, ne, inArray, desc, gt, lt, max } from 'drizzle-orm';
+import { eq, and, sql, ne, inArray, desc, gt, lt, max, asc } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { getCurrentlyPrinting } from './utils.server';
 
@@ -91,7 +91,7 @@ export async function load({ locals }) {
 				lt(latestMarking.latestTimestamp, threeDaysAgo)
 			)
 		)
-		.orderBy(desc(latestMarking.latestTimestamp));
+		.orderBy(asc(latestMarking.latestTimestamp));
 
 	return {
 		allProjects,
