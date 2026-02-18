@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
 	import { projectStatuses } from '$lib/utils.js';
-	import { ExternalLink, Info } from '@lucide/svelte';
+	import { ExternalLink, Info, AlertTriangle } from '@lucide/svelte';
 	import relativeDate from 'tiny-relative-date';
 
 	let { data, form } = $props();
@@ -40,6 +40,31 @@
 					>&ThickSpace;
 				{/each}
 			</p>
+		</div>
+	{/if}
+
+	{#if data.stuckPrinting.length > 0}
+		<div class="themed-box mb-3 p-3">
+			<div class="mb-3 flex items-center gap-2">
+				<AlertTriangle class="text-orange-400" />
+				<h2 class="text-xl font-bold">Projects Stuck in Printing</h2>
+			</div>
+			<div class="space-y-2">
+				{#each data.stuckPrinting as stuck}
+					{@const daysStuck = Math.floor((Date.now() - stuck.updatedAt.getTime()) / (1000 * 60 * 60 * 24))}
+					<div class="flex items-center justify-between rounded border-l-3 border-orange-600 bg-primary-900/50 p-2.5 text-sm">
+						<div>
+							<a href={`/dashboard/admin/print/${stuck.id}`} class="underline hover:text-primary-300"
+								>{stuck.name}</a
+							>
+							<span class="text-primary-400">
+								— {stuck.printer?.name || 'Unknown printer'}
+							</span>
+						</div>
+						<span class="font-bold text-orange-500">{daysStuck}d</span>
+					</div>
+				{/each}
+			</div>
 		</div>
 	{/if}
 

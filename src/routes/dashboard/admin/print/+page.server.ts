@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
 import { project, user, devlog, legionReview } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
-import { eq, and, sql, ne, inArray, desc, gt } from 'drizzle-orm';
+import { eq, and, sql, ne, inArray, desc, gt, asc, lt } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { getCurrentlyPrinting } from './utils.server';
 
@@ -53,12 +53,30 @@ export async function load({ locals }) {
 
 	const currentlyPrinting = await getCurrentlyPrinting(locals.user);
 
+	// get the slow ahh printers (3 days)
+	const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+	const stuckPrinting = await db
+		.select({
+			id: project.id,
+			name: project.name,
+			printer: {
+				id: user.id,
+				name: user.name
+			},
+			updatedAt: project.updatedAt
+		})
+		.from(project)
+		.leftJoin(user, eq(user.id, project.printedBy))
+		.where(and(eq(project.status, 'printing'), lt(project.updatedAt, threeDaysAgo), eq(project.deleted, false)))
+		.orderBy(asc(project.updatedAt));
+
 	return {
 		allProjects,
 		projects,
 		users,
 		currentlyPrinting,
-		leaderboard
+		leaderboard,
+		stuckPrinting
 	};
 }
 
