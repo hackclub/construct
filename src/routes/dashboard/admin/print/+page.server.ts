@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
 import { project, user, devlog, legionReview } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
-import { eq, and, sql, ne, inArray, desc, gt, asc, lt } from 'drizzle-orm';
+import { eq, and, sql, ne, inArray, desc, gt, lt, max } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { getCurrentlyPrinting } from './utils.server';
 
@@ -31,15 +31,13 @@ export async function load({ locals }) {
 		.from(user)
 		.where(and(ne(user.trust, 'red'), ne(user.hackatimeTrust, 'red'))); // hide banned users
 
-	const legionAgg = db
-		.$with('legionAgg')
-		.as(
-			db
-				.select({ userId: legionReview.userId, legionCnt: sql<number>`COUNT(*)`.as('legionCnt') })
-				.from(legionReview)
-				.where(eq(legionReview.action, 'print'))
-				.groupBy(legionReview.userId)
-		);
+	const legionAgg = db.$with('legionAgg').as(
+		db
+			.select({ userId: legionReview.userId, legionCnt: sql<number>`COUNT(*)`.as('legionCnt') })
+			.from(legionReview)
+			.where(eq(legionReview.action, 'print'))
+			.groupBy(legionReview.userId)
+	);
 
 	const totalExpr = sql<number>`COALESCE(${legionAgg.legionCnt}, 0)`;
 
@@ -53,8 +51,18 @@ export async function load({ locals }) {
 
 	const currentlyPrinting = await getCurrentlyPrinting(locals.user);
 
-	// get the slow ahh printers (3 days)
-	const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
+	// get the slow ahh printers (2 days)
+	const threeDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+	const latestMarking = db
+		.select({
+			projectId: legionReview.projectId,
+			latestTimestamp: max(legionReview.timestamp).as('latest_timestamp')
+		})
+		.from(legionReview)
+		.where(eq(legionReview.action, 'mark_for_printing'))
+		.groupBy(legionReview.projectId)
+		.as('latest_marking');
+
 	const stuckPrinting = await db
 		.select({
 			id: project.id,
@@ -63,12 +71,27 @@ export async function load({ locals }) {
 				id: user.id,
 				name: user.name
 			},
-			updatedAt: project.updatedAt
+			updatedAt: latestMarking.latestTimestamp
 		})
 		.from(project)
-		.leftJoin(user, eq(user.id, project.printedBy))
-		.where(and(eq(project.status, 'printing'), lt(project.updatedAt, threeDaysAgo), eq(project.deleted, false)))
-		.orderBy(asc(project.updatedAt));
+		.innerJoin(latestMarking, eq(latestMarking.projectId, project.id))
+		.innerJoin(
+			legionReview,
+			and(
+				eq(legionReview.projectId, project.id),
+				eq(legionReview.action, 'mark_for_printing'),
+				eq(legionReview.timestamp, latestMarking.latestTimestamp)
+			)
+		)
+		.innerJoin(user, eq(user.id, legionReview.userId))
+		.where(
+			and(
+				eq(project.status, 'printing'),
+				eq(project.deleted, false),
+				lt(latestMarking.latestTimestamp, threeDaysAgo)
+			)
+		)
+		.orderBy(desc(latestMarking.latestTimestamp));
 
 	return {
 		allProjects,
