@@ -1,10 +1,31 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import printerMap from '$lib/assets/printermap.png';
-	import { printersSingleList } from '$lib/printers';
+	import { getPrinterFromPath, printersSingleList, type Printer } from '$lib/printers';
+	import { CircleDollarSign } from '@lucide/svelte';
+	import { BASE_PRINTER_CLAY } from '$lib/defs';
+	import { calculateMarketPrice } from '$lib/utils';
 
 	let frame: HTMLDivElement;
 	let canvas: HTMLDivElement;
+
+	let { data } = $props();
+
+	let selectedPrinterPath: number[] | null = $state(null);
+	let selectedPrinter: Printer | null = $derived(
+		selectedPrinterPath !== null ? getPrinterFromPath(selectedPrinterPath) : null
+	);
+	let selectedPrinterPriceBricks = $derived(
+		selectedPrinter
+			? calculateMarketPrice(
+					selectedPrinter.minBrick ?? 0,
+					selectedPrinter.maxBrick ?? 0,
+					selectedPrinter.minShopScore ?? 0,
+					selectedPrinter.maxShopScore ?? 0,
+					data.user.shopScore
+				)
+			: null
+	);
 
 	const pos = $state({ x: 0, y: 0 });
 	const target = $state({ x: 0, y: 0 });
@@ -122,6 +143,56 @@
 	bind:this={frame}
 	class="relative mb-5 w-full grow overflow-hidden rounded-lg border-3 border-primary-900 bg-primary-950/60"
 >
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		class="absolute z-2 h-full w-full bg-primary-950/50 transition-all"
+		class:opacity-0={selectedPrinter == null}
+		class:pointer-events-none={selectedPrinter == null}
+		onclick={() => (selectedPrinter = null)}
+	></div>
+
+	<div
+		class="pointer-events-none absolute flex h-full w-full flex-col justify-center"
+		class:hidden={selectedPrinter == null}
+	>
+		<div class="flex flex-row justify-center">
+			<div
+				class="pointer-events-auto z-3 flex max-w-120 min-w-80 flex-col rounded-lg bg-primary-950 p-3 text-center outline-3 outline-primary-800 select-auto"
+			>
+				<h2 class="text-xl font-semibold">
+					{selectedPrinter?.longName}
+				</h2>
+				<p>
+					{selectedPrinter?.description}
+				</p>
+				<div class="flex flex-row justify-center gap-1 align-middle text-primary-500">
+					<CircleDollarSign size={22} />
+					<p class="font-semibold">
+						{#if selectedPrinter?.isBasePrinter}
+							{BASE_PRINTER_CLAY} clay
+						{:else}
+							<span class="text-primary-400">
+								{#if (selectedPrinterPriceBricks ?? 0) < (selectedPrinter?.maxBrick ?? 0)}
+									<span class="text-primary-500 line-through">{selectedPrinter?.maxBrick}</span>
+									{selectedPrinterPriceBricks} bricks
+								{:else}
+									{selectedPrinterPriceBricks} bricks
+								{/if}
+							</span>
+						{/if}
+					</p>
+				</div>
+
+				<div class="mt-2 flex flex-row gap-3">
+					<button class="button md primary flex-1" onclick={() => (selectedPrinter = null)}>
+						Cancel
+					</button>
+					<button class="button md orange flex-1">Buy</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div
 		bind:this={canvas}
 		{onpointerdown}
@@ -134,17 +205,24 @@
 		<div class="absolute top-0 left-0 z-1 h-full w-full">
 			<div class="relative h-full w-full">
 				{#each printersSingleList as printer}
-					<div
-						class="absolute -translate-1/2 bg-primary-900 cursor-pointer border-3 border-primary-700 rounded-xl opacity-85 text-nowrap"
+					<button
+						class="absolute -translate-1/2 cursor-pointer rounded-xl border-3 border-primary-700 bg-primary-900 text-nowrap opacity-85 transition-opacity hover:opacity-100"
 						style={`
 							left: ${printer.x}%;
 							top: ${printer.y}%;
 							font-size: ${scale * 0.5654}rem;
 							padding: ${scale * 0.418}rem;
 						`}
+						onclick={(e) => {
+							e.stopPropagation();
+							selectedPrinterPath = printer.path;
+						}}
+						onpointerdown={(e) => {
+							e.stopPropagation();
+						}}
 					>
 						{printer.name}
-					</div>
+					</button>
 				{/each}
 			</div>
 		</div>

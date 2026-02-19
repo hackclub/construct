@@ -14,7 +14,7 @@
 			audio.volume = 0.2;
 			audio.play();
 		}
-	})
+	});
 </script>
 
 <Head title="Printer Market" />
@@ -35,7 +35,7 @@
 		<source src={themeSong} type="audio/mp3" />
 	</audio>
 
-	<Printers />
+	<Printers {data} />
 </div>
 
 <!-- <div class="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
