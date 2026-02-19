@@ -35,7 +35,7 @@ export const printers: Printer[] = [
 				minBrick: 450,
 				minShopScore: 0,
 				maxShopScore: 5000,
-	
+
 				x: 53.5,
 				y: 36.23,
 				children: []
@@ -50,7 +50,7 @@ export const printers: Printer[] = [
 				minBrick: 270,
 				minShopScore: 0,
 				maxShopScore: 5000,
-	
+
 				x: 64.45,
 				y: 38.35,
 				children: [
@@ -64,7 +64,7 @@ export const printers: Printer[] = [
 						minBrick: 450,
 						minShopScore: 0,
 						maxShopScore: 5000,
-			
+
 						x: 72.97,
 						y: 41.18,
 						children: []
@@ -79,7 +79,7 @@ export const printers: Printer[] = [
 						minBrick: 540,
 						minShopScore: 0,
 						maxShopScore: 5000,
-			
+
 						x: 72.33,
 						y: 32.97,
 						children: [
@@ -93,7 +93,7 @@ export const printers: Printer[] = [
 								minBrick: 540,
 								minShopScore: 0,
 								maxShopScore: 5000,
-					
+
 								x: 67,
 								y: 26.4,
 								children: [
@@ -107,7 +107,7 @@ export const printers: Printer[] = [
 										minBrick: 420,
 										minShopScore: 3000,
 										maxShopScore: 10000,
-							
+
 										x: 60,
 										y: 20.95,
 										children: []
@@ -125,7 +125,7 @@ export const printers: Printer[] = [
 								minBrick: 570,
 								minShopScore: 0,
 								maxShopScore: 5000,
-					
+
 								x: 84.05,
 								y: 15.15,
 								children: [
@@ -139,7 +139,7 @@ export const printers: Printer[] = [
 										minBrick: 900,
 										minShopScore: 3000,
 										maxShopScore: 10000,
-							
+
 										x: 94.6,
 										y: 13.91,
 										children: []
@@ -155,7 +155,7 @@ export const printers: Printer[] = [
 										minBrick: 3000,
 										minShopScore: 3000,
 										maxShopScore: 10000,
-							
+
 										x: 92.03,
 										y: 6,
 										children: []
@@ -187,7 +187,7 @@ export const printers: Printer[] = [
 				minBrick: 300,
 				minShopScore: 0,
 				maxShopScore: 5000,
-	
+
 				x: 40.2,
 				y: 33.62,
 				children: [
@@ -201,7 +201,7 @@ export const printers: Printer[] = [
 						minBrick: 210,
 						minShopScore: 0,
 						maxShopScore: 5000,
-			
+
 						x: 31.6,
 						y: 25.4,
 						children: [
@@ -215,7 +215,7 @@ export const printers: Printer[] = [
 								minBrick: 350,
 								minShopScore: 0,
 								maxShopScore: 5000,
-					
+
 								x: 21.3,
 								y: 29.65,
 								children: [
@@ -229,7 +229,7 @@ export const printers: Printer[] = [
 										minBrick: 600,
 										minShopScore: 0,
 										maxShopScore: 5000,
-							
+
 										x: 9.4,
 										y: 35.7,
 										children: []
@@ -244,7 +244,7 @@ export const printers: Printer[] = [
 										minBrick: 1800,
 										minShopScore: 3000,
 										maxShopScore: 10000,
-							
+
 										x: 19.7,
 										y: 22.5,
 										children: [
@@ -258,7 +258,7 @@ export const printers: Printer[] = [
 												minBrick: 750,
 												minShopScore: 3000,
 												maxShopScore: 10000,
-									
+
 												x: 4.6,
 												y: 20.12,
 												children: []
@@ -274,7 +274,7 @@ export const printers: Printer[] = [
 												minBrick: 650,
 												minShopScore: 3000,
 												maxShopScore: 10000,
-									
+
 												x: 15.7,
 												y: 6.95,
 												children: [
@@ -288,7 +288,7 @@ export const printers: Printer[] = [
 														minBrick: 900,
 														minShopScore: 3000,
 														maxShopScore: 10000,
-											
+
 														x: 8.71,
 														y: 3.4,
 														children: []
@@ -324,7 +324,7 @@ export const printers: Printer[] = [
 				minBrick: 90,
 				minShopScore: 0,
 				maxShopScore: 5000,
-	
+
 				x: 65.35,
 				y: 67.45,
 				children: [
@@ -338,7 +338,7 @@ export const printers: Printer[] = [
 						minBrick: 300,
 						minShopScore: 0,
 						maxShopScore: 5000,
-			
+
 						x: 57.7,
 						y: 69.9,
 						children: [
@@ -352,7 +352,7 @@ export const printers: Printer[] = [
 								minBrick: 390,
 								minShopScore: 0,
 								maxShopScore: 5000,
-					
+
 								x: 52.2,
 								y: 76.78,
 								children: []
@@ -369,7 +369,7 @@ export const printers: Printer[] = [
 						minBrick: 390,
 						minShopScore: 0,
 						maxShopScore: 5000,
-			
+
 						x: 67.3,
 						y: 76.67,
 						children: [
@@ -383,7 +383,7 @@ export const printers: Printer[] = [
 								minBrick: 360,
 								minShopScore: 0,
 								maxShopScore: 5000,
-					
+
 								x: 52.95,
 								y: 85.6,
 								children: []
@@ -398,7 +398,7 @@ export const printers: Printer[] = [
 								minBrick: 420,
 								minShopScore: 3000,
 								maxShopScore: 10000,
-					
+
 								x: 73.1,
 								y: 83.1,
 								children: [
@@ -412,7 +412,7 @@ export const printers: Printer[] = [
 										minBrick: 210,
 										minShopScore: 3000,
 										maxShopScore: 10000,
-							
+
 										x: 63,
 										y: 84.5,
 										children: []
@@ -427,7 +427,7 @@ export const printers: Printer[] = [
 										minBrick: 7500,
 										minShopScore: 3000,
 										maxShopScore: 10000,
-							
+
 										x: 95,
 										y: 94.4,
 										children: []
@@ -459,7 +459,7 @@ export const printers: Printer[] = [
 				minBrick: 150,
 				minShopScore: 0,
 				maxShopScore: 5000,
-	
+
 				x: 34.5,
 				y: 65.2,
 				children: [
@@ -473,7 +473,7 @@ export const printers: Printer[] = [
 						minBrick: 360,
 						minShopScore: 0,
 						maxShopScore: 5000,
-			
+
 						x: 25.85,
 						y: 65.3,
 						children: []
@@ -488,7 +488,7 @@ export const printers: Printer[] = [
 						minBrick: 750,
 						minShopScore: 3000,
 						maxShopScore: 10000,
-			
+
 						x: 37.1,
 						y: 71.5,
 						children: [
@@ -502,7 +502,7 @@ export const printers: Printer[] = [
 								minBrick: 600,
 								minShopScore: 3000,
 								maxShopScore: 10000,
-					
+
 								x: 30.7,
 								y: 79.3,
 								children: []
@@ -519,7 +519,7 @@ export const printers: Printer[] = [
 						minBrick: 270,
 						minShopScore: 0,
 						maxShopScore: 5000,
-			
+
 						x: 25.9,
 						y: 60.3,
 						children: [
@@ -533,7 +533,7 @@ export const printers: Printer[] = [
 								minBrick: 450,
 								minShopScore: 0,
 								maxShopScore: 5000,
-					
+
 								x: 17.8,
 								y: 51.1,
 								children: [
@@ -547,7 +547,7 @@ export const printers: Printer[] = [
 										minBrick: 675,
 										minShopScore: 3000,
 										maxShopScore: 10000,
-							
+
 										x: 14.3,
 										y: 41.4,
 										children: []
@@ -566,7 +566,7 @@ export const printers: Printer[] = [
 						minBrick: 300,
 						minShopScore: 0,
 						maxShopScore: 5000,
-			
+
 						x: 27.35,
 						y: 71,
 						children: [
@@ -580,7 +580,7 @@ export const printers: Printer[] = [
 								minBrick: 330,
 								minShopScore: 0,
 								maxShopScore: 5000,
-					
+
 								x: 18.8,
 								y: 66.25,
 								children: []
@@ -595,7 +595,7 @@ export const printers: Printer[] = [
 								minBrick: 1200,
 								minShopScore: 3000,
 								maxShopScore: 10000,
-					
+
 								x: 22,
 								y: 74.95,
 								children: [
@@ -609,7 +609,7 @@ export const printers: Printer[] = [
 										minBrick: 750,
 										minShopScore: 3000,
 										maxShopScore: 10000,
-							
+
 										x: 8.1,
 										y: 83.75,
 										children: [
@@ -624,7 +624,7 @@ export const printers: Printer[] = [
 												minBrick: 750,
 												minShopScore: 3000,
 												maxShopScore: 10000,
-									
+
 												x: 4,
 												y: 91.35,
 												children: []
@@ -658,7 +658,7 @@ export const printers: Printer[] = [
 				minBrick: 35,
 				minShopScore: 0,
 				maxShopScore: 5000,
-	
+
 				x: 69.3,
 				y: 56.06,
 				children: []
@@ -673,7 +673,7 @@ export const printers: Printer[] = [
 				minBrick: 170,
 				minShopScore: 0,
 				maxShopScore: 5000,
-	
+
 				x: 77.9,
 				y: 53.5,
 				children: []
@@ -688,7 +688,7 @@ export const printers: Printer[] = [
 				minBrick: 330,
 				minShopScore: 3000,
 				maxShopScore: 10000,
-	
+
 				x: 90.9,
 				y: 55.95,
 				children: []
@@ -703,7 +703,7 @@ export const printers: Printer[] = [
 				minBrick: 755,
 				minShopScore: 3000,
 				maxShopScore: 10000,
-	
+
 				x: 88.7,
 				y: 66.35,
 				children: []
@@ -759,4 +759,10 @@ export function getPrinterFromPath(path: number[], printerList: Printer[] = prin
 	} else {
 		return getPrinterFromPath(path.slice(1), printerList[path[0]].children);
 	}
+}
+
+export function getPurchaseablePrinters(current: number[]) {
+	return (current.length === 0 ? printers : getPrinterFromPath(current).children).map(
+		(_value, index) => [...current, index]
+	);
 }

@@ -1,10 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import printerMap from '$lib/assets/printermap.png';
-	import { getPrinterFromPath, printersSingleList, type Printer } from '$lib/printers';
+	import {
+		getPrinterFromPath,
+		getPurchaseablePrinters,
+		printersSingleList,
+		type Printer
+	} from '$lib/printers';
 	import { CircleDollarSign } from '@lucide/svelte';
 	import { BASE_PRINTER_CLAY } from '$lib/defs';
-	import { calculateMarketPrice } from '$lib/utils';
+	import { arraysEqual, calculateMarketPrice } from '$lib/utils';
+	import { enhance } from '$app/forms';
 
 	let frame: HTMLDivElement;
 	let canvas: HTMLDivElement;
@@ -26,6 +32,34 @@
 				)
 			: null
 	);
+	let canAffordPrinter = $derived(
+		(selectedPrinter?.isBasePrinter && data.user.clay >= BASE_PRINTER_CLAY) ||
+			(!selectedPrinter?.isBasePrinter && data.user.brick >= (selectedPrinterPriceBricks ?? 0))
+	);
+
+	let purchaseablePrinters: number[][] = $derived(getPurchaseablePrinters(data.user.printer.path));
+
+	let selectedPrinterPurchaseable: boolean | null = $derived(
+		selectedPrinterPath !== null
+			? purchaseablePrinters.some(
+					(arr) =>
+						arr.length === selectedPrinterPath!.length &&
+						arr.every((value, index) => value === selectedPrinterPath![index])
+				)
+			: null
+	);
+	let selectedPrinterAlreadyPurchased: boolean | null = $derived(
+		selectedPrinterPath !== null
+			? selectedPrinter?.singlePurchase &&
+					data.purchasedPrinters.some(
+						(arr: number[]) =>
+							arr.length === selectedPrinterPath!.length &&
+							arr.every((value, index) => value === selectedPrinterPath![index])
+					)
+			: null
+	);
+
+	let purchasePending: boolean = $state(false);
 
 	const pos = $state({ x: 0, y: 0 });
 	const target = $state({ x: 0, y: 0 });
@@ -183,18 +217,55 @@
 						{/if}
 					</p>
 				</div>
-				<p class="mt-0.5 text-xs opacity-50">
-					Ships to your primary address on <a
-						href="https://auth.hackclub.com/addresses"
-						class="underline transition-colors hover:text-amber-500">Hack Club Auth</a
-					>
-				</p>
+				{#if !selectedPrinterPurchaseable && canAffordPrinter}
+					{#if selectedPrinterAlreadyPurchased}
+						<p class="mt-0.5 text-sm font-medium text-primary-600">Already purchased</p>
+					{:else}
+						<p class="mt-0.5 text-sm font-medium text-primary-600">
+							Haven't bought required upgrades
+						</p>
+					{/if}
+				{:else if canAffordPrinter}
+					<p class="mt-0.5 text-xs opacity-50">
+						Ships to your primary address on <a
+							href="https://auth.hackclub.com/addresses"
+							class="underline transition-colors hover:text-amber-500">Hack Club Auth</a
+						>
+					</p>
+				{:else}
+					<p class="mt-0.5 text-sm font-medium text-primary-600">Can't afford</p>
+				{/if}
 
 				<div class="mt-2 flex flex-row gap-3">
 					<button class="button md primary flex-1" onclick={() => (selectedPrinter = null)}>
 						Cancel
 					</button>
-					<button class="button md orange flex-1">Buy</button>
+					<form
+						method="POST"
+						class="flex-1"
+						action="?/order"
+						use:enhance={() => {
+							purchasePending = true;
+							return async ({ update }) => {
+								await update({ reset: true });
+								purchasePending = false;
+								selectedPrinter = null;
+							};
+						}}
+					>
+						<input
+							type="hidden"
+							name="printerPath"
+							value={JSON.stringify({ path: selectedPrinterPath })}
+						/>
+						<button
+							class="button md orange w-full"
+							type="submit"
+							disabled={!selectedPrinterPurchaseable ||
+								selectedPrinterAlreadyPurchased ||
+								!canAffordPrinter}>Buy</button
+						>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -211,8 +282,19 @@
 		<div class="absolute top-0 left-0 z-1 h-full w-full">
 			<div class="relative h-full w-full">
 				{#each printersSingleList as printer}
+					{@const purchaseable = purchaseablePrinters.some(
+						(arr) =>
+							arr.length === printer.path.length &&
+							arr.every((value, index) => value === printer.path[index])
+					)}
+					{@const current = arraysEqual(data.user.printer.path, printer.path)}
 					<button
-						class="absolute -translate-1/2 cursor-pointer rounded-xl border-3 border-primary-700 bg-primary-900 text-nowrap opacity-85 transition-opacity hover:opacity-100"
+						class="absolute -translate-1/2 cursor-pointer rounded-xl border-3 border-primary-700 bg-primary-900 text-nowrap transition-opacity hover:opacity-100"
+						class:outline-primary-500={purchaseable || current}
+						class:opacity-90={purchaseable}
+						class:outline-3={purchaseable}
+						class:outline-4={current}
+						class:opacity-95={current}
 						style={`
 							left: ${printer.x}%;
 							top: ${printer.y}%;
@@ -225,6 +307,7 @@
 						}}
 						onpointerdown={(e) => {
 							e.stopPropagation();
+							console.log(purchaseablePrinters, printer.path);
 						}}
 					>
 						{printer.name}
