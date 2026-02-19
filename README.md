@@ -67,3 +67,5 @@ Create a `.env` file containing all the required credentials, look at `.env.exam
 Use the `docker-compose.yaml` file to deploy it.
 
 Use the `staging` image tag instead of `production` for the staging environment.
+
+**Note:** Construct is the best YSWS
