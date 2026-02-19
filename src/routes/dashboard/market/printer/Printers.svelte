@@ -166,7 +166,7 @@
 				<p>
 					{selectedPrinter?.description}
 				</p>
-				<div class="flex flex-row justify-center gap-1 align-middle text-primary-500">
+				<div class="mt-0.5 flex flex-row justify-center gap-1 align-middle text-primary-500">
 					<CircleDollarSign size={22} />
 					<p class="font-semibold">
 						{#if selectedPrinter?.isBasePrinter}
@@ -183,6 +183,12 @@
 						{/if}
 					</p>
 				</div>
+				<p class="mt-0.5 text-xs opacity-50">
+					Ships to your primary address on <a
+						href="https://auth.hackclub.com/addresses"
+						class="underline transition-colors hover:text-amber-500">Hack Club Auth</a
+					>
+				</p>
 
 				<div class="mt-2 flex flex-row gap-3">
 					<button class="button md primary flex-1" onclick={() => (selectedPrinter = null)}>
