@@ -93,3 +93,9 @@ export function getProjectLinkType(
 	if (editorFileType === 'upload' && uploadedFileUrl?.endsWith('.slvs')) return 'solvespace';
 	return 'unknown';
 }
+
+export function arraysEqual(a: unknown[], b: unknown[]) {
+  if (a.length !== b.length) return false;
+  return a.every((value: unknown, index: number) => value === b[index]);
+}
+

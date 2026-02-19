@@ -6,7 +6,8 @@ import {
 	boolean,
 	serial,
 	timestamp,
-	real
+	real,
+	json
 } from 'drizzle-orm/pg-core';
 
 export const hackatimeTrustEnum = pgEnum('hackatime_trust', ['green', 'blue', 'yellow', 'red']);
@@ -30,7 +31,7 @@ export const user = pgTable('user', {
 	shopScore: real().notNull().default(0),
 
 	hasBasePrinter: boolean().notNull().default(false),
-	// bricksSpentOnUpgrades: integer().notNull().default(0),
+	printer: json().notNull().$type<{ path: number[] }>().default({ path: [] }),
 
 	hasT1Review: boolean().notNull().default(false), // Has access to t1 review
 	hasT2Review: boolean().notNull().default(false), // Has access to t2 review
@@ -288,43 +289,18 @@ export const marketItemOrder = pgTable('market_item_order', {
 	createdAt: timestamp().notNull().defaultNow()
 });
 
-// export const marketBasePrinter = pgTable('market_base_printer', {
-// 	id: serial().primaryKey(),
-// 	createdBy: integer().references(() => user.id),
+export const printerOrder = pgTable('market_printer_order', {
+	id: serial().primaryKey(),
+	userId: integer()
+		.references(() => user.id)
+		.notNull(),
+	printer: json().notNull().$type<{ path: number[] }>(),
 
-// 	name: text().notNull(),
-// 	description: text().notNull(),
-// 	image: text().notNull(),
+	clayPaid: integer(),
+	bricksPaid: integer(),
 
-// 	minRequiredShopScore: integer().notNull().default(0),
-// 	isPublic: boolean().notNull().default(false),
-
-// 	deleted: boolean().notNull().default(false),
-// 	createdAt: timestamp().notNull().defaultNow(),
-// 	updatedAt: timestamp().notNull().defaultNow()
-// });
-
-// export const marketPrinterUpgrade = pgTable('market_printer_upgrade', {
-// 	id: serial().primaryKey(),
-// 	createdBy: integer().references(() => user.id),
-
-// 	name: text().notNull(),
-// 	description: text().notNull(),
-// 	image: text().notNull(),
-
-// 	minRequiredShopScore: integer().notNull().default(0),
-
-// 	minShopScore: integer().notNull(),
-// 	maxShopScore: integer().notNull(), // Score after which price becomes constant
-// 	maxPrice: integer().notNull(),
-// 	minPrice: integer().notNull(),
-
-// 	isPublic: boolean().notNull().default(false),
-
-// 	deleted: boolean().notNull().default(false),
-// 	createdAt: timestamp().notNull().defaultNow(),
-// 	updatedAt: timestamp().notNull().defaultNow()
-// });
+	timestamp: timestamp().notNull().defaultNow()
+});
 
 // Impersonate audit logs
 export const impersonateAuditLog = pgTable('impersonate_audit_log', {
