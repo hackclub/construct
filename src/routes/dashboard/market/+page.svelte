@@ -42,6 +42,8 @@
 		</div>
 	</div>
 
+	<a href="market/printer" class="button md primary mb-5">Printer market</a>
+
 	<h2 class="mb-2 text-2xl font-bold">Market items</h2>
 
 	<div class="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
