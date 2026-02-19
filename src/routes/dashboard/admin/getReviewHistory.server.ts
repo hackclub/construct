@@ -2,7 +2,7 @@ import { db } from '$lib/server/db';
 import { legionReview, t1Review, t2Review, user } from '$lib/server/db/schema';
 import { eq, asc } from 'drizzle-orm';
 
-export async function getReviewHistory(id: number) {
+export async function getReviewHistory(id: number, includeUser = true) {
 	const t1Reviews = await db
 		.select({
 			user: {
@@ -52,6 +52,14 @@ export async function getReviewHistory(id: number) {
 		.innerJoin(user, eq(user.id, t2Review.userId))
 		.where(eq(t2Review.projectId, id))
 		.orderBy(asc(t2Review.timestamp));
+
+	if (!includeUser) {
+		return {
+			t1Reviews: t1Reviews.map(({ user, ...review }) => review),
+			legionReviews: legionReviews.map(({ user, ...review }) => review),
+			t2Reviews: t2Reviews.map(({ user, ...review }) => review)
+		};
+	}
 
 	return {
 		t1Reviews,
