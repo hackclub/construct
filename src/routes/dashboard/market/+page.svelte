@@ -29,7 +29,7 @@
 		<div class="flex grow flex-col">
 			<div class="animate-pulse">
 				<h2 class="text-2xl font-bold text-primary-400">
-					Fire your clay into bricks with Ovenpheus today!!1!
+					Fire your clay into bricks with Ovenpheus today!!!!
 				</h2>
 				<p class="text-lg text-primary-200">Get your yummy yummy bricks here!</p>
 			</div>
