@@ -213,10 +213,20 @@ export const actions = {
 		// Remove Exif metadata and save (we don't want another Hack Club classic PII leak :D)
 		const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
 
+		let imageBody: Buffer;
+		try {
+			imageBody = imageFile.type === 'image/gif' ? imageBuffer : await sharp(imageBuffer).toBuffer();
+		} catch {
+			return fail(400, {
+				fields: { description, timeSpent },
+				invalid_image_file: true
+			});
+		}
+
 		const imageCommand = new PutObjectCommand({
 			Bucket: env.S3_BUCKET_NAME,
 			Key: imagePath,
-			Body: await sharp(imageBuffer).toBuffer()
+			Body: imageBody
 		});
 		await S3.send(imageCommand);
 
