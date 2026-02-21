@@ -11,12 +11,20 @@
 	import Head from '$lib/components/Head.svelte';
 	import ProjectLinks from '$lib/components/ProjectLinks.svelte';
 	import Spinny3DPreview from '$lib/components/Spinny3DPreview.svelte';
+	import ReviewHistory from '../../admin/ReviewHistory.svelte';
 
 	const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
 	let { data, form }: PageProps = $props();
 	let sortDropdownValue = $state('descending');
 	let sortDevlogsAscending = $derived.by(() => sortDropdownValue == 'ascending');
+	let showReviewHistory = $state(false);
+	let hasReviews = $derived(
+		!!data.reviews &&
+			(data.reviews.t1Reviews.length > 0 ||
+				data.reviews.legionReviews.length > 0 ||
+				data.reviews.t2Reviews.length > 0)
+	);
 
 	let editable = $derived(data.project.status == 'building' || data.project.status == 'rejected');
 
@@ -106,7 +114,15 @@
 			</abbr>
 			∙ {Math.floor(data.project.timeSpent / 60)}h {data.project.timeSpent % 60}min
 		</p>
-		<p class="mt-0.5">Status: {projectStatuses[data.project.status]}</p>
+		<p class="mt-0.5">
+			Status: {projectStatuses[data.project.status]}
+			{#if data.project.userId === data.user.id && hasReviews}
+				∙
+				<button class="text-sm underline" onclick={() => (showReviewHistory = true)}
+					>Show reviews</button
+				>
+			{/if}
+		</p>
 
 		<div class="my-2">
 			<ProjectLinks
@@ -164,6 +180,40 @@
 		</div>
 	{/if}
 </div>
+
+{#if showReviewHistory && data.project.userId === data.user.id && hasReviews && data.reviews}
+	<div
+		class="fixed inset-0 z-1000 flex items-center justify-center bg-black/70 p-4"
+		role="dialog"
+		aria-modal="true"
+		tabindex="0"
+		onclick={(e) => {
+			if (e.target === e.currentTarget) {
+				showReviewHistory = false;
+			}
+		}}
+		onkeydown={(e) => e.key === 'Escape' && (showReviewHistory = false)}
+	>
+		<div
+			class="relative max-h-[95vh] w-full max-w-5xl overflow-y-auto rounded-lg border-3 border-primary-900 bg-primary-950 p-8 shadow-2xl"
+			role="document"
+			tabindex="-1"
+		>
+			<button
+				class="button md primary absolute top-4 right-4 z-10"
+				onclick={() => (showReviewHistory = false)}
+				aria-label="Close dialog"
+			>
+				Close
+			</button>
+
+			<div class="mt-8">
+				<h2 class="mb-4 text-2xl font-bold">Review and print history</h2>
+				<ReviewHistory reviews={data.reviews} showReviewer={false} />
+			</div>
+		</div>
+	</div>
+{/if}
 
 {#if data.project.userId === data.user.id}
 	<h3 class="mt-1 mb-1 text-xl font-semibold">Add entry</h3>
