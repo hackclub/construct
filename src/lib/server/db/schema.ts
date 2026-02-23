@@ -247,6 +247,8 @@ export const marketItem = pgTable('market_item', {
 	maxPrice: integer().notNull(),
 	minPrice: integer().notNull(),
 
+	allocatedPriceUsd: real().notNull().default(0),
+
 	isPublic: boolean().notNull().default(false),
 
 	deleted: boolean().notNull().default(false),

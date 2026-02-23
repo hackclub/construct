@@ -26,6 +26,7 @@ export const actions: Actions = {
 		const maxShopScore = parseInt(formData.get('maxShopScore')?.toString() || '0');
 		const minPrice = parseInt(formData.get('minPrice')?.toString() || '0');
 		const maxPrice = parseInt(formData.get('maxPrice')?.toString() || '0');
+		const allocatedPriceUsd = parseFloat(formData.get('allocatedPriceUsd')?.toString() || '0');
 		const isPublic = formData.get('isPublic') === 'on';
 
 		// Don't need to implement proper validation, page is admins only
@@ -44,6 +45,10 @@ export const actions: Actions = {
 			});
 		}
 
+		if (!Number.isFinite(allocatedPriceUsd) || allocatedPriceUsd < 0) {
+			throw error(400, { message: 'Allocated price must be a non-negative number' });
+		}
+
 		await db.insert(marketItem).values({
 			createdBy: locals.user.id,
 			name,
@@ -54,6 +59,7 @@ export const actions: Actions = {
 			maxShopScore,
 			minPrice,
 			maxPrice,
+			allocatedPriceUsd,
 			isPublic
 		});
 

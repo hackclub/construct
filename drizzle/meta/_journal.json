@@ -218,6 +218,13 @@
       "when": 1771515055910,
       "tag": "0030_sweet_jamie_braddock",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1771878637288,
+      "tag": "0031_jittery_squadron_sinister",
+      "breakpoints": true
     }
   ]
 }
