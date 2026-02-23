@@ -35,7 +35,8 @@ export async function load({ locals, params }) {
 				id: marketItem.id,
 				name: marketItem.name,
 				description: marketItem.description,
-				image: marketItem.image
+				image: marketItem.image,
+				allocatedPriceUsd: marketItem.allocatedPriceUsd
 			},
 			user: {
 				id: user.id,
@@ -56,12 +57,14 @@ export async function load({ locals, params }) {
 	}
 
 	let address = null;
+	let userEmail: string | null = null;
 	let userDataError = false;
 
 	if (orderData.user?.idvToken) {
 		try {
 			const token = decrypt(orderData.user.idvToken);
 			const userData = await getUserData(token);
+			userEmail = userData?.primary_email ?? null;
 			address = userData?.addresses?.find(
 				(a: { id: string }) => a.id === orderData.order.addressId
 			);
@@ -75,6 +78,7 @@ export async function load({ locals, params }) {
 	return {
 		orderData,
 		address,
+		userEmail,
 		userDataError,
 		s3PublicUrl: env.S3_PUBLIC_URL
 	};

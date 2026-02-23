@@ -47,11 +47,18 @@
 						>
 					</p>
 				{/if}
+				{#if data.userEmail}
+					<p>Email: {data.userEmail}</p>
+				{/if}
 			</div>
 
 			<div>
 				<h3 class="text-lg font-bold">Payment</h3>
 				<p>Bricks paid: {data.orderData.order.bricksPaid}</p>
+				{#if data.orderData.marketItem?.allocatedPriceUsd !== null &&
+					data.orderData.marketItem?.allocatedPriceUsd !== undefined}
+					<p>Allocated price: ${data.orderData.marketItem.allocatedPriceUsd.toFixed(2)} USD</p>
+				{/if}
 			</div>
 
 			<div>
