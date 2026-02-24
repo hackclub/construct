@@ -22,7 +22,7 @@
 		<span class="opacity-50">(allows you to get stuff for cheaper and unlock more items!)</span>
 	</p>
 
-	<div class="themed-box mb-5 flex flex-row gap-5 p-3">
+	<!-- <div class="themed-box mb-5 flex flex-row gap-5 p-3">
 		<div class="w-80">
 			<img src={ovenpheus} alt="ovenpheus" class="rounded-lg border-20 border-white" />
 		</div>
@@ -50,5 +50,8 @@
 		{#each data.marketItems as item (item.id)}
 			<MarketItem {item} userShopScore={data.user.shopScore} userBricks={data.user.brick} />
 		{/each}
+	</div> -->
+	<div class="themed-box p-3">
+		The market is currently under maintenance! Please come back later.
 	</div>
 {/if}
