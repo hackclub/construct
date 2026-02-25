@@ -5,7 +5,8 @@
 	let formData = $state({
 		minRequiredShopScore: '0',
 		minShopScore: '0',
-		maxPrice: '0'
+		maxPrice: '0',
+		allocatedPriceUsd: '0'
 	});
 
 	let formPending = $state(false);
@@ -124,6 +125,23 @@
 					</label>
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<div class="flex flex-col gap-1">
+		<p class="flex flex-col gap-1">Allocated price (USD)</p>
+		<div class="themed-box p-3">
+			<label class="flex flex-col gap-1">
+				<input
+					type="number"
+					name="allocatedPriceUsd"
+					min="0"
+					step="0.01"
+					required
+					bind:value={formData.allocatedPriceUsd}
+					class="themed-input-on-box w-full"
+				/>
+			</label>
 		</div>
 	</div>
 

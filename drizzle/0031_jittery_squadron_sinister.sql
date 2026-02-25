@@ -1,0 +1,1 @@
+ALTER TABLE "market_item" ADD COLUMN "allocatedPriceUsd" real DEFAULT 0 NOT NULL;
