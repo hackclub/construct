@@ -15,6 +15,8 @@
 	let logoutPending = $state(false);
 	let fetchPIIPending = $state(false);
 	let changeTrustPending = $state(false);
+
+	let reason = $state('');
 </script>
 
 <Head title={'User: ' + user.name} />
@@ -150,6 +152,7 @@
 						return async ({ update }) => {
 							await update({ reset: false });
 							currencyPending = false;
+							reason = '';
 						};
 					}}
 				>
@@ -162,7 +165,7 @@
 								value={form?.currency?.fields.clay ?? user.clay}
 								class="themed-input-on-box"
 								placeholder="Clay"
-								step="0.1"
+								step="0.01"
 								required
 							/>
 						</label>
@@ -174,7 +177,7 @@
 								value={form?.currency?.fields.brick ?? user.brick}
 								class="themed-input-on-box"
 								placeholder="Brick"
-								step="0.1"
+								step="0.01"
 								required
 							/>
 						</label>
@@ -186,11 +189,21 @@
 								value={form?.currency?.fields.shopScore ?? user.shopScore}
 								class="themed-input-on-box"
 								placeholder="Market score"
-								step="0.1"
+								step="0.01"
 								required
 							/>
 						</label>
 					</div>
+					<label class="mt-2 flex flex-col gap-1">
+						<span class="text-sm font-medium">Reason for change</span>
+						<textarea
+							name="reason"
+							class="themed-input-on-box"
+							placeholder="they bribed me"
+							required
+							bind:value={reason}
+						></textarea>
+					</label>
 					{#if form?.currency?.invalidFields}
 						<p class="w-full text-center text-sm">Invalid fields</p>
 					{/if}

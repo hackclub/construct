@@ -218,6 +218,13 @@
       "when": 1771515055910,
       "tag": "0030_sweet_jamie_braddock",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1772134802215,
+      "tag": "0031_slow_power_pack",
+      "breakpoints": true
     }
   ]
 }
