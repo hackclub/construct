@@ -314,6 +314,28 @@ export const impersonateAuditLog = pgTable('impersonate_audit_log', {
 	timestamp: timestamp().notNull().defaultNow()
 });
 
+// Currency audit logs
+export const currencyAuditLog = pgTable('currency_audit_log', {
+	id: serial().primaryKey(),
+	adminUserId: integer()
+		.notNull()
+		.references(() => user.id), // Admin who performed the impersonation
+	targetUserId: integer()
+		.notNull()
+		.references(() => user.id), // User whose balance was impacted
+	reason: text().notNull(),
+
+	oldClay: real().notNull(),
+	oldBrick: real().notNull(),
+	oldShopScore: real().notNull(),
+	
+	newClay: real().notNull(),
+	newBrick: real().notNull(),
+	newShopScore: real().notNull(),
+
+	timestamp: timestamp().notNull().defaultNow()
+});
+
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type Project = typeof project.$inferSelect;

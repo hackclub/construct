@@ -1,5 +1,11 @@
 import { db } from '$lib/server/db/index.js';
-import { user, devlog, session, impersonateAuditLog } from '$lib/server/db/schema.js';
+import {
+	user,
+	devlog,
+	session,
+	impersonateAuditLog,
+	currencyAuditLog
+} from '$lib/server/db/schema.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { and, eq, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
@@ -95,6 +101,7 @@ export const actions = {
 		const clay = data.get('clay');
 		const brick = data.get('brick');
 		const shopScore = data.get('market_score');
+		const reason = data.get('reason')?.toString();
 
 		if (
 			!clay ||
@@ -112,6 +119,16 @@ export const actions = {
 			});
 		}
 
+		if (reason === null || reason === undefined || reason.length <= 0) {
+			throw error(400, { message: 'invalid reason' });
+		}
+
+		const [queriedUser] = await db.select().from(user).where(eq(user.id, id));
+
+		if (!queriedUser) {
+			throw error(404, { message: 'user not found' });
+		}
+
 		await db
 			.update(user)
 			.set({
@@ -121,14 +138,22 @@ export const actions = {
 			})
 			.where(eq(user.id, id));
 
-		const [queriedUser] = await db.select().from(user).where(eq(user.id, id));
+		await db.insert(currencyAuditLog).values({
+			adminUserId: locals.user.id,
+			targetUserId: id,
+			oldClay: queriedUser.clay,
+			oldBrick: queriedUser.brick,
+			oldShopScore: queriedUser.shopScore,
+			newClay: parseFloat(clay.toString()),
+			newBrick: parseFloat(brick.toString()),
+			newShopScore: parseFloat(shopScore.toString()),
+			reason
+		});
 
-		if (!queriedUser) {
-			throw error(404, { message: 'user not found' });
-		}
+		const [queriedUserAfter] = await db.select().from(user).where(eq(user.id, id));
 
 		return {
-			queriedUser
+			queriedUserAfter: queriedUserAfter!
 		};
 	},
 
