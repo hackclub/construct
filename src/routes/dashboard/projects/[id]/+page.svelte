@@ -82,6 +82,20 @@
 			}
 		}
 	}
+
+// local journal draft 
+$effect(()=>{
+    localStorage.setItem(`journalDraft-${data.project.id}`, JSON.stringify({description, timeSpent}))
+  })
+
+$effect.pre(()=>{
+const saved = localStorage.getItem(`journalDraft-${data.project.id}`)
+if(saved){
+  const {description: savedDesc, timeSpent: savedTime} = JSON.parse(saved)
+  description = savedDesc;
+  timeSpent = savedTime;
+}
+})
 </script>
 
 <Head title={data.project.name} />
@@ -180,9 +194,14 @@
 			onpaste={handlePaste}
 			use:enhance={() => {
 				formPending = true;
-				return async ({ update }) => {
+				return async ({ update, result }) => {
 					await update();
-					formPending = false;
+          if(result.data?.success){
+            description='';
+            timeSpent = data.validationConstraints.timeSpent.min;
+            localStorage.removeItem(`journalDraft-${data.project.id}`);
+          }
+          formPending = false;
 				};
 			}}
 		>
