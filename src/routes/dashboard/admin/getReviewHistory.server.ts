@@ -46,6 +46,7 @@ export async function getReviewHistory(id: number) {
 			feedback: t2Review.feedback,
 			image: t2Review.image,
 			shopScoreMultiplier: t2Review.shopScoreMultiplier,
+			shopScore: t2Review.shopScore,
 			timestamp: t2Review.timestamp
 		})
 		.from(t2Review)

@@ -9,19 +9,18 @@
 	import { Download } from '@lucide/svelte';
 	import ReviewHistory from '../../ReviewHistory.svelte';
 	import { calculatePayouts, minutesToClay } from '$lib/currency';
-	import { BASE_SHOP_SCORE_PER_HOUR } from '$lib/defs';
 
 	let { data, form } = $props();
 
 	let formPending = $state(false);
 	let overridePending = $state(false);
 
-	let shopScoreMultiplier = $state(BASE_SHOP_SCORE_PER_HOUR);
+	let shopScore = $state(0);
 	let payouts = $derived.by(() =>
 		calculatePayouts(
 			data.project.timeSpent,
 			data.filamentUsed,
-			shopScoreMultiplier,
+			shopScore,
 			data.user.hasBasePrinter,
 			data.project.project.createdAt
 		)
@@ -166,13 +165,13 @@
 					</label>
 
 					<label class="flex flex-col gap-1">
-						<span class="font-medium">Market score per hour</span>
+						<span class="font-medium">Market score</span>
 						<input
 							type="number"
-							name="shopScoreMultiplier"
-							bind:value={shopScoreMultiplier}
+							name="shopScore"
+							bind:value={shopScore}
 							class="themed-input-on-box"
-							placeholder="Market score per hour"
+							placeholder="Market score"
 							step="0.1"
 							min="0"
 							required
