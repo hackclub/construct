@@ -18,12 +18,6 @@ export function minutesToBricks(minutes: number) {
 	return hours * BRICKS_PER_HOUR;
 }
 
-export function calculateShopScore(minutes: number, multiplier: number) {
-	const hours = minutes / 60;
-
-	return hours * multiplier;
-}
-
 export function calculateMinutes(timeSpent: number, printGrams: number) {
 	return timeSpent - printGrams * PRINT_MINUTES_PER_GRAM;
 }
@@ -43,15 +37,12 @@ export function calculateCurrencyPayout(
 export function calculatePayouts(
 	timeSpent: number,
 	printGrams: number,
-	shopScoreMultiplier: number,
+	shopScore: number,
 	hasBasePrinter: boolean,
 	dateCreated: Date
 ) {
 	const time = calculateMinutes(timeSpent, printGrams);
 	const currency = calculateCurrencyPayout(time, hasBasePrinter, dateCreated);
-	const shopScore =
-		calculateShopScore(timeSpent, shopScoreMultiplier) *
-		(dateCreated.getTime() < BETA_DATE_CUTOFF.getTime() ? BETA_MULTIPLIER : 1);
 
 	return { ...currency, shopScore };
 }

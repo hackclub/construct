@@ -225,6 +225,13 @@
       "when": 1772134802215,
       "tag": "0031_slow_power_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1772981052271,
+      "tag": "0032_eminent_blackheart",
+      "breakpoints": true
     }
   ]
 }

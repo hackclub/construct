@@ -174,7 +174,7 @@ export const actions = {
 		const data = await request.formData();
 		const notes = data.get('notes')?.toString();
 		const feedback = data.get('feedback')?.toString();
-		const shopScoreMultiplier = data.get('shopScoreMultiplier');
+		const shopScore = data.get('shopScore');
 		const imageUrl = data.get('imageUrl');
 
 		const imageUrlString =
@@ -196,14 +196,14 @@ export const actions = {
 		}
 
 		if (
-			!shopScoreMultiplier ||
-			isNaN(parseFloat(shopScoreMultiplier.toString())) ||
-			parseFloat(shopScoreMultiplier.toString()) < 0
+			!shopScore ||
+			isNaN(parseFloat(shopScore.toString())) ||
+			parseFloat(shopScore.toString()) < 0
 		) {
-			return error(400, { message: 'invalid market score multiplier' });
+			return error(400, { message: 'invalid market score' });
 		}
 
-		const parsedShopScoreMultiplier = parseFloat(shopScoreMultiplier.toString());
+		const parsedShopScore = parseFloat(shopScore.toString());
 
 		const status: typeof project.status._.data | undefined = 'finalized';
 		const statusMessage = 'finalised! :woah-dino:';
@@ -318,7 +318,7 @@ export const actions = {
 			notes,
 			image: imageUrlString,
 			feedback,
-			shopScoreMultiplier: parsedShopScoreMultiplier
+			shopScore: parsedShopScore
 		});
 
 		await db
@@ -353,7 +353,7 @@ export const actions = {
 				const payouts = calculatePayouts(
 					queriedProject.timeSpent,
 					await getLatestPrintFilament(id),
-					parsedShopScoreMultiplier,
+					parsedShopScore,
 					queriedProject.user.hasBasePrinter,
 					queriedProject.project.createdAt
 				);

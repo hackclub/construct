@@ -47,7 +47,12 @@
 				<p class="text-sm"><span class="font-bold">Image:</span> {review.image}</p>
 			{/if}
 			<p class="text-sm">
-				<span class="font-bold">Market score per hour:</span> {review.shopScoreMultiplier}
+				<span class="font-bold">Market score/h (deprecated):</span>
+				{review.shopScoreMultiplier}
+			</p>
+			<p class="text-sm">
+				<span class="font-bold">Market score:</span>
+				{review.shopScore}
 			</p>
 			<p class="text-xs">
 				by <a href={`../../users/${review.user.id}`} class="underline">{review.user.name}</a>

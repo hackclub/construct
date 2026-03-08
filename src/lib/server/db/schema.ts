@@ -208,7 +208,8 @@ export const t2Review = pgTable('t2_review', {
 	feedback: text(),
 	image: text(),
 	notes: text(),
-	shopScoreMultiplier: real().notNull().default(25.0),
+	shopScoreMultiplier: real().default(25.0),
+	shopScore: real(),
 
 	timestamp: timestamp().notNull().defaultNow()
 });
