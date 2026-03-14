@@ -35,30 +35,28 @@
 					};
 				}}
 			>
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
 					<!-- User -->
-					<label class="flex flex-col">
-						<span class="mb-1 font-medium">User</span>
-						<div class="flex h-40 flex-col">
-							<input
-								type="text"
-								placeholder="search"
-								bind:value={userSearch}
-								class="themed-input-light border-b-0 py-1.5"
-							/>
-							<select
-								class="themed-input-light grow"
-								name="user"
-								value={form?.fields.user ?? []}
-								multiple
-							>
-								{#each filteredUsers as user (user?.id)}
-									<option value={user?.id} class="truncate">{user?.name}</option>
-								{/each}
-							</select>
-						</div>
-					</label>
-				</div>
+				<label class="flex flex-col">
+					<span class="mb-1 font-medium">User</span>
+					<div class="flex h-40 flex-col">
+						<input
+							type="text"
+							placeholder="search"
+							bind:value={userSearch}
+							class="themed-input-light border-b-0 py-1.5"
+						/>
+						<select
+							class="themed-input-light grow"
+							name="user"
+							value={form?.fields.user ?? []}
+							multiple
+						>
+							{#each filteredUsers as user (user?.id)}
+								<option value={user?.id} class="truncate">{user?.name}</option>
+							{/each}
+						</select>
+					</div>
+				</label>
 				<button type="submit" class="button md primary mt-3 w-full" disabled={formPending}
 					>Apply!</button
 				>
