@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Head from '$lib/components/Head.svelte';
-	import { ChartLine, Mail, Package2, ScrollText, Store, Users } from '@lucide/svelte';
+	import { ChartLine, Mail, Package2, Printer, ScrollText, Store, Users } from '@lucide/svelte';
 
 	let { data } = $props();
 </script>
@@ -64,6 +64,15 @@
 				<ScrollText size={40} />
 			</div>
 			<p class="text-2xl font-bold">Impersonate logs</p>
+		</a>
+		<a
+			class="themed-box flex flex-col items-center justify-center gap-2 p-3 shadow-xl transition-transform hover:scale-105"
+			href="admin/printer-purchases"
+		>
+			<div>
+				<Printer size={40} />
+			</div>
+			<p class="text-2xl font-bold">Printer purchases</p>
 		</a>
 	</div>
 </div>
