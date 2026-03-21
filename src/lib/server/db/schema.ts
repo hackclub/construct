@@ -226,6 +226,8 @@ export const devlog = pgTable('devlog', {
 	image: text().notNull(),
 	model: text().notNull(),
 
+	lapseId: text(), // Optional Lapse ID
+
 	deleted: boolean().notNull().default(false), // Works the same as project deletion
 	createdAt: timestamp().notNull().defaultNow(),
 	updatedAt: timestamp().notNull().defaultNow()

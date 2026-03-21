@@ -232,6 +232,13 @@
       "when": 1772981052271,
       "tag": "0032_eminent_blackheart",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1774099217981,
+      "tag": "0033_remarkable_zombie",
+      "breakpoints": true
     }
   ]
 }
