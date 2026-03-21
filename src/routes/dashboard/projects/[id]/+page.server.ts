@@ -20,6 +20,7 @@ import {
 import { S3 } from '$lib/server/s3';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { env } from '$env/dynamic/private';
+import { getReviewHistory } from '../../admin/getReviewHistory.server';
 
 export async function load({ params, locals }) {
 	const id: number = parseInt(params.id);
@@ -62,6 +63,9 @@ export async function load({ params, locals }) {
 		.where(and(eq(devlog.projectId, queriedProject.project.id), eq(devlog.deleted, false)))
 		.orderBy(desc(devlog.createdAt));
 
+	const reviews =
+		queriedProject.project.userId === locals.user?.id ? await getReviewHistory(id, false) : null;
+
 	return {
 		project: {
 			id: queriedProject.project.id,
@@ -91,6 +95,7 @@ export async function load({ params, locals }) {
 				createdAt: devlog.createdAt
 			};
 		}),
+		reviews,
 		validationConstraints: {
 			timeSpent: {
 				min: DEVLOG_MIN_TIME,
