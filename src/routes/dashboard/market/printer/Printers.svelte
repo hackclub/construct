@@ -7,7 +7,7 @@
 		printersSingleList,
 		type Printer
 	} from '$lib/printers';
-	import { CircleDollarSign } from '@lucide/svelte';
+	import { CircleDollarSign, Lock } from '@lucide/svelte';
 	import { BASE_PRINTER_CLAY } from '$lib/defs';
 	import { arraysEqual, calculateMarketPrice } from '$lib/utils';
 	import { enhance } from '$app/forms';
@@ -185,6 +185,30 @@
 		class:pointer-events-none={selectedPrinter == null}
 		onclick={() => (selectedPrinter = null)}
 	></div>
+
+	<div
+		class="absolute flex h-full w-full flex-col justify-center z-3 cursor-not-allowed bg-primary-950/60"
+		class:hidden={data.user.printerFulfilment === 'none'}
+	>
+		<div class="flex flex-row justify-center">
+			<div
+				class="z-3 flex max-w-120 min-w-80 flex-col rounded-lg bg-primary-950 p-3 text-center outline-3 outline-primary-800 select-auto cursor-default"
+			>
+				<h2 class="text-xl font-semibold">
+					{selectedPrinter?.longName}
+				</h2>
+				<p>
+					{selectedPrinter?.description}
+				</p>
+				<div class="mt-0.5 flex flex-row justify-center gap-1.5 align-middle text-primary-500">
+					<Lock size={22} />
+					<p class="font-semibold">
+						In fulfilment queue, printer market locked
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<div
 		class="pointer-events-none absolute flex h-full w-full flex-col justify-center"

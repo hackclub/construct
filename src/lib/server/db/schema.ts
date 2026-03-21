@@ -14,6 +14,13 @@ export const hackatimeTrustEnum = pgEnum('hackatime_trust', ['green', 'blue', 'y
 export const trustEnum = pgEnum('trust', ['green', 'blue', 'yellow', 'red']);
 export const clubRoleEnum = pgEnum('club_role', ['leader', 'member']);
 
+export const printerFulfilmentStatus = pgEnum('printer_fulfilment_status', [
+	'none',
+	'queued',
+	'approved',
+	'fulfilled'
+]);
+
 export const user = pgTable('user', {
 	id: serial().primaryKey(), // User ID
 	idvId: text().notNull().unique(), // IDV ID
@@ -32,6 +39,7 @@ export const user = pgTable('user', {
 
 	hasBasePrinter: boolean().notNull().default(false),
 	printer: json().notNull().$type<{ path: number[] }>().default({ path: [] }),
+	printerFulfilment: printerFulfilmentStatus().notNull().default('none'),
 
 	hasT1Review: boolean().notNull().default(false), // Has access to t1 review
 	hasT2Review: boolean().notNull().default(false), // Has access to t2 review
@@ -226,6 +234,8 @@ export const devlog = pgTable('devlog', {
 	image: text().notNull(),
 	model: text().notNull(),
 
+	lapseId: text(), // Optional Lapse ID
+
 	deleted: boolean().notNull().default(false), // Works the same as project deletion
 	createdAt: timestamp().notNull().defaultNow(),
 	updatedAt: timestamp().notNull().defaultNow()
@@ -329,7 +339,7 @@ export const currencyAuditLog = pgTable('currency_audit_log', {
 	oldClay: real().notNull(),
 	oldBrick: real().notNull(),
 	oldShopScore: real().notNull(),
-	
+
 	newClay: real().notNull(),
 	newBrick: real().notNull(),
 	newShopScore: real().notNull(),

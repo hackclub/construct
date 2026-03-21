@@ -31,7 +31,7 @@ export async function getUserData(token: string) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const data: string | any[] = [];
 
-const failed: number[] = [];
+const failed: number[][] = [];
 
 console.log(
 	'First name,Last name,Address Line 1,Address Line 2,City,State,Postcode,Country,Email,Rubber Stamps'
@@ -45,10 +45,10 @@ for (let i = 0; i < data.length; i++) {
 		const address = addresses?.find((address: { primary: boolean }) => address.primary);
 
 		console.log(
-			`${address.first_name},${address.last_name},${address.line_1},${address.line_2},${address.city},${address.state},${address.postal_code},${address.country},${primary_email},#${data[i][0]}`
+			`"${address.first_name ?? ''}","${address.last_name ?? ''}","${address.line_1 ?? ''}","${address.line_2 ?? ''}","${address.city ?? ''}","${address.state ?? ''}","${address.postal_code ?? ''}","${address.country ?? ''}","${primary_email ?? ''}",#${data[i][0]}`
 		);
 	} catch {
-		failed.push(data[i][0]);
+		failed.push([data[i][0],data[i][1]]);
 	}
 }
 

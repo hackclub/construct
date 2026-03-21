@@ -1,0 +1,2 @@
+CREATE TYPE "public"."printer_fulfilment_status" AS ENUM('none', 'queued', 'approved', 'fulfilled');--> statement-breakpoint
+ALTER TABLE "user" ADD COLUMN "printerFulfilment" "printer_fulfilment_status" DEFAULT 'none' NOT NULL;

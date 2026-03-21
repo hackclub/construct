@@ -30,6 +30,10 @@ export const actions = {
 			throw error(500);
 		}
 
+		if (locals.user.printerFulfilment !== 'none') {
+			throw error(400, { message: 'already in fulfilment queue or fulfilled' });
+		}
+
 		const data = await request.formData();
 		const unparsedPath = data.get('printerPath')?.toString();
 		const { path: printerPath }: { path: number[] | undefined } =

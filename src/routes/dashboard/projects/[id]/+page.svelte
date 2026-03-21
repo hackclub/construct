@@ -322,7 +322,7 @@
 	{#if data.devlogs.length == 0}
 		<div>
 			No journal entries yet <img
-				src="https://emoji.slack-edge.com/T0266FRGM/heavysob/55bf09f6c9d93d08.png"
+				src="https://cdn.hackclub.com/019d1090-6521-7123-9834-65baa89d29d0/image.png"
 				alt="heavysob"
 				class="inline h-5.5"
 			/>

@@ -1,0 +1,1 @@
+ALTER TABLE "devlog" ADD COLUMN "lapseId" text;

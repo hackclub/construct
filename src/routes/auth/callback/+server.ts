@@ -57,8 +57,8 @@ export async function GET(event) {
 
 	if (
 		!ysws_eligible &&
-		(!env.LOGIN_IDV_BYPASS_SLACK_IDS ||
-			!env.LOGIN_IDV_BYPASS_SLACK_IDS.split(',').includes(slack_id))
+		!(env.LOGIN_IDV_BYPASS_SLACK_IDS &&
+			env.LOGIN_IDV_BYPASS_SLACK_IDS.split(',').includes(slack_id))
 	) {
 		return redirect(302, '/auth/ineligible');
 	}

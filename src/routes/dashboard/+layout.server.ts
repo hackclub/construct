@@ -20,7 +20,8 @@ export function load({ locals }) {
 			hasT2Review: locals.user.hasT2Review,
 			hasAdmin: locals.user.hasAdmin,
 			hasBasePrinter: locals.user.hasBasePrinter,
-			printer: locals.user.printer
+			printer: locals.user.printer,
+			printerFulfilment: locals.user.printerFulfilment
 		},
 		s3PublicUrl: env.S3_PUBLIC_URL
 	};
