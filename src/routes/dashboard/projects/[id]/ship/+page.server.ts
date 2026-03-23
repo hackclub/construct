@@ -247,9 +247,9 @@ export const actions = {
             return error(404, { message: 'project not found' });
         }
 
-        // Make sure it has at least 2h
-        if (queriedProject.timeSpent < 120) {
-            return error(400, { message: 'minimum 2h needed to ship' });
+        // Make sure it has at least 1h
+        if (queriedProject.timeSpent < 60) {
+            return error(400, { message: 'minimum 1h needed to ship' });
         }
 
         // Make sure it has at least 2 devlogs

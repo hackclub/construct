@@ -203,8 +203,8 @@
 
 	<div class="mt-3">
 		<h2 class="mb-1 text-xl font-bold">Requirements</h2>
-		<ChecklistItem completed={data.project.timeSpent >= 120}
-			>At least 120 minutes spent</ChecklistItem
+		<ChecklistItem completed={data.project.timeSpent >= 60}
+			>At least 60 minutes spent</ChecklistItem
 		>
 		<ChecklistItem completed={data.project.devlogCount >= 2}>At least 2 journal logs</ChecklistItem>
 		<ChecklistItem completed={data.project.description != ''}>
@@ -226,7 +226,7 @@
 		</p>
 	</div>
 	<div class="mb-1">
-		{#if data.project.timeSpent >= 120 && data.project.description != '' && data.project.url != ''}
+		{#if data.project.timeSpent >= 60 && data.project.description != '' && data.project.url != ''}
 			<p class="text-primary-300">
 				Are you sure you want to ship "{data.project.name}"?
 				<span class="font-bold">You won't be able to edit it or journal again</span> unless it gets rejected.
@@ -241,7 +241,7 @@
 			type="submit"
 			class="button sm orange"
 			disabled={formPending ||
-				data.project.timeSpent < 120 ||
+				data.project.timeSpent < 60 ||
 				data.project.devlogCount < 2 ||
 				data.project.description == '' ||
 				!printablesUrl ||
@@ -254,7 +254,7 @@
 	</div>
 </form>
 
-{#if data.project.timeSpent >= 120}
+{#if data.project.timeSpent >= 60}
 	<div class="mt-3 mb-5">
 		<h2 class="mb-2 text-xl font-bold">{submitAsClub ? 'Filament usage' : 'Estimate payout'}</h2>
 		<div class="themed-box p-3">
