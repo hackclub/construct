@@ -31,7 +31,7 @@
 		<div class="flex-1">
 			<h3 class="mb-1 text-lg font-semibold">Project requirements</h3>
 			<ul class="list-inside list-disc text-sm">
-				<li>You should spend at least 2 hours on each individual project.</li>
+				<li>You should spend at least 1 hour on each individual project.</li>
 				<li>
 					You should use one of our <a href="/approved-editors" class="underline">approved editors</a>.
 				</li>
