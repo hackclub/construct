@@ -14,8 +14,8 @@ export const BASE_SHOP_SCORE_PER_HOUR = 25.0;
 export const PRINT_PAYOUT_CENTS_PER_GRAM = 2.0;
 export const PRINT_MINUTES_PER_GRAM = 0.24;
 
-export const T1_PAYOUT_BRICKS = 0.75;
-export const T2_PAYOUT_BRICKS = 1.0;
+export const T1_PAYOUT_CLAY = 0.075;
+export const T2_PAYOUT_CLAY = 0.1;
 
 export const BETA_DATE_CUTOFF = new Date('2025-12-16');
 export const BETA_MULTIPLIER = 1.5;

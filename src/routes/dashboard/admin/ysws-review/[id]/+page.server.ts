@@ -12,7 +12,7 @@ import { getReviewHistory } from '../../getReviewHistory.server';
 import { calculatePayouts } from '$lib/currency';
 import { isValidUrl } from '$lib/utils';
 import { sanitizeUrl } from '@braintree/sanitize-url';
-import { T2_PAYOUT_BRICKS } from '$lib/defs';
+import { T2_PAYOUT_CLAY } from '$lib/defs';
 
 export async function load({ locals, params }) {
 	if (!locals.user) {
@@ -330,11 +330,11 @@ export const actions = {
 			.where(eq(project.id, id));
 
 		if (queriedProject.project.status === 'printed') {
-			// Bricks payout for reviewer
+			// Clay payout for reviewer
 			await db
 				.update(user)
 				.set({
-					brick: locals.user.brick + T2_PAYOUT_BRICKS
+					clay: locals.user.clay + T2_PAYOUT_CLAY
 				})
 				.where(eq(user.id, locals.user.id));
 		}
