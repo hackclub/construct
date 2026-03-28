@@ -35,7 +35,7 @@
 
 			<div class="flex flex-row flex-wrap gap-3">
 				<a href={`/dashboard/users/${user.id}`} class="button md primary">Public profile</a>
-				<a href={`../../users/${user.id}`} class="button md primary">Admin profile</a>
+				<a href={`../users/${user.id}`} class="button md primary">Admin profile</a>
 			</div>
 
 			<h2 class="mt-2 text-2xl font-bold">User details</h2>
