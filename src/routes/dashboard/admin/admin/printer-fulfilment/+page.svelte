@@ -17,7 +17,7 @@
 		fulfilled: 'Fulfilled'
 	};
 
-	let formPending = $derived(navigating !== null);
+	let formPending = $derived(navigating.to !== null);
 </script>
 
 <Head title="Printer fulfilment" />

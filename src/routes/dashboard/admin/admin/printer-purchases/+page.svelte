@@ -14,7 +14,7 @@
 		data.users.filter((user) => user.name.toLowerCase().includes(userSearch.toLowerCase()))
 	);
 
-	let formPending = $derived(navigating !== null);
+	let formPending = $derived(navigating.to !== null);
 </script>
 
 <Head title="Printer purchases" />
