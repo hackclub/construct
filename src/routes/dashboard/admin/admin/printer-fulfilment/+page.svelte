@@ -1,15 +1,13 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
+	import { navigating } from '$app/state';
 
-	let { data, form } = $props();
+	let { data } = $props();
 
 	let userSearch = $state('');
 
-	let users = $derived(form?.users ?? data.users);
-
 	let filteredUsers = $derived(
-		users.filter((user) => user.name.toLowerCase().includes(userSearch.toLowerCase()))
+		data.users.filter((user) => user.name.toLowerCase().includes(userSearch.toLowerCase()))
 	);
 
 	const fulfilmentStatusLabels: Record<string, string> = {
@@ -19,7 +17,7 @@
 		fulfilled: 'Fulfilled'
 	};
 
-	let formPending = $state(false);
+	let formPending = $derived(navigating.to !== null);
 </script>
 
 <Head title="Printer fulfilment" />
@@ -30,22 +28,13 @@
 	<div class="flex flex-col-reverse gap-5 lg:flex-row">
 		<div class="themed-box grow p-3">
 			<h2 class="mb-2 text-xl font-bold">Filter</h2>
-			<form
-				method="POST"
-				use:enhance={() => {
-					formPending = true;
-					return async ({ update }) => {
-						await update();
-						formPending = false;
-					};
-				}}
-			>
+			<form method="GET">
 				<label class="flex flex-col gap-1">
 					<span class="font-medium">Status</span>
 					<select
 						class="h-40 grow border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 placeholder:text-primary-900 active:ring-3"
 						name="status"
-						value={form?.fields.status ?? ['queued']}
+						value={data.fields.status}
 						multiple
 					>
 						{#each data.fulfilmentStatuses as status (status)}

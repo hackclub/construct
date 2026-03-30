@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
 	import { getPrinterFromPath } from '$lib/printers.js';
 	import relativeDate from 'tiny-relative-date';
+	import { navigating } from '$app/state';
 
-	let { data, form } = $props();
+	let { data } = $props();
 
 	let userSearch = $state('');
 
-	let orders = $derived(form?.orders ?? data.orders);
+	let orders = $derived(data.orders);
 
 	let filteredUsers = $derived(
 		data.users.filter((user) => user.name.toLowerCase().includes(userSearch.toLowerCase()))
 	);
 
-	let formPending = $state(false);
+	let formPending = $derived(navigating.to !== null);
 </script>
 
 <Head title="Printer purchases" />
@@ -25,16 +25,7 @@
 	<div class="flex flex-col-reverse gap-5 lg:flex-row">
 		<div class="themed-box grow p-3">
 			<h2 class="mb-2 text-xl font-bold">Filter & Sort</h2>
-			<form
-				method="POST"
-				use:enhance={() => {
-					formPending = true;
-					return async ({ update }) => {
-						await update();
-						formPending = false;
-					};
-				}}
-			>
+			<form method="GET">
 					<!-- User -->
 				<label class="flex flex-col">
 					<span class="mb-1 font-medium">User</span>
@@ -48,7 +39,7 @@
 						<select
 							class="themed-input-light grow"
 							name="user"
-							value={form?.fields.user ?? []}
+							value={data.fields.user}
 							multiple
 						>
 							{#each filteredUsers as user (user?.id)}

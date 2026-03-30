@@ -2,7 +2,6 @@ import { db } from '$lib/server/db/index.js';
 import { user, printerOrder, printerFulfilmentStatus } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, inArray, sql, asc } from 'drizzle-orm';
-import type { Actions } from './$types';
 
 type FulfilmentStatus = (typeof printerFulfilmentStatus.enumValues)[number];
 
@@ -24,7 +23,7 @@ async function getUsers(statusFilter: FulfilmentStatus[]) {
 		.orderBy(asc(sql`min(${printerOrder.timestamp})`));
 }
 
-export async function load({ locals }) {
+export async function load({ locals, url }) {
 	if (!locals.user) {
 		throw error(500);
 	}
@@ -32,33 +31,18 @@ export async function load({ locals }) {
 		throw error(403, { message: 'oi get out' });
 	}
 
-	const users = await getUsers(['queued']);
+	const hasFilters = url.searchParams.size > 0;
+	const statusFilter = hasFilters
+		? (url.searchParams.getAll('status') as FulfilmentStatus[])
+		: (['queued'] as FulfilmentStatus[]);
+
+	const users = await getUsers(statusFilter);
 
 	return {
 		users,
-		fulfilmentStatuses: printerFulfilmentStatus.enumValues
+		fulfilmentStatuses: printerFulfilmentStatus.enumValues,
+		fields: {
+			status: statusFilter
+		}
 	};
 }
-
-export const actions = {
-	default: async ({ locals, request }) => {
-		if (!locals.user) {
-			throw error(500);
-		}
-		if (!locals.user.hasAdmin) {
-			throw error(403, { message: 'oi get out' });
-		}
-
-		const data = await request.formData();
-		const statusFilter = data.getAll('status') as FulfilmentStatus[];
-
-		const users = await getUsers(statusFilter);
-
-		return {
-			users,
-			fields: {
-				status: statusFilter
-			}
-		};
-	}
-} satisfies Actions;
