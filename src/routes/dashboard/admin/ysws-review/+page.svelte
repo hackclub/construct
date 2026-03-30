@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import Head from '$lib/components/Head.svelte';
 	import { projectStatuses } from '$lib/utils.js';
 	import { ExternalLink } from '@lucide/svelte';
 	import relativeDate from 'tiny-relative-date';
+	import { navigating } from '$app/state';
 
-	let { data, form } = $props();
+	let { data } = $props();
 
 	let projectSearch = $state('');
 	let userSearch = $state('');
 
-	let projects = $derived(form?.projects ?? data.projects);
+	let projects = $derived(data.projects);
 
 	let filteredProjects = $derived(
 		data.allProjects.filter((project) =>
@@ -21,7 +21,7 @@
 		data.users.filter((user) => user.name.toLowerCase().includes(userSearch.toLowerCase()))
 	);
 
-	let formPending = $state(false);
+	let formPending = $derived(navigating.to !== null);
 </script>
 
 <Head title="YSWS Review" />
@@ -32,16 +32,7 @@
 	<div class="flex flex-col-reverse gap-5 lg:flex-row">
 		<div class="themed-box grow p-3">
 			<h2 class="mb-2 text-xl font-bold">Filter & Sort</h2>
-			<form
-				method="POST"
-				use:enhance={() => {
-					formPending = true;
-					return async ({ update }) => {
-						await update();
-						formPending = false;
-					};
-				}}
-			>
+			<form method="GET">
 				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
 					<!-- Project status -->
 					<label class="flex flex-col gap-1">
@@ -49,7 +40,7 @@
 						<select
 							class="h-40 grow border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 placeholder:text-primary-900 active:ring-3"
 							name="status"
-							value={form?.fields.status ?? ['printed']}
+							value={data.fields.status}
 							multiple
 						>
 							{#each Object.entries(projectStatuses) as [status, longStatus]}
@@ -71,7 +62,7 @@
 							<select
 								class="themed-input-light grow"
 								name="project"
-								value={form?.fields.project ?? []}
+								value={data.fields.project}
 								multiple
 							>
 								{#each filteredProjects as project}
@@ -94,7 +85,7 @@
 							<select
 								class="themed-input-light grow"
 								name="user"
-								value={form?.fields.user ?? []}
+								value={data.fields.user}
 								multiple
 							>
 								{#each filteredUsers as user}

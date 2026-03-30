@@ -2,10 +2,9 @@ import { db } from '$lib/server/db/index.js';
 import { project, user, devlog, t1Review } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, and, sql, ne, inArray, desc, gt } from 'drizzle-orm';
-import type { Actions } from './$types';
 import { getProjectLinkType } from '$lib/utils';
 
-export async function load({ locals }) {
+export async function load({ locals, url }) {
 	if (!locals.user) {
 		throw error(500);
 	}
@@ -13,7 +12,21 @@ export async function load({ locals }) {
 		throw error(403, { message: 'oi get out' });
 	}
 
-	const projects = await getProjects(['submitted'], [], [], []);
+	const hasFilters = url.searchParams.size > 0;
+	const statusFilter = hasFilters
+		? (url.searchParams.getAll('status') as (typeof project.status._.data)[])
+		: (['submitted'] as (typeof project.status._.data)[]);
+	const projectFilter = url.searchParams
+		.getAll('project')
+		.map((id) => parseInt(id))
+		.filter((id) => !isNaN(id) && id > 0);
+	const userFilter = url.searchParams
+		.getAll('user')
+		.map((id) => parseInt(id))
+		.filter((id) => !isNaN(id) && id > 0);
+	const typeFilter = url.searchParams.getAll('type');
+
+	const projects = await getProjects(statusFilter, projectFilter, userFilter, typeFilter);
 
 	const allProjects = await db
 		.select({
@@ -55,49 +68,15 @@ export async function load({ locals }) {
 		allProjects,
 		projects,
 		users,
-		leaderboard
+		leaderboard,
+		fields: {
+			status: statusFilter,
+			project: projectFilter,
+			user: userFilter,
+			type: typeFilter
+		}
 	};
 }
-
-export const actions = {
-	default: async ({ locals, request }) => {
-		if (!locals.user) {
-			throw error(500);
-		}
-		if (!locals.user.hasT1Review) {
-			throw error(403, { message: 'oi get out' });
-		}
-
-		const data = await request.formData();
-		const statusFilter = data.getAll('status') as (typeof project.status._.data)[];
-
-		const projectFilter = data.getAll('project').map((projectId) => {
-			const parsedInt = parseInt(projectId.toString());
-			if (!parsedInt) throw error(400, { message: 'malformed project filter' });
-			return parseInt(projectId.toString());
-		});
-
-		const userFilter = data.getAll('user').map((userId) => {
-			const parsedInt = parseInt(userId.toString());
-			if (!parsedInt) throw error(400, { message: 'malformed user filter' });
-			return parseInt(userId.toString());
-		});
-
-		const typeFilter = data.getAll('type') as string[];
-
-		const projects = await getProjects(statusFilter, projectFilter, userFilter, typeFilter);
-
-		return {
-			projects,
-			fields: {
-				status: statusFilter,
-				project: projectFilter,
-				user: userFilter,
-				type: typeFilter
-			}
-		};
-	}
-} satisfies Actions;
 
 async function getProjects(
 	statusFilter: (typeof project.status._.data)[],

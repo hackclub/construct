@@ -2,9 +2,8 @@ import { db } from '$lib/server/db/index.js';
 import { marketItemOrder, marketItem, user } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, and, ne, inArray, desc } from 'drizzle-orm';
-import type { Actions } from './$types';
 
-export async function load({ locals }) {
+export async function load({ locals, url }) {
 	if (!locals.user) {
 		throw error(500);
 	}
@@ -12,7 +11,20 @@ export async function load({ locals }) {
 		throw error(403, { message: 'oi get out' });
 	}
 
-	const orders = await getOrders(['awaiting_approval'], [], []);
+	const hasFilters = url.searchParams.size > 0;
+	const statusFilter = hasFilters
+		? (url.searchParams.getAll('status') as (typeof marketItemOrder.status._.data)[])
+		: (['awaiting_approval'] as (typeof marketItemOrder.status._.data)[]);
+	const marketItemFilter = url.searchParams
+		.getAll('marketItem')
+		.map((id) => parseInt(id))
+		.filter((id) => !isNaN(id) && id > 0);
+	const userFilter = url.searchParams
+		.getAll('user')
+		.map((id) => parseInt(id))
+		.filter((id) => !isNaN(id) && id > 0);
+
+	const orders = await getOrders(statusFilter, marketItemFilter, userFilter);
 
 	const allMarketItems = await db
 		.select({
@@ -33,46 +45,14 @@ export async function load({ locals }) {
 	return {
 		allMarketItems,
 		orders,
-		users
+		users,
+		fields: {
+			status: statusFilter,
+			marketItem: marketItemFilter,
+			user: userFilter
+		}
 	};
 }
-
-export const actions = {
-	default: async ({ locals, request }) => {
-		if (!locals.user) {
-			throw error(500);
-		}
-		if (!locals.user.hasAdmin) {
-			throw error(403, { message: 'oi get out' });
-		}
-
-		const data = await request.formData();
-		const statusFilter = data.getAll('status') as (typeof marketItemOrder.status._.data)[];
-
-		const marketItemFilter = data.getAll('marketItem').map((itemId) => {
-			const parsedInt = parseInt(itemId.toString());
-			if (!parsedInt) throw error(400, { message: 'malformed market item filter' });
-			return parsedInt;
-		});
-
-		const userFilter = data.getAll('user').map((userId) => {
-			const parsedInt = parseInt(userId.toString());
-			if (!parsedInt) throw error(400, { message: 'malformed user filter' });
-			return parsedInt;
-		});
-
-		const orders = await getOrders(statusFilter, marketItemFilter, userFilter);
-
-		return {
-			orders,
-			fields: {
-				status: statusFilter,
-				marketItem: marketItemFilter,
-				user: userFilter
-			}
-		};
-	}
-} satisfies Actions;
 
 async function getOrders(
 	statusFilter: (typeof marketItemOrder.status._.data)[],

@@ -2,9 +2,8 @@ import { db } from '$lib/server/db/index.js';
 import { printerOrder, user } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
 import { eq, inArray, desc } from 'drizzle-orm';
-import type { Actions } from './$types';
 
-export async function load({ locals }) {
+export async function load({ locals, url }) {
 	if (!locals.user) {
 		throw error(500);
 	}
@@ -12,7 +11,12 @@ export async function load({ locals }) {
 		throw error(403, { message: 'oi get out' });
 	}
 
-	const orders = await getOrders([]);
+	const userFilter = url.searchParams
+		.getAll('user')
+		.map((id) => parseInt(id))
+		.filter((id) => !isNaN(id) && id > 0);
+
+	const orders = await getOrders(userFilter);
 
 	const users = await db
 		.select({
@@ -23,37 +27,12 @@ export async function load({ locals }) {
 
 	return {
 		orders,
-		users
+		users,
+		fields: {
+			user: userFilter
+		}
 	};
 }
-
-export const actions = {
-	default: async ({ locals, request }) => {
-		if (!locals.user) {
-			throw error(500);
-		}
-		if (!locals.user.hasAdmin) {
-			throw error(403, { message: 'oi get out' });
-		}
-
-		const data = await request.formData();
-
-		const userFilter = data.getAll('user').map((userId) => {
-			const parsedInt = parseInt(userId.toString());
-			if (isNaN(parsedInt)) throw error(400, { message: 'malformed user filter' });
-			return parsedInt;
-		});
-
-		const orders = await getOrders(userFilter);
-
-		return {
-			orders,
-			fields: {
-				user: userFilter
-			}
-		};
-	}
-} satisfies Actions;
 
 async function getOrders(userFilter: number[]) {
 	return await db
