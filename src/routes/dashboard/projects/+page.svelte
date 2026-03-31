@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Lock, ExternalLink, Link, Download, Search, X } from 'lucide-svelte';
-	import TimeAgo from '$lib/components/TimeAgo.svelte';
+import { Lock, ExternalLink, Link, Download, Search, X } from '@lucide/svelte';
+import relativeDate from 'tiny-relative-date';
 
 	export let data: PageData;
 
@@ -170,7 +170,9 @@
 					<!-- Footer -->
 					<div class="flex flex-row gap-4">
 						<p class="grow text-sm">
-							Created <TimeAgo date={project.createdAt} class="relative z-2" /> ∙ {formatTime(project.timeSpent ?? 0)}
+							Created <abbr title={project.createdAt.toUTCString()} class="relative z-2">
+    {relativeDate(project.createdAt)}
+</abbr> ∙ {formatTime(project.timeSpent ?? 0)}
 						</p>
 						<p class="text-sm">{formatStatus(project.status)}</p>
 					</div>
