@@ -31,11 +31,30 @@
 	font-style: normal;
 	font-display: swap;
 }
+@font-face {
+    font-family: "Papyrus";
+    src: url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.eot");
+    src: url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.svg#Papyrus")format("svg");
+}
+@font-face {
+    font-family: "Comic Sans MS";
+    src: url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.eot");
+    src: url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.svg#Comic Sans MS")format("svg");
+}
+
 
 @theme {
-	--font-hero: 'Press Start 2P', var(--font-sans);
+	--font-hero: 'Comic Sans MS', 'Press Start 2P', var(--font-sans);
 	--font-hc: 'Phantom Sans', var(--font-sans);
-	--font-sans:
+	--font-sans: 'Papyrus',
 		'Sora', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
 		'Segoe UI Symbol', 'Noto Color Emoji';
 
