@@ -24,9 +24,9 @@ export async function load({ locals, url }) {
 		.getAll('user')
 		.map((id) => parseInt(id))
 		.filter((id) => !isNaN(id) && id > 0);
-	const doubleDippingFilter = url.searchParams.getAll(
-		'doubleDippingWith'
-	) as (typeof project.doubleDippingWith._.data)[];
+	const doubleDippingFilter = hasFilters
+		? (url.searchParams.getAll('doubleDippingWith') as (typeof project.doubleDippingWith._.data)[])
+		: (['none'] as (typeof project.doubleDippingWith._.data)[]);
 
 	const projects = await getProjects(statusFilter, projectFilter, userFilter, doubleDippingFilter);
 
