@@ -246,6 +246,13 @@
       "when": 1774107485445,
       "tag": "0034_spicy_thunderball",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1775052317026,
+      "tag": "0035_easy_hydra",
+      "breakpoints": true
     }
   ]
 }

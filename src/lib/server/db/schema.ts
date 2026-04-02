@@ -94,7 +94,7 @@ export const projectStatusEnum = pgEnum('status', [
 	'rejected',
 	'rejected_locked'
 ]); // rejected == can still re-ship, rejected_locked == can't re-ship
-
+export const doubleDippingEnum = pgEnum('double_dipping', ['none', 'enclosure']);
 export const editorFileEnum = pgEnum('editor_file_type', ['url', 'upload']);
 
 export const project = pgTable('project', {
@@ -113,6 +113,7 @@ export const project = pgTable('project', {
 	uploadedFileUrl: text(),
 
 	modelFile: text(),
+	doubleDippingWith: doubleDippingEnum().notNull().default('none'),
 
 	status: projectStatusEnum().notNull().default('building'),
 	printedBy: integer().references(() => user.id),

@@ -32,29 +32,36 @@
 	font-display: swap;
 }
 @font-face {
-    font-family: "Papyrus";
-    src: url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.eot");
-    src: url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.eot?#iefix")format("embedded-opentype"),
-    url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.woff2")format("woff2"),
-    url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.woff")format("woff"),
-    url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.ttf")format("truetype"),
-    url("https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.svg#Papyrus")format("svg");
+	font-family: 'Papyrus';
+	src: url('https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.eot');
+	src:
+		url('https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.eot?#iefix')
+			format('embedded-opentype'),
+		url('https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.woff2') format('woff2'),
+		url('https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.woff') format('woff'),
+		url('https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.ttf') format('truetype'),
+		url('https://db.onlinewebfonts.com/t/107eaa009712278feeb98175016a8a81.svg#Papyrus')
+			format('svg');
 }
 @font-face {
-    font-family: "Comic Sans MS";
-    src: url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.eot");
-    src: url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.eot?#iefix")format("embedded-opentype"),
-    url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.woff2")format("woff2"),
-    url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.woff")format("woff"),
-    url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.ttf")format("truetype"),
-    url("https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.svg#Comic Sans MS")format("svg");
+	font-family: 'Comic Sans MS';
+	src: url('https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.eot');
+	src:
+		url('https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.eot?#iefix')
+			format('embedded-opentype'),
+		url('https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.woff2') format('woff2'),
+		url('https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.woff') format('woff'),
+		url('https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.ttf') format('truetype'),
+		url('https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.svg#Comic Sans MS')
+			format('svg');
 }
 
-
 @theme {
-	--font-hero: 'Comic Sans MS', 'Press Start 2P', var(--font-sans);
+	--font-hero: 
+		/* 'Comic Sans MS', */ 'Press Start 2P', var(--font-sans);
 	--font-hc: 'Phantom Sans', var(--font-sans);
-	--font-sans: 'Papyrus',
+	--font-sans:
+		/* 'Papyrus', */
 		'Sora', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
 		'Segoe UI Symbol', 'Noto Color Emoji';
 
@@ -287,6 +294,10 @@
 		}
 	}
 
+	.link {
+		@apply underline hover:opacity-70 transition-opacity;
+	}
+
 	.themed-input-light {
 		@apply border-3 border-primary-700 bg-primary-900 fill-primary-50 p-2 text-sm ring-primary-900 outline-transparent placeholder:text-primary-700 active:ring-3;
 	}
@@ -304,7 +315,36 @@
 	}
 
 	.list-link {
-		@apply underline text-primary-400 hover:text-primary-500/75 transition-all;
+		@apply text-primary-400 underline transition-all hover:text-primary-500/75;
+	}
+
+	.enclosure-bg {
+		background-color: #391F12;
+		position: relative;
+		overflow: hidden;
+		z-index: 1;
+		@apply border-3 border-[#F48D2C];
+	}
+
+	.enclosure-bg::before {
+		content: "";
+		position: absolute;
+
+		top: 50%;
+		left: 50%;
+
+		width: 150%;
+		height: 6000%;
+
+		transform: translate(-50%, -50%) rotate(30deg);
+
+		background-image: url("https://cdn.hackclub.com/019d4983-aa2c-7c07-ad9e-07ec8b3f9bb9/image.png");
+		opacity: 15%;
+		background-repeat: repeat;
+		background-size: 35px 35px;
+
+		z-index: 0;
+		pointer-events: none;
 	}
 }
 

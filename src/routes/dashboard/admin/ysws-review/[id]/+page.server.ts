@@ -36,6 +36,7 @@ export async function load({ locals, params }) {
 				editorUrl: project.editorUrl,
 				uploadedFileUrl: project.uploadedFileUrl,
 				modelFile: project.modelFile,
+				doubleDippingWith: project.doubleDippingWith,
 
 				submittedToAirtable: project.submittedToAirtable,
 
@@ -120,7 +121,8 @@ export const actions = {
 					editorFileType: project.editorFileType,
 					editorUrl: project.editorUrl,
 					uploadedFileUrl: project.uploadedFileUrl,
-					submittedToAirtable: project.submittedToAirtable
+					submittedToAirtable: project.submittedToAirtable,
+					doubleDippingWith: project.doubleDippingWith
 				},
 				user: {
 					id: user.id,
@@ -208,6 +210,15 @@ export const actions = {
 		const status: typeof project.status._.data | undefined = 'finalized';
 		const statusMessage = 'finalised! :woah-dino:';
 
+		const [latestShip] = await db
+			.select({ clubId: ship.clubId })
+			.from(ship)
+			.where(eq(ship.projectId, id))
+			.orderBy(desc(ship.timestamp))
+			.limit(1);
+
+		const isClubShip = latestShip?.clubId !== null && latestShip?.clubId !== undefined;
+
 		if (airtableBase && !queriedProject.project.submittedToAirtable) {
 			if (!queriedProject.user?.idvToken) {
 				return fail(400, {
@@ -268,7 +279,10 @@ export const actions = {
 				fld9TiRu0JTKaqCbA: queriedProject.user?.name,
 				fld1xMv37PLYw0MbZ: queriedProject.user?.idvId,
 				fldoe0vNhq3NDzEUo: true,
-				fldADmpBlSo84dNNM: false
+				fldADmpBlSo84dNNM: false,
+				fldTChAWwclLnySvi:
+					queriedProject.project.doubleDippingWith === 'enclosure' ? 'Enclosure' : undefined, // Double dipping with
+				fld8ErBRNDh8PZUwz: latestShip?.clubId ?? undefined // Club ID
 			});
 
 			const records = await airtableBase('tblwUPbRqbRBnQl7G')
@@ -340,15 +354,6 @@ export const actions = {
 		}
 
 		if (queriedProject.user) {
-			const [latestShip] = await db
-				.select({ clubId: ship.clubId })
-				.from(ship)
-				.where(eq(ship.projectId, id))
-				.orderBy(desc(ship.timestamp))
-				.limit(1);
-
-			const isClubShip = latestShip?.clubId !== null && latestShip?.clubId !== undefined;
-
 			if (!isClubShip) {
 				const payouts = calculatePayouts(
 					queriedProject.timeSpent,

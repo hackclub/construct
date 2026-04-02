@@ -74,6 +74,7 @@ export async function load({ params, locals }) {
 			editorUrl: queriedProject.project.editorUrl,
 			uploadedFileUrl: queriedProject.project.uploadedFileUrl,
 			modelFile: queriedProject.project.modelFile,
+			doubleDippingWith: queriedProject.project.doubleDippingWith,
 
 			createdAt: queriedProject.project.createdAt,
 			updatedAt: queriedProject.project.updatedAt,
@@ -245,7 +246,8 @@ export const actions = {
 			description: description.toString().trim(),
 			image: imagePath,
 			model: modelPath,
-			timeSpent: lapseUrlValid && lapse?.ok ? lapse.timelapse.durationMins : parseInt(timeSpent!.toString()),
+			timeSpent:
+				lapseUrlValid && lapse?.ok ? lapse.timelapse.durationMins : parseInt(timeSpent!.toString()),
 			lapseId: lapseUrlValid && lapse?.ok ? lapseId : null,
 			createdAt: new Date(Date.now()),
 			updatedAt: new Date(Date.now())

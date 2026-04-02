@@ -201,10 +201,22 @@
 		<input type="hidden" name="submit_as_club" value={submitAsClub ? 'true' : 'false'} />
 	{/if}
 
+	<label class="mt-2 flex grow flex-col gap-1">
+		<p>Double dipping with</p>
+		<select class="themed-input-on-box text-sm" name="doubledip" required>
+			<option disabled selected>Select YSWS</option>
+			<option value="none">None</option>
+			<option value="enclosure">Enclosure</option>
+		</select>
+		<p class="mt-0.5 text-sm opacity-50">
+			Are you submitting this project to any other YSWSes? You can only double dip with YSWSes in
+			this list. Select "None" if you're only shipping this to Construct.
+		</p>
+	</label>
+
 	<div class="mt-3">
 		<h2 class="mb-1 text-xl font-bold">Requirements</h2>
-		<ChecklistItem completed={data.project.timeSpent >= 60}
-			>At least 60 minutes spent</ChecklistItem
+		<ChecklistItem completed={data.project.timeSpent >= 60}>At least 60 minutes spent</ChecklistItem
 		>
 		<ChecklistItem completed={data.project.devlogCount >= 2}>At least 2 journal logs</ChecklistItem>
 		<ChecklistItem completed={data.project.description != ''}>
@@ -274,9 +286,7 @@
 				/>
 			</label>
 			{#if submitAsClub}
-				<p class="mt-2 opacity-80">
-					Club submissions do not receive personal currency rewards.
-				</p>
+				<p class="mt-2 opacity-80">Club submissions do not receive personal currency rewards.</p>
 			{:else}
 				<p class="mt-2">
 					You'll get <span class="font-bold"

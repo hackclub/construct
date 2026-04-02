@@ -29,6 +29,7 @@ export async function load({ locals, params }) {
 				editorUrl: project.editorUrl,
 				uploadedFileUrl: project.uploadedFileUrl,
 				modelFile: project.modelFile,
+				doubleDippingWith: project.doubleDippingWith,
 
 				printedBy: project.printedBy,
 

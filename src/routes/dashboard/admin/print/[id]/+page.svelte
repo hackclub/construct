@@ -8,6 +8,7 @@
 	import Spinny3DPreview from '$lib/components/Spinny3DPreview.svelte';
 	import { Download } from '@lucide/svelte';
 	import ReviewHistory from '../../ReviewHistory.svelte';
+	import DoubleDippingBanner from '$lib/components/DoubleDippingBanner.svelte';
 
 	let { data, form } = $props();
 
@@ -27,6 +28,11 @@
 			<h1 class="mt-5 font-hero text-2xl font-medium">{data.project.project.name}</h1>
 
 			<h2 class="mt-2 text-2xl font-bold">Project details</h2>
+
+			{#if data.project.project.doubleDippingWith !== 'none'}
+				<DoubleDippingBanner ysws={data.project.project.doubleDippingWith} reviewMessage />
+			{/if}
+			
 			<div class="themed-box flex flex-col gap-3 p-3">
 				<div>
 					<p>

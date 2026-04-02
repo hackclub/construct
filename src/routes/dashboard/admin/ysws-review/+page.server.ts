@@ -23,8 +23,11 @@ export async function load({ locals, url }) {
 		.getAll('user')
 		.map((id) => parseInt(id))
 		.filter((id) => !isNaN(id) && id > 0);
+	const doubleDippingFilter = hasFilters
+		? (url.searchParams.getAll('doubleDippingWith') as (typeof project.doubleDippingWith._.data)[])
+		: (['none'] as (typeof project.doubleDippingWith._.data)[]);
 
-	const projects = await getProjects(statusFilter, projectFilter, userFilter);
+	const projects = await getProjects(statusFilter, projectFilter, userFilter, doubleDippingFilter);
 
 	const allProjects = await db
 		.select({
@@ -69,7 +72,8 @@ export async function load({ locals, url }) {
 		fields: {
 			status: statusFilter,
 			project: projectFilter,
-			user: userFilter
+			user: userFilter,
+			doubleDippingWith: doubleDippingFilter
 		}
 	};
 }
@@ -77,7 +81,8 @@ export async function load({ locals, url }) {
 async function getProjects(
 	statusFilter: (typeof project.status._.data)[],
 	projectFilter: number[],
-	userFilter: number[]
+	userFilter: number[],
+	doubleDippingFilter: (typeof project.doubleDippingWith._.data)[]
 ) {
 	return await db
 		.select({
@@ -104,7 +109,10 @@ async function getProjects(
 				eq(project.deleted, false),
 				statusFilter.length > 0 ? inArray(project.status, statusFilter) : undefined,
 				projectFilter.length > 0 ? inArray(project.id, projectFilter) : undefined,
-				userFilter.length > 0 ? inArray(project.userId, userFilter) : undefined
+				userFilter.length > 0 ? inArray(project.userId, userFilter) : undefined,
+				doubleDippingFilter.length > 0
+					? inArray(project.doubleDippingWith, doubleDippingFilter)
+					: undefined
 			)
 		)
 		.groupBy(

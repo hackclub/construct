@@ -11,6 +11,7 @@
 	import ProjectLinks from '$lib/components/ProjectLinks.svelte';
 	import Spinny3DPreview from '$lib/components/Spinny3DPreview.svelte';
 	import { getIdFromLapseUrl, getLapse, type Lapse } from '$lib/lapse';
+	import DoubleDippingBanner from '$lib/components/DoubleDippingBanner.svelte';
 
 	const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
@@ -112,6 +113,12 @@
 <Head title={data.project.name} />
 
 <h1 class="mt-5 mb-2 font-hero text-3xl font-medium">{data.project.name}</h1>
+
+{#if data.project.doubleDippingWith !== 'none'}
+	<div class="mb-2">
+		<DoubleDippingBanner ysws={data.project.doubleDippingWith} />
+	</div>
+{/if}
 
 <div class="flex flex-col gap-3 xl:flex-row">
 	<div class="mb-6 grow">
