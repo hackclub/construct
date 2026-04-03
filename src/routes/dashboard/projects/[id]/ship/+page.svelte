@@ -213,7 +213,16 @@
 			this list. Select "None" if you're only shipping this to Construct.
 		</p>
 	</label>
-
+<label class="mt-2 flex grow flex-col gap-1">
+  <p>For Printers <span class="opacity-50">(optional, max 3000 characters)</span></p>
+  <textarea
+    name="for_printers"
+    maxlength="3000"
+    placeholder="Any notes for the person printing your model — tolerances, supports, material suggestions, etc."
+    class="themed-input-on-box min-h-24 resize-y"
+  >{data.project.forPrinters ?? ''}</textarea>
+  <p class="mt-0.5 text-sm opacity-50">This will only be visible on your project page, not on project cards.</p>
+</label>
 	<div class="mt-3">
 		<h2 class="mb-1 text-xl font-bold">Requirements</h2>
 		<ChecklistItem completed={data.project.timeSpent >= 60}>At least 60 minutes spent</ChecklistItem
