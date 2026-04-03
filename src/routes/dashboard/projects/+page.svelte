@@ -64,7 +64,7 @@ import relativeDate from 'tiny-relative-date';
 	<div class="flex justify-between items-center">
 		<div>
 			<h1 class="mt-5 mb-2 font-hero text-3xl font-medium">Projects</h1>
-			<h2 class="text-lg text-[#72685e] font-medium">
+			<h2 class="text-md text-[#72685e] font-medium">
 				{data.totalHours}h total ∙ {data.finalHours}h finalized
 			</h2>
 		</div>
@@ -76,8 +76,8 @@ import relativeDate from 'tiny-relative-date';
 		</a>
 	</div>
 
-	<!-- ── Search bar — uses themed-input-on-box from app.css ──────── -->
-	<div class="relative mt-4 flex items-center">
+	<!-- ── Search bar — uses themed-input from app.css ──────── -->
+	<div class="relative mt-2 flex items-center">
 		<Search size={15} class="pointer-events-none absolute left-3 text-primary-700" />
 		<input
 			type="text"
@@ -85,7 +85,7 @@ import relativeDate from 'tiny-relative-date';
 			placeholder="Search projects..."
 			autocomplete="off"
 			spellcheck="false"
-			class="themed-input-on-box w-full py-2.5 pl-9 pr-9 text-sm"
+			class="themed-input w-full py-2.5 pl-9 pr-9 text-sm"
 		/>
 		{#if searchQuery}
 			<button
@@ -100,11 +100,11 @@ import relativeDate from 'tiny-relative-date';
 
 	<!-- ── Filter chips — use themed-box style (dashed border) ──────── -->
 	<div class="mt-3 flex flex-wrap gap-2">
-		{#each FILTERS as filter}
+		{#each FILTERS as filter (filter.key)}
 			<button
 				on:click={() => (activeFilter = filter.key)}
 				class="
-					rounded-lg border-3 border-dashed px-3 py-1 text-xs font-semibold transition-colors
+					rounded-lg border-2 px-2 py-1 text-xs font-semibold transition-colors
 					{activeFilter === filter.key
 						? 'border-primary-600 bg-primary-700 text-primary-50'
 						: 'border-primary-900 bg-primary-950 text-primary-700 hover:border-primary-700 hover:bg-primary-900 hover:text-primary-400'}
