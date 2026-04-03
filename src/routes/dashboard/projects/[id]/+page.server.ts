@@ -68,6 +68,7 @@ export async function load({ params, locals }) {
 			userId: queriedProject.project.userId,
 			name: queriedProject.project.name,
 			description: queriedProject.project.description,
+			forPrinters: queriedProject.project.forPrinters,
 
 			url: queriedProject.project.url,
 			editorFileType: queriedProject.project.editorFileType,
