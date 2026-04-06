@@ -164,6 +164,11 @@ export async function GET(event) {
 		return redirect(302, 'https://fraud.land');
 	}
 
+	if (!['blue', 'green', 'yellow', 'red'].includes(hackatimeTrust)) {
+		// weird hackatime issue, assume blue
+		hackatimeTrust = 'blue';
+	}
+
 	const isSuperAdmin =
 		env.SUPER_ADMIN_SLACK_ID != undefined &&
 		env.SUPER_ADMIN_SLACK_ID.length > 0 &&
