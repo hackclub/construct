@@ -56,7 +56,7 @@
 		"cron": "^4.4.0",
 		"cryptr": "^6.4.0",
 		"drizzle-kit": "^0.31.10",
-		"drizzle-orm": "^0.44.7",
+		"drizzle-orm": "^0.45.2",
 		"express": "^5.2.1",
 		"pg": "^8.20.0",
 		"sharp": "^0.34.5",
