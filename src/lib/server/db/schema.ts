@@ -105,6 +105,7 @@ export const project = pgTable('project', {
 
 	name: text(),
 	description: text(),
+	forPrinters: text().notNull().default(''), // Notes for whoever prints this project
 
 	url: text(),
 

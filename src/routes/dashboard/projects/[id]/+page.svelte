@@ -33,6 +33,8 @@
 	let lapseUrlValidFormat: boolean = $state(false);
 	let lapse: Lapse | null = $state(null);
 
+	let forPrintersOpen = $state(false);
+
 	function onchange() {
 		timeSpent = lapse?.ok
 			? lapse.timelapse.durationMins
@@ -155,6 +157,37 @@
 				<br />
 			{/each}
 		</p>
+
+		{#if data.project.forPrinters}
+			<div class="mt-2">
+				<button
+					type="button"
+					class="flex items-center gap-1 text-sm opacity-60 transition-opacity hover:opacity-100"
+					onclick={() => (forPrintersOpen = !forPrintersOpen)}
+				>
+					<span>For Printers</span>
+					<svg
+						class="h-4 w-4 transition-transform {forPrintersOpen ? 'rotate-180' : ''}"
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<polyline points="6 9 12 15 18 9" />
+					</svg>
+				</button>
+				{#if forPrintersOpen}
+					<div class="themed-box mt-1 p-3 text-sm">
+						{#each data.project.forPrinters.split('\n') as line}
+							{line}<br />
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/if}
 
 		{#if data.project.userId === data.user.id}
 			<div class="mt-3 flex gap-2">

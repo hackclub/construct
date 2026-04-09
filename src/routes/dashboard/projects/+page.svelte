@@ -1,3 +1,4 @@
+let forPrinters = $state(data.project.forPrinters ?? '');
 <script lang="ts">
 import { Lock, ExternalLink, Link, Download, Search, X } from '@lucide/svelte';
 import relativeDate from 'tiny-relative-date';

@@ -13,6 +13,7 @@ export async function load({ locals }) {
 			id: project.id,
 			name: project.name,
 			description: project.description,
+			forPrinters: project.forPrinters,
 
 			url: project.url,
 			editorFileType: project.editorFileType,

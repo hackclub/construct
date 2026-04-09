@@ -25,6 +25,7 @@ export async function load({ params, locals }) {
 			id: project.id,
 			name: project.name,
 			description: project.description,
+			forPrinters: project.forPrinters,
 
 			url: project.url,
 			editorFileType: project.editorFileType,
@@ -51,6 +52,7 @@ export async function load({ params, locals }) {
 			project.id,
 			project.name,
 			project.description,
+			project.forPrinters,
 			project.url,
 			project.createdAt,
 			project.status
@@ -93,6 +95,7 @@ export const actions = {
 		const modelFile = data.get('model_file') as File;
 		const submitAsClub = data.get('submit_as_club') === 'true';
 		const doubleDippingWith = data.get('doubledip') as typeof project.doubleDippingWith._.data;
+		const forPrinters = (data.get('for_printers')?.toString() ?? '').slice(0, 3000);
 
 		const printablesUrlString =
 			printablesUrl && printablesUrl.toString() ? sanitizeUrl(printablesUrl.toString()) : null;
@@ -299,7 +302,8 @@ export const actions = {
 				uploadedFileUrl: editorFileExists ? editorFilePath : undefined,
 
 				modelFile: modelPath,
-                doubleDippingWith
+				doubleDippingWith,
+				forPrinters
 			})
 			.where(
 				and(

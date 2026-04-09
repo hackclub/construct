@@ -17,6 +17,7 @@
 	let editorUploadFile = $state(null);
 	let modelFile = $state(null);
 	let submitAsClub = $state(false);
+	let forPrinters = $state(data.project.forPrinters ?? '');
 
 	let hasEditorFile = $derived((editorUrl || editorUploadFile) && !(editorUrl && editorUploadFile));
 
@@ -163,6 +164,20 @@
 				Must be a 3MF file under {MAX_UPLOAD_SIZE / 1024 / 1024} MiB
 			</p>
 		{/if}
+	</label>
+
+	<label class="mt-2 flex grow flex-col gap-1">
+		<p>For Printers <span class="opacity-50">(optional, max 3000 characters)</span></p>
+		<textarea
+			name="for_printers"
+			maxlength="3000"
+			placeholder="Any notes for whoever prints your model — tolerances, supports, material suggestions, etc."
+			bind:value={forPrinters}
+			class="themed-input-on-box min-h-24 resize-y"
+		></textarea>
+		<p class="mt-0.5 text-sm opacity-50">
+			Only visible on your project page, not on project cards. Shown to printers after review.
+		</p>
 	</label>
 
 	{#if data.clubMembership}
