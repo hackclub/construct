@@ -1,6 +1,7 @@
 <script lang="ts">
-import { Lock, ExternalLink, Link, Download, Search, X } from '@lucide/svelte';
-import relativeDate from 'tiny-relative-date';
+	import EndMessage from '$lib/components/EndMessage.svelte';
+	import { Lock, ExternalLink, Link, Download, Search, X } from '@lucide/svelte';
+	import relativeDate from 'tiny-relative-date';
 
 	export let data: PageData;
 
@@ -8,13 +9,15 @@ import relativeDate from 'tiny-relative-date';
 
 	// ── Filter definitions ──────────────────────────────────────────
 	const FILTERS = [
-		{ key: 'all',         label: 'All' },
-		{ key: 'building',    label: 'Building' },
-		{ key: 'submitted',   label: 'Submitted' },
+		{ key: 'all', label: 'All' },
+		{ key: 'building', label: 'Building' },
+		{ key: 'submitted', label: 'Submitted' },
 		{ key: 't1_approved', label: 'Approved / Queue' },
-		{ key: 'printing',    label: 'Being Printed' },
-		{ key: 'printed',     label: 'Printed' },
-		{ key: 'finalized',   label: 'Finalized' },
+		{ key: 'printing', label: 'Being Printed' },
+		{ key: 'printed', label: 'Printed' },
+		{ key: 'finalized', label: 'Finalized' },
+		{ key: 'rejected', label: 'Rejected' },
+		{ key: 'rejected_locked', label: 'Rejected (locked)' }
 	] as const;
 
 	type FilterKey = (typeof FILTERS)[number]['key'];
@@ -36,17 +39,23 @@ import relativeDate from 'tiny-relative-date';
 
 	// ── Helpers (kept from original page) ──────────────────────────
 	const isLocked = (project: (typeof projects)[0]) =>
-		['printed', 'finalized', 'printing', 'submitted', 't1_approved'].includes(project.status);
+		['printed', 'finalized', 'printing', 'submitted', 't1_approved', 'rejected_locked'].includes(
+			project.status
+		);
 
 	function formatStatus(status: string) {
-		return {
-			building:    'Building',
-			submitted:   'Submitted',
-			t1_approved: 'On print queue',
-			printing:    'Being printed',
-			printed:     'Printed',
-			finalized:   'Finalized',
-		}[status] ?? status;
+		return (
+			{
+				building: 'Building',
+				submitted: 'Submitted',
+				t1_approved: 'On print queue',
+				printing: 'Being printed',
+				printed: 'Printed',
+				finalized: 'Finalized',
+				rejected: 'Rejected',
+				rejected_locked: 'Rejected (locked)'
+			}[status] ?? status
+		);
 	}
 
 	function formatTime(minutes: number | string) {
@@ -61,20 +70,22 @@ import relativeDate from 'tiny-relative-date';
 
 <div class="flex h-full flex-col">
 	<!-- ── Header ──────────────────────────────────────────────────── -->
-	<div class="flex justify-between items-center">
+	<div class="flex items-center justify-between">
 		<div>
 			<h1 class="mt-5 mb-2 font-hero text-3xl font-medium">Projects</h1>
-			<h2 class="text-md text-[#72685e] font-medium">
+			<h2 class="text-md font-medium text-[#72685e]">
 				{data.totalHours}h total ∙ {data.finalHours}h finalized
 			</h2>
 		</div>
 		<a
 			href="/dashboard/projects/create"
-			class="offset block button md lg:inline-block text-center bg-primary-800 hover:ring-primary-50 hover:ring-2 hover:bg-primary-700 -mt-14"
+			class="offset button md -mt-14 block bg-primary-800 text-center hover:bg-primary-700 hover:ring-2 hover:ring-primary-50 lg:inline-block"
 		>
 			Create project
 		</a>
 	</div>
+
+	<EndMessage />
 
 	<!-- ── Search bar — uses themed-input from app.css ──────── -->
 	<div class="relative mt-2 flex items-center">
@@ -85,7 +96,7 @@ import relativeDate from 'tiny-relative-date';
 			placeholder="Search projects..."
 			autocomplete="off"
 			spellcheck="false"
-			class="themed-input w-full py-2.5 pl-9 pr-9 text-sm"
+			class="themed-input w-full py-2.5 pr-9 pl-9 text-sm"
 		/>
 		{#if searchQuery}
 			<button
@@ -106,8 +117,8 @@ import relativeDate from 'tiny-relative-date';
 				class="
 					rounded-lg border-2 px-2 py-1 text-xs font-semibold transition-colors
 					{activeFilter === filter.key
-						? 'border-primary-600 bg-primary-700 text-primary-50'
-						: 'border-primary-900 bg-primary-950 text-primary-700 hover:border-primary-700 hover:bg-primary-900 hover:text-primary-400'}
+					? 'border-primary-600 bg-primary-700 text-primary-50'
+					: 'border-primary-900 bg-primary-950 text-primary-700 hover:border-primary-700 hover:bg-primary-900 hover:text-primary-400'}
 				"
 			>
 				{filter.label}
@@ -116,23 +127,32 @@ import relativeDate from 'tiny-relative-date';
 	</div>
 
 	<!-- ── Count ─────────────────────────────────────────────────── -->
-	<p class="mt-2 mb-0 text-sm text-[#72685e] font-medium">
+	<p class="mt-2 mb-0 text-sm font-medium text-[#72685e]">
 		{filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''}
 	</p>
 
 	<!-- ── Project grid ──────────────────────────────────────────── -->
 	{#if filteredProjects.length > 0}
-		<div class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-5 mt-2">
+		<div class="mt-2 grid grid-cols-1 gap-5 lg:grid-cols-2 2xl:grid-cols-3">
 			{#each filteredProjects as project (project.id)}
-				<div class="themed-box relative flex flex-col p-3 shadow-lg/20 transition-all hover:scale-102">
+				<div
+					class="themed-box relative flex flex-col p-3 shadow-lg/20 transition-all hover:scale-102"
+				>
 					<!-- Clickable overlay -->
-					<a class="absolute inset-0 z-1" href="/dashboard/projects/{project.id}" aria-label="project"></a>
+					<a
+						class="absolute inset-0 z-1"
+						href="/dashboard/projects/{project.id}"
+						aria-label="project"
+					></a>
 
 					<!-- Title + lock -->
 					<h1 class="flex flex-row gap-1 text-xl font-semibold">
 						<span class="grow truncate">{project.name}</span>
 						{#if isLocked(project)}
-							<span title="This project is currently locked as it has been shipped" class="relative z-2">
+							<span
+								title="This project is currently locked as it has been shipped"
+								class="relative z-2"
+							>
 								<Lock size={24} />
 							</span>
 						{/if}
@@ -153,13 +173,21 @@ import relativeDate from 'tiny-relative-date';
 							{/if}
 							{#if project.editorFileType === 'upload' && project.uploadedFileUrl}
 								<div class="flex">
-									<a class="button sm primary relative z-2" href="{s3PublicUrl}/{project.uploadedFileUrl}" target="_blank">
+									<a
+										class="button sm primary relative z-2"
+										href="{s3PublicUrl}/{project.uploadedFileUrl}"
+										target="_blank"
+									>
 										<Download size={20} /> Project file
 									</a>
 								</div>
 							{:else if project.editorFileType === 'url' && project.editorUrl}
 								<div class="flex">
-									<a class="button sm primary relative z-2" href={project.editorUrl} target="_blank">
+									<a
+										class="button sm primary relative z-2"
+										href={project.editorUrl}
+										target="_blank"
+									>
 										<Link size={20} /> Project link
 									</a>
 								</div>
@@ -171,8 +199,9 @@ import relativeDate from 'tiny-relative-date';
 					<div class="flex flex-row gap-4">
 						<p class="grow text-sm">
 							Created <abbr title={project.createdAt.toUTCString()} class="relative z-2">
-    {relativeDate(project.createdAt)}
-</abbr> ∙ {formatTime(project.timeSpent ?? 0)}
+								{relativeDate(project.createdAt)}
+							</abbr>
+							∙ {formatTime(project.timeSpent ?? 0)}
 						</p>
 						<p class="text-sm">{formatStatus(project.status)}</p>
 					</div>
@@ -194,7 +223,10 @@ import relativeDate from 'tiny-relative-date';
 				{/if}
 			</p>
 			<button
-				on:click={() => { searchQuery = ''; activeFilter = 'all'; }}
+				on:click={() => {
+					searchQuery = '';
+					activeFilter = 'all';
+				}}
 				class="button sm mt-2 bg-primary-800 hover:bg-primary-700"
 			>
 				Clear filters

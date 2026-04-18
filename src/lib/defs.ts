@@ -19,3 +19,5 @@ export const T2_PAYOUT_CLAY = 0.1;
 
 export const BETA_DATE_CUTOFF = new Date('2025-12-16');
 export const BETA_MULTIPLIER = 1.5;
+
+export const END_DATE = new Date(1776657600*1000);
