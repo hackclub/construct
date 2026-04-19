@@ -187,12 +187,12 @@
 	></div>
 
 	<div
-		class="absolute flex h-full w-full flex-col justify-center z-3 cursor-not-allowed bg-primary-950/60"
+		class="absolute z-3 flex h-full w-full cursor-not-allowed flex-col justify-center bg-primary-950/60"
 		class:hidden={data.user.printerFulfilment === 'none'}
 	>
 		<div class="flex flex-row justify-center">
 			<div
-				class="z-3 flex max-w-120 min-w-80 flex-col rounded-lg bg-primary-950 p-3 text-center outline-3 outline-primary-800 select-auto cursor-default"
+				class="z-3 flex max-w-120 min-w-80 cursor-default flex-col rounded-lg bg-primary-950 p-3 text-center outline-3 outline-primary-800 select-auto"
 			>
 				<h2 class="text-xl font-semibold">
 					{selectedPrinter?.longName}
@@ -202,9 +202,7 @@
 				</p>
 				<div class="mt-0.5 flex flex-row justify-center gap-1.5 align-middle text-primary-500">
 					<Lock size={22} />
-					<p class="font-semibold">
-						In fulfilment queue, printer market locked
-					</p>
+					<p class="font-semibold">In fulfilment queue, printer market locked</p>
 				</div>
 			</div>
 		</div>
@@ -256,6 +254,10 @@
 							class="underline transition-colors hover:text-amber-500">Hack Club Auth</a
 						>
 					</p>
+				{:else if !selectedPrinterPurchaseable && !selectedPrinterAlreadyPurchased && !canAffordPrinter}
+					<p class="mt-0.5 text-sm font-medium text-primary-600">
+						Haven't bought required upgrades
+					</p>
 				{:else}
 					<p class="mt-0.5 text-sm font-medium text-primary-600">Can't afford</p>
 				{/if}
@@ -294,6 +296,7 @@
 			</div>
 		</div>
 	</div>
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		bind:this={canvas}
 		{onpointerdown}
@@ -305,7 +308,7 @@
 		<img src={printerMap} alt="printer map" draggable="false" />
 		<div class="absolute top-0 left-0 z-1 h-full w-full">
 			<div class="relative h-full w-full">
-				{#each printersSingleList as printer}
+				{#each printersSingleList as printer (printer.path)}
 					{@const purchaseable = purchaseablePrinters.some(
 						(arr) =>
 							arr.length === printer.path.length &&
