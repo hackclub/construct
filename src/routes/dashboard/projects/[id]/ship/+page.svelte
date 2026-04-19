@@ -4,6 +4,7 @@
 	import Head from '$lib/components/Head.svelte';
 	import Project from '$lib/components/Project.svelte';
 	import { calculateCurrencyPayout, calculateMinutes } from '$lib/currency';
+	import { END_DATE } from '$lib/defs';
 	import { MAX_UPLOAD_SIZE } from '../config';
 	import type { PageProps } from './$types';
 	import { Ship, SquarePen } from '@lucide/svelte';
@@ -16,7 +17,11 @@
 	let editorUrl = $state(data.project.editorUrl);
 	let editorUploadFile = $state(null);
 	let modelFile = $state(null);
-	let submitAsClub = $state(false);
+	let submitAsClub = $state(
+				END_DATE <= new Date() && data.project.status === 'building' && data.clubMembership
+			? true
+			: false
+	);
 
 	let hasEditorFile = $derived((editorUrl || editorUploadFile) && !(editorUrl && editorUploadFile));
 
@@ -33,6 +38,20 @@
 <Head title="Ship project" />
 
 <h1 class="mt-5 mb-3 font-hero text-2xl font-medium">Ship project</h1>
+
+{#if END_DATE <= new Date() && data.project.status == 'building'}
+	<div
+		class="mt-3 mb-3 flex flex-col gap-0.5 rounded-lg border-3 border-primary-700 bg-primary-900 p-3"
+	>
+		<h2 class="text-xl font-bold text-primary-400">New non-clubs submissions are now closed!</h2>
+		<p>
+			Construct has ended for non-clubs projects. The market is still open and you can re-ship
+			rejected projects, however you can't ship new projects.
+		</p>
+		<p class="mt-1">You can still ship new projects as normal for clubs.</p>
+	</div>
+{/if}
+
 <Project
 	id={data.project.id}
 	name={data.project.name}
@@ -169,13 +188,19 @@
 		<div class="mt-1">
 			<p class="mb-1 font-bold">Submit as</p>
 			<div class="themed-box flex flex-col gap-2 p-3">
-				<label class="flex cursor-pointer items-center gap-2">
+				<label
+					class="flex items-center gap-2"
+					class:opacity-50={END_DATE <= new Date() && data.project.status === 'building'}
+					class:cursor-pointer={!(END_DATE <= new Date() && data.project.status === 'building')}
+					class:cursor-not-allowed={END_DATE <= new Date() && data.project.status === 'building'}
+				>
 					<input
 						type="radio"
 						name="submission_type"
 						value="individual"
 						checked={!submitAsClub}
 						onchange={() => (submitAsClub = false)}
+						disabled={END_DATE <= new Date() && data.project.status === 'building'}
 						class="radio"
 					/>
 					<span>Individual submission</span>
@@ -239,10 +264,15 @@
 	</div>
 	<div class="mb-1">
 		{#if data.project.timeSpent >= 60 && data.project.description != '' && data.project.url != ''}
-			<p class="text-primary-300">
-				Are you sure you want to ship "{data.project.name}"?
-				<span class="font-bold">You won't be able to edit it or journal again</span> unless it gets rejected.
-			</p>
+			{#if !submitAsClub && END_DATE <= new Date() && data.project.status === 'building'}
+				<p class="text-red-400">Non-clubs submissions are now closed!</p>
+			{:else}
+				<p class="text-primary-300">
+					Are you sure you want to ship "{data.project.name}"?
+					<span class="font-bold">You won't be able to edit it or journal again</span> unless it gets
+					rejected.
+				</p>
+			{/if}
 		{/if}
 	</div>
 	<div class="flex flex-row gap-2">
@@ -258,7 +288,8 @@
 				data.project.description == '' ||
 				!printablesUrl ||
 				!hasEditorFile ||
-				!modelFile}
+				!modelFile ||
+				(!submitAsClub && END_DATE <= new Date())}
 		>
 			<Ship />
 			Ship
