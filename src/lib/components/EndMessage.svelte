@@ -1,6 +1,5 @@
 <script>
 	import { END_DATE } from "$lib/defs";
-	import relativeDate from "tiny-relative-date";
 </script>
 
 <div
@@ -9,12 +8,7 @@
 	{#if END_DATE > new Date()}
 		<h2 class="text-xl font-bold text-primary-400">It's almost the end!</h2>
 		<p>
-			Construct will be ending <abbr
-				title={`${END_DATE.toLocaleDateString()} ${END_DATE.toLocaleTimeString()}`}
-				class="font-bold"
-			>
-				{relativeDate(END_DATE)}
-			</abbr>, at 00:00 EST on April 20th ({END_DATE.toLocaleDateString()}
+			Construct will be ending at 00:00 EST on April 20th ({END_DATE.toLocaleDateString()}
 			{END_DATE.toLocaleTimeString()} in your timezone)
 		</p>
 		<p>
@@ -25,11 +19,7 @@
 	{:else}
 		<h2 class="text-xl font-bold text-primary-400">Construct has ended!</h2>
 		<p>
-			Construct has ended <abbr
-				title={`${END_DATE.toLocaleDateString()} ${END_DATE.toLocaleTimeString()}`}
-			>
-				{relativeDate(END_DATE)}
-			</abbr>.
+			Construct has ended.
 		</p>
 		<p>
 			The market is still open and you can still re-ship rejected projects, however you can't ship
