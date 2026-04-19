@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
-import { devlog, project, clubMembership, club } from '$lib/server/db/schema.js';
+import { devlog, project, clubMembership, club, ship } from '$lib/server/db/schema.js';
 import { error, fail, redirect } from '@sveltejs/kit';
-import { eq, and, or, sql } from 'drizzle-orm';
+import { eq, and, or, sql, desc } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
 import { isValidUrl } from '$lib/utils';
@@ -10,8 +10,8 @@ import { extname } from 'path';
 import { env } from '$env/dynamic/private';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { S3 } from '$lib/server/s3';
-import { ship } from '$lib/server/db/schema.js';
 import { sanitizeUrl } from '@braintree/sanitize-url';
+import { END_DATE } from '$lib/defs';
 
 export async function load({ params, locals }) {
 	const id: number = parseInt(params.id);
@@ -74,7 +74,8 @@ export async function load({ params, locals }) {
 
 	return {
 		project: queriedProject,
-		clubMembership: membership.length > 0 ? membership[0] : null
+		clubMembership: membership.length > 0 ? membership[0] : null,
+		lastIsClubsShip: await lastIsClubsShip(id)
 	};
 }
 
@@ -109,7 +110,7 @@ export const actions = {
 			});
 		}
 
-        // Double dipping
+		// Double dipping
 		if (doubleDippingWith !== 'none' && doubleDippingWith !== 'enclosure') {
 			return error(400);
 		}
@@ -233,6 +234,7 @@ export const actions = {
 				name: project.name,
 				description: project.description,
 				url: project.url,
+				status: project.status,
 				timeSpent: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
 				devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`
 			})
@@ -267,6 +269,23 @@ export const actions = {
 			return error(400, { message: 'project must have a description' });
 		}
 
+		// Get club ID if submitting as club
+		let clubIdForShip: number | null = null;
+		if (submitAsClub) {
+			const [membership] = await db
+				.select({ clubId: clubMembership.clubId })
+				.from(clubMembership)
+				.where(eq(clubMembership.userId, locals.user.id))
+				.limit(1);
+			if (membership) {
+				clubIdForShip = membership.clubId;
+			}
+		}
+
+		if (END_DATE <= new Date() && clubIdForShip === null && (queriedProject.status === 'building' || await lastIsClubsShip(id))) {
+			return error(400, { message: "can't submit individual project past end date" });
+		}
+
 		// Editor file
 		const editorFilePath = `ships/editor-files/${crypto.randomUUID()}${extname(editorFile.name)}`;
 
@@ -299,7 +318,7 @@ export const actions = {
 				uploadedFileUrl: editorFileExists ? editorFilePath : undefined,
 
 				modelFile: modelPath,
-                doubleDippingWith
+				doubleDippingWith
 			})
 			.where(
 				and(
@@ -308,19 +327,6 @@ export const actions = {
 					eq(project.deleted, false)
 				)
 			);
-
-		// Get club ID if submitting as club
-		let clubIdForShip: number | null = null;
-		if (submitAsClub) {
-			const [membership] = await db
-				.select({ clubId: clubMembership.clubId })
-				.from(clubMembership)
-				.where(eq(clubMembership.userId, locals.user.id))
-				.limit(1);
-			if (membership) {
-				clubIdForShip = membership.clubId;
-			}
-		}
 
 		await db.insert(ship).values({
 			userId: locals.user.id,
@@ -343,3 +349,18 @@ export const actions = {
 		return redirect(303, '/dashboard/projects');
 	}
 } satisfies Actions;
+
+async function lastIsClubsShip(id: number) {
+	const [latestShip] = await db
+		.select({
+			clubId: ship.clubId
+		})
+		.from(ship)
+		.where(eq(ship.projectId, id))
+		.orderBy(desc(ship.timestamp))
+		.limit(1);
+
+	if (latestShip && latestShip.clubId) return true;
+
+	return false;
+}
