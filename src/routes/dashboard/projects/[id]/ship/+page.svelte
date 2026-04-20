@@ -18,7 +18,9 @@
 	let editorUploadFile = $state(null);
 	let modelFile = $state(null);
 	let submitAsClub = $state(
-				END_DATE <= new Date() && (data.project.status === 'building' || data.lastIsClubsShip) && data.clubMembership
+		END_DATE <= new Date() &&
+			(data.project.status === 'building' || data.lastIsClubsShip) &&
+			data.clubMembership
 			? true
 			: false
 	);
@@ -190,9 +192,14 @@
 			<div class="themed-box flex flex-col gap-2 p-3">
 				<label
 					class="flex items-center gap-2"
-					class:opacity-50={END_DATE <= new Date() && (data.project.status === 'building' || data.lastIsClubsShip)}
-					class:cursor-pointer={!(END_DATE <= new Date() && (data.project.status === 'building' || data.lastIsClubsShip))}
-					class:cursor-not-allowed={END_DATE <= new Date() && (data.project.status === 'building' || data.lastIsClubsShip)}
+					class:opacity-50={END_DATE <= new Date() &&
+						(data.project.status === 'building' || data.lastIsClubsShip)}
+					class:cursor-pointer={!(
+						END_DATE <= new Date() &&
+						(data.project.status === 'building' || data.lastIsClubsShip)
+					)}
+					class:cursor-not-allowed={END_DATE <= new Date() &&
+						(data.project.status === 'building' || data.lastIsClubsShip)}
 				>
 					<input
 						type="radio"
@@ -200,7 +207,8 @@
 						value="individual"
 						checked={!submitAsClub}
 						onchange={() => (submitAsClub = false)}
-						disabled={END_DATE <= new Date() && (data.project.status === 'building' || data.lastIsClubsShip)}
+						disabled={END_DATE <= new Date() &&
+							(data.project.status === 'building' || data.lastIsClubsShip)}
 						class="radio"
 					/>
 					<span>Individual submission</span>
@@ -289,7 +297,9 @@
 				!printablesUrl ||
 				!hasEditorFile ||
 				!modelFile ||
-				(!submitAsClub && END_DATE <= new Date())}
+				(END_DATE <= new Date() &&
+					!submitAsClub &&
+					(data.project.status === 'building' || data.lastIsClubsShip))}
 		>
 			<Ship />
 			Ship
