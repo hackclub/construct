@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
 import { marketItemOrder, marketItem, user } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
-import { eq, and, ne, inArray, desc } from 'drizzle-orm';
+import { eq, and, ne, inArray, asc } from 'drizzle-orm';
 
 export async function load({ locals, url }) {
 	if (!locals.user) {
@@ -96,5 +96,5 @@ async function getOrders(
 				userFilter.length > 0 ? inArray(marketItemOrder.userId, userFilter) : undefined
 			)
 		)
-		.orderBy(desc(marketItemOrder.createdAt));
+		.orderBy(asc(marketItemOrder.createdAt));
 }
