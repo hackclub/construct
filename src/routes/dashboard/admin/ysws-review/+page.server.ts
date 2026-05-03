@@ -2,7 +2,7 @@ import { db } from '$lib/server/db/index.js';
 import { project, user, devlog, t2Review } from '$lib/server/db/schema.js';
 import { getProjectLinkType } from '$lib/utils';
 import { error } from '@sveltejs/kit';
-import { eq, and, sql, ne, inArray, desc, gt } from 'drizzle-orm';
+import { eq, and, sql, ne, inArray, desc, gt, asc } from 'drizzle-orm';
 
 export async function load({ locals, url }) {
 	if (!locals.user) {
@@ -29,7 +29,13 @@ export async function load({ locals, url }) {
 		? (url.searchParams.getAll('doubleDippingWith') as (typeof project.doubleDippingWith._.data)[])
 		: (['none'] as (typeof project.doubleDippingWith._.data)[]);
 
-	const projects = await getProjects(statusFilter, projectFilter, userFilter, typeFilter, doubleDippingFilter);
+	const projects = await getProjects(
+		statusFilter,
+		projectFilter,
+		userFilter,
+		typeFilter,
+		doubleDippingFilter
+	);
 
 	const allProjects = await db
 		.select({
@@ -47,14 +53,12 @@ export async function load({ locals, url }) {
 		.from(user)
 		.where(and(ne(user.trust, 'red'), ne(user.hackatimeTrust, 'red'))); // hide banned users
 
-	const t2Agg = db
-		.$with('t2Agg')
-		.as(
-			db
-				.select({ userId: t2Review.userId, t2Cnt: sql<number>`COUNT(*)`.as('t2Cnt') })
-				.from(t2Review)
-				.groupBy(t2Review.userId)
-		);
+	const t2Agg = db.$with('t2Agg').as(
+		db
+			.select({ userId: t2Review.userId, t2Cnt: sql<number>`COUNT(*)`.as('t2Cnt') })
+			.from(t2Review)
+			.groupBy(t2Review.userId)
+	);
 
 	const totalExpr = sql<number>`COALESCE(${t2Agg.t2Cnt}, 0)`;
 
@@ -136,6 +140,7 @@ async function getProjects(
 				user.id,
 				user.name
 			)
+			.orderBy(asc(project.updatedAt))
 	).filter((item) =>
 		typeFilter.length > 0
 			? typeFilter.includes(
