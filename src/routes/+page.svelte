@@ -363,7 +363,7 @@
 			{:else}
 				<Button text="Login with Hack Club" href="/auth/idv" />
 			{/if}
-			<p class="text-md my-3">Ages 13-18, ending April 19th!</p>
+			<p class="text-md my-3">Ages 13-18, ended April 19th 2026! </p>
 		</div>
 	</div>
 </div>
