@@ -57,6 +57,9 @@ export async function load({ locals, params }) {
 
 	let address = null;
 	let email = null;
+	let firstName = null;
+	let lastName = null;
+	let phoneNumber = null;
 	let userDataError = false;
 
 	if (orderData.user?.idvToken) {
@@ -65,6 +68,9 @@ export async function load({ locals, params }) {
 			const userData = await getUserData(token);
 
 			email = userData.primary_email;
+			firstName = userData.first_name;
+			lastName = userData.last_name;
+			phoneNumber = userData.phone_number;
 			address = userData?.addresses?.find(
 				(a: { id: string }) => a.id === orderData.order.addressId
 			);
@@ -78,6 +84,9 @@ export async function load({ locals, params }) {
 	return {
 		orderData,
 		email,
+		firstName,
+		lastName,
+		phoneNumber,
 		address,
 		userDataError,
 		s3PublicUrl: env.S3_PUBLIC_URL

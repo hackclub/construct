@@ -88,6 +88,9 @@
 
 			{#if data.pii}
 				<div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+					<DataCard title="Name">
+						{data.pii.address?.first_name} {data.pii.address?.last_name}
+					</DataCard>
 					<DataCard title="Email">
 						{data.pii.primary_email}
 					</DataCard>
@@ -100,7 +103,6 @@
 
 				<div class="themed-box p-3">
 					{#if data.pii.address}
-						<p>{data.pii.address.first_name} {data.pii.address.last_name}</p>
 						<p>{data.pii.address.line_1}</p>
 						{#if data.pii.address.line_2}
 							<p>{data.pii.address.line_2}</p>
