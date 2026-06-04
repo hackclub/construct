@@ -69,6 +69,24 @@
 			</div>
 
 			<div>
+				<h3 class="text-lg font-bold">Full name</h3>
+				{#if data.userDataError}
+					<p class="text-red-500">Failed to fetch user data, ask them to re-login</p>
+				{:else}
+					<p>{data.firstName} {data.lastName}</p>
+				{/if}
+			</div>
+
+			<div>
+				<h3 class="text-lg font-bold">Phone number</h3>
+				{#if data.userDataError}
+					<p class="text-red-500">Failed to fetch user data, ask them to re-login</p>
+				{:else}
+					<code>{data.phoneNumber}</code>
+				{/if}
+			</div>
+
+			<div>
 				<h3 class="text-lg font-bold">Shipping address</h3>
 				{#if data.userDataError}
 					<p class="text-red-500">Failed to fetch user data, ask them to re-login</p>
