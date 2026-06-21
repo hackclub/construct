@@ -51,7 +51,7 @@
 		"@braintree/sanitize-url": "^7.1.2",
 		"@lucide/svelte": "^0.547.0",
 		"@prgm/sveltekit-progress-bar": "^3.0.2",
-		"@sentry/sveltekit": "^10.46.0",
+		"@sentry/sveltekit": "^10.59.0",
 		"airtable": "^0.12.2",
 		"cron": "^4.4.0",
 		"cryptr": "^6.4.0",
