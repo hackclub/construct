@@ -42,7 +42,7 @@
 			{#if data.project.project.doubleDippingWith !== 'none'}
 				<DoubleDippingBanner ysws={data.project.project.doubleDippingWith} reviewMessage />
 			{/if}
-			
+
 			<div class="themed-box flex flex-col gap-3 p-3">
 				<div>
 					<p>
@@ -60,6 +60,7 @@
 							.project.timeSpent % 60}min
 					</p>
 					<p>Status: {projectStatuses[data.project.project.status]}</p>
+					<p>Shipped for: {data.shippedForClub ? 'Clubs' : 'Individually'}</p>
 					<p>Address found: {data.addressFound ? 'true' : 'false'}</p>
 					<p>Filament spent printing: {data.filamentUsed}g</p>
 					<p>Submitted to Airtable: {data.project.project.submittedToAirtable ?? 'null (false)'}</p>
