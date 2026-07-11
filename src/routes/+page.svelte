@@ -364,6 +364,7 @@
 				<Button text="Login with Hack Club" href="/auth/idv" />
 			{/if}
 			<p class="text-md my-3">Ages 13-18, ended April 19th 2026! </p>
+			<p class="text-md my-3">Program by @Olive and @arca</p>
 		</div>
 	</div>
 </div>
