@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db/index.js';
-import { project, user, devlog, t2Review } from '$lib/server/db/schema.js';
+import { project, user, devlog, t2Review, ship } from '$lib/server/db/schema.js';
 import { getProjectLinkType } from '$lib/utils';
 import { error } from '@sveltejs/kit';
 import { eq, and, sql, ne, inArray, desc, gt, asc } from 'drizzle-orm';
@@ -37,6 +37,30 @@ export async function load({ locals, url }) {
 		doubleDippingFilter
 	);
 
+	const projectIds = projects.map((item) => item.project.id);
+
+	const projectLatestShips =
+		projectIds.length > 0
+			? await db
+					.select({
+						projectId: ship.projectId,
+						clubId: ship.clubId
+					})
+					.from(ship)
+					.where(inArray(ship.projectId, projectIds))
+					.orderBy(desc(ship.timestamp))
+			: [];
+
+	const shippedForClubByProjectId = new Map<number, boolean>();
+	for (const latestShip of projectLatestShips) {
+		if (!shippedForClubByProjectId.has(latestShip.projectId)) {
+			shippedForClubByProjectId.set(
+				latestShip.projectId,
+				latestShip.clubId !== null && latestShip.clubId !== undefined
+			);
+		}
+	}
+
 	const allProjects = await db
 		.select({
 			id: project.id,
@@ -72,7 +96,10 @@ export async function load({ locals, url }) {
 
 	return {
 		allProjects,
-		projects,
+		projects: projects.map((item) => ({
+			...item,
+			shippedForClub: shippedForClubByProjectId.get(item.project.id) ?? false
+		})),
 		users,
 		leaderboard,
 		fields: {
