@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
-import { project, user, devlog, legionReview } from '$lib/server/db/schema.js';
+import { project, user, devlog, legionReview, ship } from '$lib/server/db/schema.js';
 import { error } from '@sveltejs/kit';
-import { eq, and, asc, sql } from 'drizzle-orm';
+import { eq, and, asc, desc, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
 import { getReviewHistory } from '../../getReviewHistory.server';
@@ -81,13 +81,21 @@ export async function load({ locals, params }) {
 		.where(and(eq(devlog.projectId, queriedProject.project.id), eq(devlog.deleted, false)))
 		.orderBy(asc(devlog.createdAt));
 
+	const [latestShip] = await db
+		.select({ clubId: ship.clubId })
+		.from(ship)
+		.where(eq(ship.projectId, queriedProject.project.id))
+		.orderBy(desc(ship.timestamp))
+		.limit(1);
+
 	const currentlyPrinting = await getCurrentlyPrinting(locals.user);
 
 	return {
 		project: queriedProject,
 		devlogs,
 		reviews: await getReviewHistory(id),
-		currentlyPrinting
+		currentlyPrinting,
+		shippedForClub: latestShip?.clubId !== null && latestShip?.clubId !== undefined
 	};
 }
 

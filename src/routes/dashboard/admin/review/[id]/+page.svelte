@@ -23,13 +23,13 @@
 	<div class="grow overflow-scroll">
 		<div class="flex grow flex-col gap-3">
 			<h1 class="mt-5 font-hero text-2xl font-medium">{data.project.project.name}</h1>
-			
+
 			<h2 class="mt-2 text-2xl font-bold">Project details</h2>
 
 			{#if data.project.project.doubleDippingWith !== 'none'}
 				<DoubleDippingBanner ysws={data.project.project.doubleDippingWith} reviewMessage />
 			{/if}
-			
+
 			<div class="themed-box flex flex-col gap-3 p-3">
 				<div>
 					<p>
@@ -47,6 +47,7 @@
 							.project.timeSpent % 60}min
 					</p>
 					<p>Status: {projectStatuses[data.project.project.status]}</p>
+					<p>Shipped for: {data.shippedForClub ? 'Clubs' : 'Individually'}</p>
 					<div class="mt-1">
 						<ProjectLinks
 							url={data.project.project.url}

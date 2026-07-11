@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/index.js';
-import { project, user, devlog, t1Review } from '$lib/server/db/schema.js';
+import { project, user, devlog, t1Review, ship } from '$lib/server/db/schema.js';
 import { error, redirect } from '@sveltejs/kit';
-import { eq, and, asc, sql } from 'drizzle-orm';
+import { eq, and, asc, desc, sql } from 'drizzle-orm';
 import type { Actions } from './$types';
 import { sendSlackDM } from '$lib/server/slack.js';
 import { getReviewHistory } from '../../getReviewHistory.server';
@@ -78,6 +78,13 @@ export async function load({ locals, params }) {
 		.where(and(eq(devlog.projectId, queriedProject.project.id), eq(devlog.deleted, false)))
 		.orderBy(asc(devlog.createdAt));
 
+	const [latestShip] = await db
+		.select({ clubId: ship.clubId })
+		.from(ship)
+		.where(eq(ship.projectId, queriedProject.project.id))
+		.orderBy(desc(ship.timestamp))
+		.limit(1);
+
 	return {
 		project: queriedProject,
 		devlogs: devlogs.map((devlog) => {
@@ -86,7 +93,8 @@ export async function load({ locals, params }) {
 				lapseId: null
 			};
 		}),
-		reviews: await getReviewHistory(id)
+		reviews: await getReviewHistory(id),
+		shippedForClub: latestShip?.clubId !== null && latestShip?.clubId !== undefined
 	};
 }
 

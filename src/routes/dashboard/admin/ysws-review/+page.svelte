@@ -33,7 +33,9 @@
 		<div class="themed-box grow p-3">
 			<h2 class="mb-2 text-xl font-bold">Filter & Sort</h2>
 			<form method="GET">
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+				<div
+					class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"
+				>
 					<!-- Project status -->
 					<label class="flex flex-col gap-1">
 						<span class="font-medium">Status</span>
@@ -82,12 +84,7 @@
 								bind:value={userSearch}
 								class="themed-input-light border-b-0 py-1.5"
 							/>
-							<select
-								class="themed-input-light grow"
-								name="user"
-								value={data.fields.user}
-								multiple
-							>
+							<select class="themed-input-light grow" name="user" value={data.fields.user} multiple>
 								{#each filteredUsers as user}
 									<option value={user?.id} class="truncate">{user?.name}</option>
 								{/each}
@@ -162,7 +159,9 @@
 		</div>
 	</div>
 
-	<h2 class="mt-4 mb-2 text-2xl font-bold">Projects <span class="ml-2 align-middle text-sm font-normal">({projects.length})</span></h2>
+	<h2 class="mt-4 mb-2 text-2xl font-bold">
+		Projects <span class="ml-2 align-middle text-sm font-normal">({projects.length})</span>
+	</h2>
 
 	{#if projects.length == 0}
 		<div class="flex grow items-center justify-center">
@@ -212,6 +211,7 @@
 							project.timeSpent / 60
 						)}h {project.timeSpent % 60}min
 					</p>
+					<p class="text-sm">Shipped for: {project.shippedForClub ? 'Clubs' : 'Individually'}</p>
 					<div class="flex flex-row gap-4">
 						<p class="grow text-sm">
 							Created <abbr

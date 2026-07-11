@@ -89,12 +89,20 @@ export async function load({ locals, params }) {
 		.where(and(eq(devlog.projectId, queriedProject.project.id), eq(devlog.deleted, false)))
 		.orderBy(asc(devlog.createdAt));
 
+	const [latestShip] = await db
+		.select({ clubId: ship.clubId })
+		.from(ship)
+		.where(eq(ship.projectId, queriedProject.project.id))
+		.orderBy(desc(ship.timestamp))
+		.limit(1);
+
 	const [queriedUser] = await db
 		.select({
 			id: user.id,
 			idvToken: user.idvToken
 		})
-		.from(user).where(eq(user.id, queriedProject.user.id))
+		.from(user)
+		.where(eq(user.id, queriedProject.user.id))
 		.limit(1);
 
 	let userData;
@@ -112,7 +120,8 @@ export async function load({ locals, params }) {
 		devlogs,
 		addressFound: address ? true : false,
 		reviews: await getReviewHistory(id),
-		filamentUsed: await getLatestPrintFilament(id)
+		filamentUsed: await getLatestPrintFilament(id),
+		shippedForClub: latestShip?.clubId !== null && latestShip?.clubId !== undefined
 	};
 }
 
