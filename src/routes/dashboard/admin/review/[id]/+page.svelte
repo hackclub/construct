@@ -47,6 +47,7 @@
 							.project.timeSpent % 60}min
 					</p>
 					<p>Status: {projectStatuses[data.project.project.status]}</p>
+					<p>Shipped for: {data.shippedForClub ? 'Clubs' : 'Individually'}</p>
 					<div class="mt-1">
 						<ProjectLinks
 							url={data.project.project.url}
