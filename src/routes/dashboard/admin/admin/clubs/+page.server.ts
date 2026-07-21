@@ -71,6 +71,7 @@ export async function load({ locals }) {
 	const clubsWithStats = clubsRaw.map((c) => {
 		const clubProjectIds = shipsByClub.get(c.id) ?? [];
 		const shipCount = clubProjectIds.length;
+		const memberCount = Number(c.memberCount) || 0;
 
 		let totalMinutes = 0;
 		let devlogCount = 0;
@@ -82,10 +83,11 @@ export async function load({ locals }) {
 			}
 		}
 
-		const avgMinutesPerMember = c.memberCount > 0 ? Math.round(totalMinutes / c.memberCount) : 0;
+		const avgMinutesPerMember = memberCount > 0 ? Math.round(totalMinutes / memberCount) : 0;
 
 		return {
 			...c,
+			memberCount,
 			shipCount,
 			totalMinutes,
 			devlogCount,
