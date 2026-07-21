@@ -18,6 +18,8 @@
 	import { onMount, onDestroy } from 'svelte';
 	import {
 		Chart,
+		BarController,
+		BarElement,
 		LineController,
 		LineElement,
 		PointElement,
@@ -28,7 +30,7 @@
 		Filler
 	} from 'chart.js';
 
-	Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Filler);
+	Chart.register(BarController, BarElement, LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Filler);
 
 	let { data } = $props();
 
@@ -38,10 +40,14 @@
 		{ label: 'Submitted', key: 'submitted' },
 		{ label: 'T1 Approved', key: 't1Approved' },
 		{ label: 'Printed', key: 'printed' },
-		{ label: 'Finalized', key: 'finalized' }
+		{ label: 'Finalized', key: 'finalized' },
+		{ label: '10 Hours Finalised', key: 'hours10' },
+		{ label: '25 Hours Finalised', key: 'hours25' },
+		{ label: '40 Hours Finalised', key: 'hours40' },
+		{ label: 'Bought a printer', key: 'boughtPrinter' },
+		{ label: 'Printer in queue', key: 'printerQueued' },
+		{ label: 'Printer fulfilled', key: 'printerFulfilled' },
 	] as const;
-
-	const funnelColor = '#f89708';
 	const chartColors = {
 		users: '#338eda',
 		projects: '#fe6c11',
@@ -77,6 +83,7 @@
 		refunded: 'Refunded'
 	};
 
+	let funnelChartEl = $state<HTMLCanvasElement | null>(null);
 	let usersChartEl = $state<HTMLCanvasElement | null>(null);
 	let projectsChartEl = $state<HTMLCanvasElement | null>(null);
 	let submissionsChartEl = $state<HTMLCanvasElement | null>(null);
@@ -149,7 +156,74 @@
 		charts.push(chart);
 	}
 
+	function initFunnelChart() {
+		if (!funnelChartEl) return;
+		const ctx = funnelChartEl.getContext('2d');
+		if (!ctx) return;
+
+		const labels = funnelStages.map(s => s.label);
+		const values = funnelStages.map(s => data.funnel[s.key] as number);
+		const total = data.funnel.totalUsers;
+
+		const stageColors = funnelStages.map((_, i) => {
+			if (i < 6) return '#f89708';
+			if (i < 9) return '#0dbc8e';
+			return '#338eda';
+		});
+
+		const chart = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels,
+				datasets: [{
+					data: values,
+					backgroundColor: stageColors,
+					borderRadius: 4,
+				}]
+			},
+			options: {
+				indexAxis: 'y',
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: {
+					legend: { display: false },
+					tooltip: {
+						backgroundColor: '#22211f',
+						titleColor: '#f3dcc6',
+						bodyColor: '#f3dcc6',
+						cornerRadius: 8,
+						padding: 10,
+						callbacks: {
+							label: (ctx) => {
+								const val = ctx.parsed.x ?? 0;
+								const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
+								return `${val} (${pct}%)`;
+							}
+						}
+					}
+				},
+				scales: {
+					x: {
+						beginAtZero: true,
+						ticks: { color: '#94857d', font: { size: 10 } },
+						grid: { color: '#342f2c' },
+					},
+					y: {
+						ticks: { color: '#94857d', font: { size: 11 } },
+						grid: { display: false },
+					}
+				},
+				interaction: {
+					intersect: false,
+					mode: 'index',
+				}
+			}
+		});
+		charts.push(chart);
+	}
+
 	function initCharts() {
+		initFunnelChart();
 		const months = data.usersOverTime.map((d: { month: string }) => formatWeek(d.month));
 		makeLineChart(usersChartEl, months, data.usersOverTime.map((d: { count: number }) => d.count), 'New users', chartColors.users);
 		makeLineChart(projectsChartEl, months, data.projectsOverTime.map((d: { count: number }) => d.count), 'Projects created', chartColors.projects);
@@ -186,24 +260,8 @@
 		<div class="flex flex-col gap-1">
 			<h2 class="flex flex-row gap-2 text-2xl font-bold"><GitFork size={28} />User Funnel</h2>
 			<div class="themed-box p-4 shadow-xl">
-				<div class="flex flex-col gap-2">
-					{#each funnelStages as stage}
-						{@const value = data.funnel[stage.key] as number}
-						{@const pct = data.funnel.totalUsers > 0 ? ((value / data.funnel.totalUsers) * 100).toFixed(1) : '0.0'}
-						{@const widthPct = data.funnel.totalUsers > 0 ? (value / data.funnel.totalUsers) * 100 : 0}
-						<div class="flex flex-col gap-0.5">
-							<div class="flex justify-between text-sm">
-								<span class="font-medium">{stage.label}</span>
-								<span class="opacity-60">{value} ({pct}%)</span>
-							</div>
-							<div class="flex justify-center">
-								<div
-									class="h-7 rounded opacity-80 transition-all"
-									style="width: {Math.max(widthPct, 2)}%; background-color: {funnelColor}"
-								></div>
-							</div>
-						</div>
-					{/each}
+				<div style="height: 480px;">
+					<canvas bind:this={funnelChartEl}></canvas>
 				</div>
 			</div>
 		</div>
