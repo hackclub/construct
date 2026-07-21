@@ -45,7 +45,7 @@
 		{ label: '25 Hours Finalised', key: 'hours25' },
 		{ label: '40 Hours Finalised', key: 'hours40' },
 		{ label: 'Bought a printer', key: 'boughtPrinter' },
-		{ label: 'Printer in queue', key: 'printerQueued' },
+		{ label: 'Requested printer', key: 'requestedPrinter' },
 		{ label: 'Printer fulfilled', key: 'printerFulfilled' },
 	] as const;
 	const chartColors = {
@@ -164,6 +164,7 @@
 		const labels = funnelStages.map(s => s.label);
 		const values = funnelStages.map(s => data.funnel[s.key] as number);
 		const total = data.funnel.totalUsers;
+		const maxVal = Math.max(...values);
 
 		const stageColors = funnelStages.map((_, i) => {
 			if (i < 6) return '#f89708';
@@ -171,18 +172,26 @@
 			return '#338eda';
 		});
 
+		const offsetData = values.map(v => (maxVal - v) / 2);
+
 		const chart = new Chart(ctx, {
 			type: 'bar',
 			data: {
 				labels,
-				datasets: [{
-					data: values,
-					backgroundColor: stageColors,
-					borderRadius: 4,
-				}]
+				datasets: [
+					{
+						data: offsetData,
+						backgroundColor: 'transparent',
+						hoverBackgroundColor: 'transparent',
+					},
+					{
+						data: values,
+						backgroundColor: stageColors,
+						borderRadius: 2,
+					}
+				]
 			},
 			options: {
-				indexAxis: 'y',
 				responsive: true,
 				maintainAspectRatio: false,
 				plugins: {
@@ -195,7 +204,8 @@
 						padding: 10,
 						callbacks: {
 							label: (ctx) => {
-								const val = ctx.parsed.x ?? 0;
+								if (ctx.datasetIndex === 0) return;
+								const val = ctx.parsed.y ?? 0;
 								const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
 								return `${val} (${pct}%)`;
 							}
@@ -204,13 +214,18 @@
 				},
 				scales: {
 					x: {
-						beginAtZero: true,
-						ticks: { color: '#94857d', font: { size: 10 } },
-						grid: { color: '#342f2c' },
+						stacked: true,
+						ticks: {
+							color: '#94857d',
+							font: { size: 10 },
+							maxRotation: 45,
+						},
+						grid: { display: false },
 					},
 					y: {
-						ticks: { color: '#94857d', font: { size: 11 } },
-						grid: { display: false },
+						stacked: true,
+						beginAtZero: true,
+						display: false,
 					}
 				},
 				interaction: {
