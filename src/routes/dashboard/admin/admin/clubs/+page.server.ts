@@ -62,8 +62,8 @@ export async function load({ locals }) {
 
 		for (const row of devlogRows) {
 			devlogsByProject.set(row.projectId, {
-				totalMinutes: row.totalMinutes,
-				devlogCount: row.devlogCount
+				totalMinutes: Number(row.totalMinutes) || 0,
+				devlogCount: Number(row.devlogCount) || 0
 			});
 		}
 	}

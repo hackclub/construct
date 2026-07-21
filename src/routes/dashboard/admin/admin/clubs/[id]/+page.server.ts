@@ -66,7 +66,7 @@ export async function load({ locals, params }) {
 			})
 			.from(devlog)
 			.where(and(inArray(devlog.projectId, projectIds), eq(devlog.deleted, false)));
-		totalMinutes = result?.total ?? 0;
+		totalMinutes = Number(result?.total) ?? 0;
 	}
 
 	const membersWithTime = await Promise.all(
@@ -87,8 +87,8 @@ export async function load({ locals, params }) {
 							eq(devlog.userId, m.id)
 						)
 					);
-				memberMinutes = result?.total ?? 0;
-				memberDevlogs = result?.count ?? 0;
+				memberMinutes = Number(result?.total) ?? 0;
+				memberDevlogs = Number(result?.count) ?? 0;
 			}
 			return {
 				...m,
