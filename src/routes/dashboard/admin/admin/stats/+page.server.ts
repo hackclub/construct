@@ -120,10 +120,10 @@ export async function load({ locals }) {
 		.select({ count: countDistinct(printerOrder.userId) })
 		.from(printerOrder);
 
-	const [printerQueued] = await db
+	const [requestedPrinter] = await db
 		.select({ count: count() })
 		.from(user)
-		.where(inArray(user.printerFulfilment, ['queued', 'approved']));
+		.where(inArray(user.printerFulfilment, ['queued', 'approved', 'fulfilled']));
 
 	const [printerFulfilled] = await db
 		.select({ count: count() })
@@ -137,7 +137,7 @@ export async function load({ locals }) {
 		hours25,
 		hours40,
 		boughtPrinter: printerBought.count,
-		printerQueued: printerQueued.count,
+		requestedPrinter: requestedPrinter.count,
 		printerFulfilled: printerFulfilled.count,
 	};
 
