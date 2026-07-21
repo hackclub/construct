@@ -54,53 +54,46 @@ export async function load({ locals, params }) {
 		.innerJoin(ship, eq(ship.projectId, project.id))
 		.where(and(eq(project.status, 'finalized'), eq(ship.clubId, clubId)));
 
-	let totalMinutes = 0;
-	const projectIds: number[] = [];
-	if (clubShips.length > 0) {
-		for (const s of clubShips) {
-			projectIds.push(s.projectId);
-		}
-		const [result] = await db
+	const projectIds = clubShips.map((s) => s.projectId);
+	const shipCount = projectIds.length;
+
+	const memberIds = members.map((m) => m.id);
+
+	const devlogByUser = new Map<number, { totalMinutes: number; devlogCount: number }>();
+	if (projectIds.length > 0) {
+		const devlogRows = await db
 			.select({
-				total: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`
+				userId: devlog.userId,
+				totalMinutes: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
+				devlogCount: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`
 			})
 			.from(devlog)
-			.where(and(inArray(devlog.projectId, projectIds), eq(devlog.deleted, false)));
-		totalMinutes = Number(result?.total) ?? 0;
+			.where(
+				and(
+					inArray(devlog.projectId, projectIds),
+					inArray(devlog.userId, memberIds),
+					eq(devlog.deleted, false)
+				)
+			)
+			.groupBy(devlog.userId);
+
+		for (const row of devlogRows) {
+			if (row.userId === null) continue;
+			devlogByUser.set(row.userId, {
+				totalMinutes: Number(row.totalMinutes) || 0,
+				devlogCount: Number(row.devlogCount) || 0
+			});
+		}
 	}
 
-	const membersWithTime = await Promise.all(
-		members.map(async (m) => {
-			let memberMinutes = 0;
-			let memberDevlogs = 0;
-			if (projectIds.length > 0) {
-				const [result] = await db
-					.select({
-						total: sql<number>`COALESCE(SUM(${devlog.timeSpent}), 0)`,
-						count: sql<number>`COALESCE(COUNT(${devlog.id}), 0)`
-					})
-					.from(devlog)
-					.where(
-						and(
-							inArray(devlog.projectId, projectIds),
-							eq(devlog.deleted, false),
-							eq(devlog.userId, m.id)
-						)
-					);
-				memberMinutes = Number(result?.total) ?? 0;
-				memberDevlogs = Number(result?.count) ?? 0;
-			}
-			return {
-				...m,
-				totalMinutes: memberMinutes,
-				devlogCount: memberDevlogs
-			};
-		})
-	);
+	const totalMinutes = [...devlogByUser.values()].reduce((s, u) => s + u.totalMinutes, 0);
+
+	const membersWithTime = members.map((m) => {
+		const stats = devlogByUser.get(m.id) ?? { totalMinutes: 0, devlogCount: 0 };
+		return { ...m, ...stats };
+	});
 
 	membersWithTime.sort((a, b) => b.totalMinutes - a.totalMinutes);
-
-	const shipCount = projectIds.length;
 
 	return {
 		club: clubInfo,
