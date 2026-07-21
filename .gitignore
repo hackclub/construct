@@ -30,3 +30,6 @@ uploads/models/*-*.*
 
 # no leaky
 *.NOLEAKY.*
+
+# devcontainer
+.devcontainer/devcontainer-lock.json
