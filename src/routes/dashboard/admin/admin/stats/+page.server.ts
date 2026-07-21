@@ -95,9 +95,50 @@ export async function load({ locals }) {
 		printed: sql<number>`count(distinct ${project.userId}) filter (where ${project.deleted} = false and ${project.status} in ('printed', 't2_approved', 'finalized'))`,
 		finalized: sql<number>`count(distinct ${project.userId}) filter (where ${project.deleted} = false and ${project.status} = 'finalized')`,
 	}).from(project);
+	// --- Hours Finalised (on finalized projects) ---
+	const hoursOnFinalized = await db
+		.select({
+			totalMinutes: sql<number>`sum(${devlog.timeSpent})`,
+		})
+		.from(devlog)
+		.innerJoin(project, eq(devlog.projectId, project.id))
+		.where(
+			and(
+				eq(devlog.deleted, false),
+				eq(project.deleted, false),
+				eq(project.status, 'finalized')
+			)
+		)
+		.groupBy(devlog.userId);
+
+	const hours10 = hoursOnFinalized.filter(r => Number(r.totalMinutes) >= 600).length;
+	const hours25 = hoursOnFinalized.filter(r => Number(r.totalMinutes) >= 1500).length;
+	const hours40 = hoursOnFinalized.filter(r => Number(r.totalMinutes) >= 2400).length;
+
+	// --- Printer Milestones ---
+	const [printerBought] = await db
+		.select({ count: countDistinct(printerOrder.userId) })
+		.from(printerOrder);
+
+	const [printerQueued] = await db
+		.select({ count: count() })
+		.from(user)
+		.where(inArray(user.printerFulfilment, ['queued', 'approved']));
+
+	const [printerFulfilled] = await db
+		.select({ count: count() })
+		.from(user)
+		.where(eq(user.printerFulfilment, 'fulfilled'));
+
 	const funnelData = {
 		totalUsers: totalUsers.count,
-		...funnel
+		...funnel,
+		hours10,
+		hours25,
+		hours40,
+		boughtPrinter: printerBought.count,
+		printerQueued: printerQueued.count,
+		printerFulfilled: printerFulfilled.count,
 	};
 
 	// --- Review Pipeline ---
