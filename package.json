@@ -53,6 +53,7 @@
 		"@prgm/sveltekit-progress-bar": "^3.0.2",
 		"@sentry/sveltekit": "^10.59.0",
 		"airtable": "^0.12.2",
+		"chart.js": "^4.5.1",
 		"cron": "^4.4.0",
 		"cryptr": "^6.4.0",
 		"drizzle-kit": "^0.31.10",
