@@ -60,9 +60,9 @@
 		"drizzle-orm": "^0.45.2",
 		"express": "^5.2.1",
 		"pg": "^8.20.0",
-		"sharp": "^0.34.5",
+		"sharp": "^0.35.3",
 		"three": "^0.181.2",
 		"tiny-relative-date": "^2.0.2",
-		"wrangler": "^4.103.0"
+		"wrangler": "^4.114.0"
 	}
 }
