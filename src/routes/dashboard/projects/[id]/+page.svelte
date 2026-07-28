@@ -1,6 +1,6 @@
 <script lang="ts">
 	import CharCountedTextarea from '$lib/components/CharCountedTextarea.svelte';
-	import { SquarePen, Trash, Ship, Lock } from '@lucide/svelte';
+	import { SquarePen, Trash, Ship, Lock, ClipboardPenLine, Box, ClipboardPen } from '@lucide/svelte';
 	import relativeDate from 'tiny-relative-date';
 	import type { PageProps } from './$types';
 	import Devlog from '$lib/components/Devlog.svelte';
@@ -182,6 +182,29 @@
 					<Trash />
 					Delete
 				</a>
+			</div>
+		{/if}
+
+		{#if data.user.isPrinter || data.user.hasT1Review || data.user.hasT2Review}
+			<div class="mt-3 flex gap-2">
+				{#if data.user.isPrinter}
+					<a href={`/dashboard/admin/print/${data.project.id}`} class="button sm primary">
+						<Box />
+						Print
+					</a>
+				{/if}
+				{#if data.user.hasT1Review}
+					<a href={`/dashboard/admin/review/${data.project.id}`} class="button sm primary">
+						<ClipboardPen />
+						T1 Review
+					</a>
+				{/if}
+				{#if data.user.hasT2Review}
+					<a href={`/dashboard/admin/ysws-review/${data.project.id}`} class="button sm primary">
+						<ClipboardPenLine />
+						YSWS Review
+					</a>
+				{/if}
 			</div>
 		{/if}
 	</div>
