@@ -17,13 +17,7 @@
 	let editorUrl = $state(data.project.editorUrl);
 	let editorUploadFile = $state(null);
 	let modelFile = $state(null);
-	let submitAsClub = $state(
-		END_DATE <= new Date() &&
-			(data.project.status === 'building' || data.lastIsClubsShip) &&
-			data.clubMembership
-			? true
-			: false
-	);
+	let submitAsClub = $state(data.clubMembership ? true : false);
 
 	let hasEditorFile = $derived((editorUrl || editorUploadFile) && !(editorUrl && editorUploadFile));
 
@@ -190,29 +184,6 @@
 		<div class="mt-1">
 			<p class="mb-1 font-bold">Submit as</p>
 			<div class="themed-box flex flex-col gap-2 p-3">
-				<label
-					class="flex items-center gap-2"
-					class:opacity-50={END_DATE <= new Date() &&
-						(data.project.status === 'building' || data.lastIsClubsShip)}
-					class:cursor-pointer={!(
-						END_DATE <= new Date() &&
-						(data.project.status === 'building' || data.lastIsClubsShip)
-					)}
-					class:cursor-not-allowed={END_DATE <= new Date() &&
-						(data.project.status === 'building' || data.lastIsClubsShip)}
-				>
-					<input
-						type="radio"
-						name="submission_type"
-						value="individual"
-						checked={!submitAsClub}
-						onchange={() => (submitAsClub = false)}
-						disabled={END_DATE <= new Date() &&
-							(data.project.status === 'building' || data.lastIsClubsShip)}
-						class="radio"
-					/>
-					<span>Individual submission</span>
-				</label>
 				<label class="flex cursor-pointer items-center gap-2">
 					<input
 						type="radio"
