@@ -7,9 +7,7 @@
 	import Shop from './Shop.svelte';
 	import Footer from './Footer.svelte';
 
-	import model from '$lib/assets/Construct Logo.3mf?url';
 	import modelImage from '$lib/assets/model.png';
-	import keyringModel from '$lib/assets/keyring.3mf?url';
 	import sticker1Image from '$lib/assets/sticker1.png';
 	import sticker2Image from '$lib/assets/sticker2.png';
 
@@ -33,10 +31,6 @@
 
 		if (ref) {
 			document.cookie = 'ref=' + ref + '; path=/';
-		}
-
-		if (!model) {
-			return;
 		}
 
 		let canvas = document.querySelector(`#canvas`);
@@ -201,7 +195,7 @@
 		var loader = new ThreeMFLoader();
 
 		loader.load(
-			model,
+			'https://cdn.hackclub.com/01a02596-2931-7b09-9839-ba805470f522/construct_logo.3mf',
 			parseObject,
 			(xhr) => {
 				// TODO: loading slider
@@ -300,7 +294,7 @@
 						>
 							<Spinny3DPreview
 								identifier="keyring"
-								modelUrl={keyringModel}
+								modelUrl="https://cdn.hackclub.com/01a02596-2c64-79e5-92e0-7ebd8adff32a/keyring.3mf"
 								sizeCutoff={8 * 1024 * 1024}
 								respectLocalStorage={false}
 							/>
@@ -363,7 +357,7 @@
 			{:else}
 				<Button text="Login with Hack Club" href="/auth/idv" />
 			{/if}
-			<p class="text-md my-3">Ages 13-18, ended April 19th 2026! </p>
+			<p class="text-md my-3">Ages 13-18, ended April 19th 2026!</p>
 			<p class="text-md my-3">Program by @Olive and @arca</p>
 		</div>
 	</div>
