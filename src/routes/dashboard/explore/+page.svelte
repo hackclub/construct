@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import Devlog from '$lib/components/Devlog.svelte';
 	import Head from '$lib/components/Head.svelte';
 
@@ -14,6 +14,10 @@
 	let observer: IntersectionObserver | null = null;
 	const rootMargin = '320px 0px';
 
+	let devlogRefs = $state<(HTMLDivElement | null)[]>([]);
+	let previewVisibility = $state(new Array(data.devlogs.length).fill(true));
+	const PREVIEW_UNMOUNT_MARGIN = 1200;
+
 	function hydrateDevlogs(rawDevlogs: typeof data.devlogs) {
 		return rawDevlogs.map((entry) => ({
 			...entry,
@@ -24,26 +28,35 @@
 		}));
 	}
 
+	function updatePreviewVisibility() {
+		previewVisibility = devlogRefs.map((ref) => {
+			if (!ref) return false;
+			const rect = ref.getBoundingClientRect();
+			return (
+				rect.bottom > -PREVIEW_UNMOUNT_MARGIN &&
+				rect.top < window.innerHeight + PREVIEW_UNMOUNT_MARGIN
+			);
+		});
+	}
+
 	async function loadMoreDevlogs() {
 		if (loadingMore || !hasMore) return;
-
 		loadingMore = true;
 		loadError = '';
-
 		try {
 			const params = new URLSearchParams({ offset: `${nextOffset}` });
 			const response = await fetch(`/dashboard/explore?${params.toString()}`);
-
 			if (!response.ok) {
 				throw new Error('Failed to load more devlogs');
 			}
-
 			const payload = await response.json();
 			const incoming = hydrateDevlogs(payload.devlogs ?? []);
-
 			devlogs = [...devlogs, ...incoming];
+			previewVisibility = [...previewVisibility, ...new Array(incoming.length).fill(false)];
 			nextOffset = payload.nextOffset ?? nextOffset + incoming.length;
 			hasMore = Boolean(payload.hasMore);
+			await tick();
+			updatePreviewVisibility();
 		} catch (error) {
 			console.error(error);
 			loadError = 'Could not load more right now.';
@@ -53,6 +66,11 @@
 	}
 
 	onMount(() => {
+		const onScroll = () => updatePreviewVisibility();
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onScroll);
+		tick().then(updatePreviewVisibility);
+
 		if (!hasMore || !sentinel) return;
 
 		observer = new IntersectionObserver(
@@ -68,7 +86,11 @@
 
 		observer.observe(sentinel);
 
-		return () => observer?.disconnect();
+		return () => {
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', onScroll);
+			observer?.disconnect();
+		};
 	});
 </script>
 
@@ -87,23 +109,23 @@
 			/>
 		</div>
 	{:else}
-		{#each devlogs as devlog (devlog.devlog.id)}
-			<Devlog
-				devlog={devlog.devlog}
-				projectId={devlog.project.id}
-				projectName={devlog.project.name}
-				user={devlog.user}
-				showModifyButtons={false}
-				allowDelete={false}
-			/>
+		{#each devlogs as devlog, i (devlog.devlog.id)}
+			<div bind:this={devlogRefs[i]}>
+				<Devlog
+					devlog={devlog.devlog}
+					projectId={devlog.project.id}
+					projectName={devlog.project.name}
+					user={devlog.user}
+					showModifyButtons={false}
+					allowDelete={false}
+					show3DPreview={previewVisibility[i]}
+				/>
+			</div>
 		{/each}
-
 		<div bind:this={sentinel} class="h-1 w-full"></div>
-
 		{#if loadingMore}
 			<p class="text-sm opacity-70">Loading more...</p>
 		{/if}
-
 		{#if loadError}
 			<div class="flex items-center gap-2 text-sm text-red-300">
 				<span>{loadError}</span>
@@ -112,7 +134,6 @@
 				</button>
 			</div>
 		{/if}
-
 		{#if !hasMore && !loadingMore}
 			<p class="text-center text-sm opacity-70">You're caught up.</p>
 		{/if}

@@ -12,7 +12,8 @@
 		showModifyButtons,
 		allowDelete = true,
 		projectName = null,
-		user = null
+		user = null,
+		show3DPreview = true
 	} = $props();
 </script>
 
@@ -63,7 +64,7 @@
 				/>
 			</div>
 		</div>
-		{#if devlog.model}
+		{#if devlog.model && show3DPreview}
 			<div
 				class="relative max-h-100 w-full grow border-3 border-primary-900 lg:w-100 lg:max-w-[60%]"
 			>
