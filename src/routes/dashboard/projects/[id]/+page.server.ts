@@ -232,6 +232,12 @@ export const actions = {
 
 		// Remove Exif metadata and save (we don't want another Hack Club classic PII leak :D)
 		const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
+		if (!isPngOrJpeg(imageBuffer)) {
+			return fail(400, {
+				fields: { description, timeSpent },
+				invalid_image_file: true
+			});
+		}
 
 		const imageCommand = new PutObjectCommand({
 			Bucket: env.S3_BUCKET_NAME,
@@ -263,6 +269,21 @@ export const actions = {
 		return { success: true };
 	}
 } satisfies Actions;
+
+function isPngOrJpeg(buf: Buffer): boolean {
+	const isJpeg = buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+	const isPng =
+		buf.length >= 8 &&
+		buf[0] === 0x89 &&
+		buf[1] === 0x50 &&
+		buf[2] === 0x4e &&
+		buf[3] === 0x47 &&
+		buf[4] === 0x0d &&
+		buf[5] === 0x0a &&
+		buf[6] === 0x1a &&
+		buf[7] === 0x0a;
+	return isJpeg || isPng;
+}
 
 async function getMaxDevlogTime(id: number) {
 	const queriedDevlogArray = await db
