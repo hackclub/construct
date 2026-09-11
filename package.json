@@ -63,6 +63,6 @@
 		"sharp": "^0.35.4",
 		"three": "^0.181.2",
 		"tiny-relative-date": "^2.0.2",
-		"wrangler": "^4.114.0"
+		"wrangler": "^4.131.0"
 	}
 }
